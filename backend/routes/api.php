@@ -16,7 +16,10 @@ use App\Http\Controllers\DetailsController;
 |
 */
 
+
  Route::post('/addUser', [UserController::class, 'createUser']);
+
+ Route::post('/logout', [UserController::class, 'logoutUser']);
 
  Route::post('/login', [UserController::class, 'loginUser']);
 
@@ -29,3 +32,9 @@ use App\Http\Controllers\DetailsController;
  Route::post('/updateUserProfilePhoto', [UserController::class, 'updateUserProfilePhoto']);
 
  Route::get('/user/search', [DetailsController::class, 'search']);
+  
+ Route::get('/admin/users', [DetailsController::class, 'pagination']);
+
+ Route::get('/verifyData', [DetailsController::class, 'verifyData']);
+
+ Route::post('/admin/delete', [DetailsController::class, 'deleteUser']);

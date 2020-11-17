@@ -43,10 +43,9 @@
                         'Content-Type': 'application/json',
                     }
                 }).then((res) =>{
-                    if(res.data['message'] === 'success'){
-                        localStorage.setItem('email', this.email);
-                        this.$router.push('/');
-                    }
+                    localStorage.setItem('token', res.data['token']);
+                    localStorage.setItem('admin', res.data['admin']);
+                    this.$router.push('/');
                 }).catch((error)=>{
                     console.log(error);
                 });

@@ -55,10 +55,13 @@
                 </div>
             </div>
         </div>
+        <alert-box></alert-box>
     </div>
 </template>
 
 <script>
+import alertBox from './templates/invalidToken';
+
 import axios from 'axios';
     export default{
         data(){
@@ -77,10 +80,13 @@ import axios from 'axios';
                 selectedFile: null
             }
         },
+        components:{
+            'alert-box': alertBox,
+        },
         mounted() {
             axios.get('http://127.0.0.1:8000/api/fetchUserData', {
                 params: {
-                    email: localStorage.getItem('email')
+                    token: localStorage.getItem('token'),
                 }
             }).then((response)=>{
                 this.firstName = response.data['firstName'],
@@ -91,12 +97,12 @@ import axios from 'axios';
                 this.userPhoto = response.data['profile_image']
                 if(this.userPhoto == null)
                     this.userPhoto = 'default.jpg'
-            }).catch((error) =>{
-                console.log(error)
+            }).catch(() =>{
+                document.getElementById('overlay-alert').style.display ="block";    
             })
         },
         methods: {
-             on: function(){
+            on: function(){
                 this.tempFName = this.firstName;
                 this.tempLName = this.lastName;
                 this.tempEmail = this.email;
@@ -121,9 +127,10 @@ import axios from 'axios';
                         firstName: this.firstName,
                         lastName: this.lastName,
                         email: this.email,
-                        birthday: this.birthday
-                    }).catch((error) =>{
-                        console.log(error)
+                        birthday: this.birthday,
+                        token: localStorage.getItem('token'),
+                    }).catch(() =>{
+                        document.getElementById('overlay-alert').style.display ="block";
                 });
                 this.off();
                 if(this.selectedFile != null){
@@ -133,7 +140,7 @@ import axios from 'axios';
             onUpload: function(){
                 const fd = new FormData();
                 fd.append('image', this.selectedFile, 'profile_image_'+this.id);
-                fd.append('id', this.id);
+                fd.append('token', localStorage.getItem('token'));
                 axios.post('http://127.0.0.1:8000/api/updateUserProfilePhoto', fd, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
@@ -153,8 +160,6 @@ import axios from 'axios';
     }
 </script>
 <style scoped>
-    .info{
-    }
     .btn-profile{
         margin-top: 10px;
         width: 425px;

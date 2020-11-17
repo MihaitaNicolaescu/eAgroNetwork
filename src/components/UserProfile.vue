@@ -65,8 +65,6 @@ import axios from 'axios';
     }
 </script>
 <style scoped>
-    .info{
-    }
     .btn-profile{
         margin-top: 10px;
         width: 425px;

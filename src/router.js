@@ -16,7 +16,7 @@ export default new Router({
             name: 'home',
             component: () => import('./components/Home.vue'),
             beforeEnter: (to, from, next) => {
-                if(!localStorage.getItem('email')) next('/login')
+                if(!localStorage.getItem('token')) next('/login')
                 else next();
             }
         },
@@ -30,7 +30,7 @@ export default new Router({
             name: 'profile',
             component: () => import('./components/Profile.vue'),
             beforeEnter: (to, from, next) => {
-                if(!localStorage.getItem('email')) next('/login')
+                if(!localStorage.getItem('token')) next('/login')
                 else next();
             }
         },
@@ -38,6 +38,22 @@ export default new Router({
             path: '/profile/:id',
             name: 'userProfile',
             component: () => import('./components/UserProfile.vue')
-        }  
+        },
+        {
+            path: '/admin',
+            name: 'admin',
+            component: () => import('./components/AdminPanel.vue'),
+            beforeEnter: (to, from, next) => {
+                if(!localStorage.getItem('token')) next('/login')
+                else next();
+            }
+                
+        },
+        {
+            path :'*',
+            component: () => import('./components/404.vue')
+        }
+
     ],
 })
+
