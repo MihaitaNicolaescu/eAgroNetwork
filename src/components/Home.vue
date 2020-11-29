@@ -126,6 +126,76 @@
             }
         },
         methods:{
+             modifyVote: function(userId, postId, vote){ // functia modifica reactia userului de la o anumita postare cand reactioneaza cu up sau down
+                axios.get('http://127.0.0.1:8000/api/modifyVote',{
+                    params:{
+                        token: localStorage.getItem('token'),
+                        userId: userId,
+                        postId: postId,
+                        vote: vote,
+                    }
+                })
+            },
+            cancelVoteUp: function(postId, index, vote){
+                axios.get('http://127.0.0.1:8000/api/vote', {
+                    params:{
+                        token: localStorage.getItem('token'),
+                        postId: postId,
+                        vote: -1,
+                    }
+                }).then(
+                    this.fallowPosts[index].votes--,
+                    this.fallowPosts[index].vote = 0,
+                ).catch((error)=>{
+                    console.log(error);
+                })
+                this.modifyVote(this.id, postId, vote)
+            },
+            cancelVoteDown: function(postId, index, vote){
+                axios.get('http://127.0.0.1:8000/api/vote', {
+                    params:{
+                        token: localStorage.getItem('token'),
+                        postId: postId,
+                        vote: +1,
+                    }
+                }).then(
+                    this.fallowPosts[index].votes++,
+                    this.fallowPosts[index].vote = 0,
+                ).catch((error)=>{
+                    console.log(error);
+                })
+                this.modifyVote(this.id, postId, vote)
+            },
+            voteUp: function(postId, index, vote){
+                axios.get('http://127.0.0.1:8000/api/vote', {
+                    params:{
+                        token: localStorage.getItem('token'),
+                        postId: postId,
+                        vote: 1,
+                    }
+                }).then(
+                    this.fallowPosts[index].votes++,
+                    this.fallowPosts[index].vote = 1,
+                ).catch((error)=>{
+                    console.log(error);
+                })
+                this.modifyVote(this.id, postId, vote)
+            },
+            voteDown: function(postId, index, vote){
+                axios.get('http://127.0.0.1:8000/api/vote', {
+                    params:{
+                        token: localStorage.getItem('token'),
+                        postId: postId,
+                        vote: -1,
+                    }
+                }).then(
+                    this.fallowPosts[index].votes--,
+                    this.fallowPosts[index].vote = -1,
+                ).catch((error)=>{
+                    console.log(error);
+                })
+                this.modifyVote(this.id, postId, vote)
+            },
             getFallowListPosts: function(){
                 let listConverted = JSON.stringify(this.fallowList);
                const sendGetRequest = async() => {
