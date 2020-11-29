@@ -4,7 +4,7 @@
            <button class="btn btn-outline-secondary" v-on:click="logout">Log out</button>
               <form style="float: left" class="form-inline my-2 my-lg-0">
                 <input class="form-control mr-sm-2 input-search" type="search" placeholder="Search" aria-label="Search" v-model="query">
-                <button class="btn btn-icons  icon-search" type="button" v-on:click="this.searchMembers()"><i class="material-icons">search</i></button>
+                <button class="btn btn-icons  icon-search" type="button"><i class="material-icons">search</i></button>
               </form>
             <div class="ml-auto">
                 <button v-if="admin" class="btn btn-icons" v-on:click="adminPanel"><span class="material-icons">admin_panel_settings</span></button>
@@ -35,7 +35,30 @@
             </ul>
         </div>
         <div class="container">
-            <h1>Pagina in lucru!</h1>
+            <div id="posts" class="col-7">
+                        <div v-for="(post, index) in fallowPosts" :key="post.id">
+                            <div class="container-post sn p-3">
+                                <div class="user-info">
+                                    <img class="user-info-img" :src="require('@/assets/profiles/' + post.profile_image)">
+                                    <p>{{post.firstName + " " + post.lastName}}</p>
+                                </div>
+                                <div class="post-description">
+                                {{post.description}} 
+                                </div>
+                                <div class="d-flex align-items-center flex-column image-post">
+                                    <img class="post-image" :src="require('../assets/posts/' + post.filename)">
+                                </div>
+                                <button v-show="post.vote == 0 || post.vote == null || post.vote == -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
+                                <button v-show="post.vote == 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
+                                <span>{{post.votes}}</span>
+                                <button v-show="post.vote == 0 || post.vote==null || post.vote == 1" class="btn btn-react" type="button"><span class="material-icons" v-on:click="voteDown(post.id, index, -1)">thumb_down_alt</span></button>
+                                <button v-show="post.vote == -1" class="btn btn-react" type="button"><span class="material-icons" v-on:click="cancelVoteDown(post.id, index, 0)" style="color: blue;">thumb_down_alt</span></button>
+                                <button class="btn btn-react" type="button"><span class="material-icons">insert_comment</span></button>
+                                <button class="btn btn-react" tyoe="button" style="float: right;"><span><span class="material-icons">edit</span></span></button>
+                            </div>
+                        </div>
+                        
+                    </div>
         </div>
         <alert-box></alert-box>
     </div>
@@ -52,6 +75,8 @@
                 results: [],
                 admin: 0,
                 hasNotifications: 0,
+                fallowList: [],
+                fallowPosts: [],
             }
         },
         components: {
@@ -85,17 +110,53 @@
                this.admin = response.data['admin'];
                this.hasNotifications = response.data['notifications'];
             }).catch(() =>{
-                document.getElementById('overlay-alert').style.display ="block";    
+                this.$router.push('login');    
             })
+
+            this.getUserInformatios();
         },
         watch: {
             query: function(){
                 if(this.query.length >= 1){
                     this.searchMembers();
                 }
+            },
+            fallowList: function(){
+                this.getFallowListPosts();
             }
         },
         methods:{
+            getFallowListPosts: function(){
+                let listConverted = JSON.stringify(this.fallowList);
+               const sendGetRequest = async() => {
+                    try{
+                        const resp = await axios.get('http://127.0.0.1:8000/api/fetchFallowPosts', {
+                    params:{
+                        fallowList: listConverted,
+                        token: localStorage.getItem('token'),
+                    }});
+                    this.fallowPosts = resp.data['posts'];
+                    }catch(error){
+                        console.log(error);
+                    }
+                }
+                sendGetRequest();
+
+            },
+            getUserInformatios: function(){
+                 const sendGetRequest = async() => {
+                    try{
+                        const response = await axios.get('http://127.0.0.1:8000/api/fetchFallowList', {
+                    params: {
+                        token: localStorage.getItem('token'),
+                    }});
+                    this.fallowList = response.data;
+                    }catch(error){
+                        console.log(error);
+                    }
+                }
+                sendGetRequest();
+            },
             closeNotifications: function(){
                 document.getElementById('notifications-box').style.display ="none";
             },
@@ -128,6 +189,15 @@
 </script>
 
 <style scoped>
+    #label-post{
+        width: 500px;
+    }
+    #post-description{
+        width: 500px;
+    }
+    textarea{
+        resize:none;
+    }
     #search-image{
         width: 50px;
         height: 50px;
@@ -144,7 +214,7 @@
     .list-search{
         position: fixed;
         width: 400px;
-        margin-left: 342px;
+        margin-left: 98px;
         z-index: 2;
     }
     .search-item:hover{
@@ -170,6 +240,101 @@
     .list-notifications{
         background-color: #f8f9fa !important;
         margin-left: 368px;
+    }
+
+    .btn-react{
+        background: transparent;
+    }
+    .user-info{
+        display: block ruby;
+        font-size: 15px;
+        font-weight: bold;
+    }
+    #posts{
+        overflow: scroll;
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+        height: 850px;
+    }
+    #post::-webkit-scrollbar {
+        display: none;
+    }
+    .container-post{
+        background-color: #d9d9d9!important;
+        width: 600px;
+        height: auto;
+        padding: 10px;
+        box-shadow: 5px 10px #888888;
+        margin-top:20px;
+        
+    }
+    .user-info-img{
+        width: 50px;
+        height: 50px;
+        border-radius: 50px;
+        object-fit: cover;
+    }
+    .post-add{
+        margin-top: 100px;
+    }
+    .description-post{
+        margin-top: 10px;
+        resize: none;
+        width: 460px;
+    }
+    .btn-profile{
+        width: 225px;
+        font-size: 20px;
+        margin-top: 5px;
+    }
+    .info{
+        margin: 0px;
+    }
+    #profile{
+        font-size: 20px;
+    }
+    #overlay{
+        position: fixed;
+        display: none;
+        width: 500px;
+        height: 500px;
+        background-color: rgb(77,74,73);
+        z-index: 2;
+        cursor: pointer;
+        margin-left: 300px;
+        margin-top: -140px;
+    }
+    #post-overlay{
+        position: fixed;
+        display: none;
+        width: 500px;
+        height: 500px;
+        background-color: rgb(77,74,73);
+        z-index: 2;
+        cursor: pointer;
+        margin-left: 300px;
+        margin-top: -140px;
+    }
+    .form-control{
+        font-size: 20px !important;
+        font-weight: bold;
+    }
+    .input-group-text{
+        font-size: 1.2rem !important;
+        font-weight: bold;
+    }
+    .profile-image{
+        border-radius: 50%;
+        object-fit: cover;
+        width: 200px;
+        height: 200px;
+    }
+    .post-image{
+        max-width: 550px;
+        min-width: 550px;
+        max-height: 700px;
+        margin: auto;
+        object-fit: scale-down;
     }
 
 </style> 

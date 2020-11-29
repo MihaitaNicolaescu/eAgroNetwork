@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
@@ -9,14 +10,37 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-
-    public function updateUserProfilePhoto(Request $request){
+    public function addFallower(Request $request){
         try{
             $recived = auth()->userOrFail();
         }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
             return response()->json(['error' => $e->getMessage()], 401);
         }
+        try{
+            $fallowList = json_decode($recived['fallowed']);
+            if($fallowList == null){
+                $fallowList = [];
+            }
+            array_push($fallowList, $request->fallowId);
+            $fallowList = json_encode($fallowList);
+            $user = User::where('id', '=', $recived['id'])->first();
+            $user->fallowed = $fallowList;
+            $user->save();
+            $recived['fallowed'] = $fallowList;
+        }catch(Exception $e){    
+            return response()->json(['message' => 'Error on save data in database!'], 417);
+        }
+    }
+
+    public function updateUserProfilePhoto(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+            error_log($recived);
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
         $imageName = $request->image->getClientOriginalName(). '.jpg';
+        error_log($request->token);
         try{
             $request->image->move(public_path('../../src/assets/profiles'), $imageName);
             $user = User::where('id', $recived['id'])->first();
@@ -57,6 +81,18 @@ class UserController extends Controller
         }
         $user = User::where('id', $recived['id'])->first();
         return response()->json($user);
+    }
+
+    public function fetchFallowList(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            error_log($e);
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+        $user = User::where('id', $recived['id'])->first();
+        $fallowList = json_decode($user->fallowed);
+        return response()->json($fallowList);
     }
 
     public function fetchProfile(Request $request){

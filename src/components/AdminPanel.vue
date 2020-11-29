@@ -14,6 +14,7 @@
             <table class="table">
                 <thead>
                     <tr>
+                    <th scope="col">ID</th>
                     <th scope="col">ID_DB</th>
                     <th scope="col">NUME</th>
                     <th scope="col">PRENUME</th>
@@ -23,7 +24,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="user in users" :key="user.id">
+                    <tr v-for="(user, index) in users" :key="user.id">
+                        <td>{{index}}</td>
                         <td>{{user.id}}</td>
                         <td>{{user.firstName}}</td>
                         <td>{{user.lastName}}</td>
@@ -32,7 +34,6 @@
                         <td v-else><span class="material-icons">clear</span></td>
                         <td>
                             <button class="btn btn-outline-danger" type="button" v-on:click="deleteUser(user.id)">Delete</button> 
-                            <button class="btn btn-outline-secondary" type="button">Edit</button>
                         </td>
                     </tr>
                 </tbody>
