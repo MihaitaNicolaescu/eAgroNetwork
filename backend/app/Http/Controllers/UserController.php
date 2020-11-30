@@ -10,6 +10,48 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function getFallow(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+        try{
+            $array = User::where('id', '=', $recived['id'])->first();
+            $fallowList = json_decode($array->fallowed);
+            $isFallower = false;
+            //de modificat foreach-ul
+            foreach($fallowList as $userId){
+                if($userId == $request->id_user){
+                    $isFallower = true;
+                    break;
+                }
+            }
+            return response()->json($isFallower);
+        }catch(Exception $e){
+            return response()->json(['message' => 'Error on accesing database!'], 417);
+        }
+    }
+    public function deleteFallower(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+        try{
+            $array = User::where('id', '=', $recived['id'])->first();
+            $fallowList = json_decode($array->fallowed);
+            $key = array_search($request->fallowId, $fallowList);
+            
+            
+            unset($fallowList[$key]);
+            $fallowList = array_values($fallowList);
+            $array->fallowed = json_encode($fallowList);
+            $array->save();
+        }catch(Exception $e){    
+            return response()->json(['message' => 'Error on save data in database!'], 417);
+        }
+    }
     public function addFallower(Request $request){
         try{
             $recived = auth()->userOrFail();

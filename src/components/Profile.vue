@@ -35,8 +35,6 @@
                                 <button v-show="post.vote == 0 || post.vote == null || post.vote == -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
                                 <button v-show="post.vote == 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
                                 <span>{{post.votes}}</span>
-                                <button v-show="post.vote == 0 || post.vote==null || post.vote == 1" class="btn btn-react" type="button"><span class="material-icons" v-on:click="voteDown(post.id, index, -1)">thumb_down_alt</span></button>
-                                <button v-show="post.vote == -1" class="btn btn-react" type="button"><span class="material-icons" v-on:click="cancelVoteDown(post.id, index, 0)" style="color: blue;">thumb_down_alt</span></button>
                                 <button class="btn btn-react" type="button"><span class="material-icons">insert_comment</span></button>
                                 <button class="btn btn-react" tyoe="button" style="float: right;"><span><span class="material-icons">edit</span></span></button>
                             </div>
@@ -168,21 +166,6 @@ import axios from 'axios';
                 })
                 this.modifyVote(this.id, postId, vote)
             },
-            cancelVoteDown: function(postId, index, vote){
-                axios.get('http://127.0.0.1:8000/api/vote', {
-                    params:{
-                        token: localStorage.getItem('token'),
-                        postId: postId,
-                        vote: +1,
-                    }
-                }).then(
-                    this.userPosts[index].votes++,
-                    this.userPosts[index].vote = 0,
-                ).catch((error)=>{
-                    console.log(error);
-                })
-                this.modifyVote(this.id, postId, vote)
-            },
             voteUp: function(postId, index, vote){
                 axios.get('http://127.0.0.1:8000/api/vote', {
                     params:{
@@ -193,21 +176,6 @@ import axios from 'axios';
                 }).then(
                     this.userPosts[index].votes++,
                     this.userPosts[index].vote = 1,
-                ).catch((error)=>{
-                    console.log(error);
-                })
-                this.modifyVote(this.id, postId, vote)
-            },
-            voteDown: function(postId, index, vote){
-                axios.get('http://127.0.0.1:8000/api/vote', {
-                    params:{
-                        token: localStorage.getItem('token'),
-                        postId: postId,
-                        vote: -1,
-                    }
-                }).then(
-                    this.userPosts[index].votes--,
-                    this.userPosts[index].vote = -1,
                 ).catch((error)=>{
                     console.log(error);
                 })

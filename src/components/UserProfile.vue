@@ -15,7 +15,8 @@
                                 <p class="info">Email: {{ email }}</p>
                                 <p class="info">Birthday: {{ birthday }}</p>
                             </div>
-                            <button class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste</button>
+                            <button v-if="!fallowed && fallowed!=null" class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste</button>
+                            <button v-if="fallowed && fallowed!=null" class="btn btn-danger btn-sm" type="button" v-on:click="cancelFallow()">Nu mai urmari</button>
                         </div>
                     </div>
                     <div id="posts" class="col-7">
@@ -34,10 +35,7 @@
                                 <button v-show="post.vote == 0 || post.vote == null || post.vote == -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
                                 <button v-show="post.vote == 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
                                 <span>{{post.votes}}</span>
-                                <button v-show="post.vote == 0 || post.vote==null || post.vote == 1" class="btn btn-react" type="button"><span class="material-icons" v-on:click="voteDown(post.id, index, -1)">thumb_down_alt</span></button>
-                                <button v-show="post.vote == -1" class="btn btn-react" type="button"><span class="material-icons" v-on:click="cancelVoteDown(post.id, index, 0)" style="color: blue;">thumb_down_alt</span></button>
                                 <button class="btn btn-react" type="button"><span class="material-icons">insert_comment</span></button>
-                                <button class="btn btn-react" tyoe="button" style="float: right;"><span><span class="material-icons">edit</span></span></button>
                             </div>
                         </div>
                         
@@ -66,6 +64,7 @@ import axios from 'axios';
                 tempEmail: '',
                 tempBirthday: '',
                 userPosts: {},
+                fallowed:null,
             }
         },
         async created(){
@@ -77,14 +76,37 @@ import axios from 'axios';
         watch:{
             id: function(){
                 this.getUserPosts();
+                this.getFallowed();
             }
         },
         methods: {
+            getFallowed:function(){
+                axios.get('http://127.0.0.1:8000/api/getFallow', {
+                    params:{
+                        token: localStorage.getItem('token'),
+                        id_user: this.id,
+                    }
+                }).then((response)=>{
+                    this.fallowed = response.data;
+                })
+            },
             fallow: function(){
                  axios.post('http://127.0.0.1:8000/api/fallowUser', {
                     token: localStorage.getItem('token'),
                     fallowId: this.id,
                 }).then(
+                    this.fallowed = true,
+                ).catch((error)=>{
+                    if(error['message'] == "token") document.getElementById('overlay-alert').style.display ="block";
+                    else console.log(error);
+                })
+            },
+            cancelFallow: function(){
+                 axios.post('http://127.0.0.1:8000/api/cancelFallowUser', {
+                    token: localStorage.getItem('token'),
+                    fallowId: this.id,
+                }).then(
+                    this.fallowed = false,
                 ).catch((error)=>{
                     if(error['message'] == "token") document.getElementById('overlay-alert').style.display ="block";
                     else console.log(error);
@@ -115,22 +137,8 @@ import axios from 'axios';
                 })
                 this.modifyVote(this.id, postId, vote)
             },
-            cancelVoteDown: function(postId, index, vote){
-                axios.get('http://127.0.0.1:8000/api/vote', {
-                    params:{
-                        token: localStorage.getItem('token'),
-                        postId: postId,
-                        vote: +1,
-                    }
-                }).then(
-                    this.userPosts[index].votes++,
-                    this.userPosts[index].vote = 0,
-                ).catch((error)=>{
-                    console.log(error);
-                })
-                this.modifyVote(this.id, postId, vote)
-            },
             voteUp: function(postId, index, vote){
+                let response = false;
                 axios.get('http://127.0.0.1:8000/api/vote', {
                     params:{
                         token: localStorage.getItem('token'),
@@ -138,27 +146,18 @@ import axios from 'axios';
                         vote: 1,
                     }
                 }).then(
-                    this.userPosts[index].votes++,
-                    this.userPosts[index].vote = 1,
+                    response = true,
                 ).catch((error)=>{
                     console.log(error);
                 })
-                this.modifyVote(this.id, postId, vote)
-            },
-            voteDown: function(postId, index, vote){
-                axios.get('http://127.0.0.1:8000/api/vote', {
-                    params:{
-                        token: localStorage.getItem('token'),
-                        postId: postId,
-                        vote: -1,
+                if(response == true){
+                    this.modifyVote(this.id, postId, vote)
+                    if(this.userPosts[index].vote == -1){
+                        this.cancelVoteDown(postId, index, 0);
+                        this.userPosts[index].votes++,
+                        this.userPosts[index].vote = 1
                     }
-                }).then(
-                    this.userPosts[index].votes--,
-                    this.userPosts[index].vote = -1,
-                ).catch((error)=>{
-                    console.log(error);
-                })
-                this.modifyVote(this.id, postId, vote)
+                }
             },
             getUserPosts: function(){
                const sendGetRequest = async() => {

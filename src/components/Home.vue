@@ -34,31 +34,27 @@
                 </li>
             </ul>
         </div>
-        <div class="container">
+        <div class="container d-flex align-items-center flex-column">
             <div id="posts" class="col-7">
-                        <div v-for="(post, index) in fallowPosts" :key="post.id">
-                            <div class="container-post sn p-3">
-                                <div class="user-info">
-                                    <img class="user-info-img" :src="require('@/assets/profiles/' + post.profile_image)">
-                                    <p>{{post.firstName + " " + post.lastName}}</p>
-                                </div>
-                                <div class="post-description">
-                                {{post.description}} 
-                                </div>
-                                <div class="d-flex align-items-center flex-column image-post">
-                                    <img class="post-image" :src="require('../assets/posts/' + post.filename)">
-                                </div>
-                                <button v-show="post.vote == 0 || post.vote == null || post.vote == -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
-                                <button v-show="post.vote == 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
-                                <span>{{post.votes}}</span>
-                                <button v-show="post.vote == 0 || post.vote==null || post.vote == 1" class="btn btn-react" type="button"><span class="material-icons" v-on:click="voteDown(post.id, index, -1)">thumb_down_alt</span></button>
-                                <button v-show="post.vote == -1" class="btn btn-react" type="button"><span class="material-icons" v-on:click="cancelVoteDown(post.id, index, 0)" style="color: blue;">thumb_down_alt</span></button>
-                                <button class="btn btn-react" type="button"><span class="material-icons">insert_comment</span></button>
-                                <button class="btn btn-react" tyoe="button" style="float: right;"><span><span class="material-icons">edit</span></span></button>
-                            </div>
+                <div v-for="(post, index) in fallowPosts" :key="post.id">
+                    <div class="container-post sn p-3">
+                        <div class="user-info">
+                            <img class="user-info-img" :src="require('@/assets/profiles/' + post.profile_image)">
+                            <p>{{post.firstName + " " + post.lastName}}</p>
                         </div>
-                        
+                        <div class="post-description">
+                        {{post.description}} 
+                        </div>
+                        <div class="d-flex align-items-center flex-column image-post">
+                            <img class="post-image" :src="require('../assets/posts/' + post.filename)">
+                        </div>
+                        <button v-show="post.vote == 0 || post.vote == null || post.vote == -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
+                        <button v-show="post.vote == 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
+                        <span>{{post.votes}}</span>
+                        <button class="btn btn-react" type="button"><span class="material-icons">insert_comment</span></button>
                     </div>
+                </div>
+            </div>
         </div>
         <alert-box></alert-box>
     </div>
@@ -151,21 +147,6 @@
                 })
                 this.modifyVote(this.id, postId, vote)
             },
-            cancelVoteDown: function(postId, index, vote){
-                axios.get('http://127.0.0.1:8000/api/vote', {
-                    params:{
-                        token: localStorage.getItem('token'),
-                        postId: postId,
-                        vote: +1,
-                    }
-                }).then(
-                    this.fallowPosts[index].votes++,
-                    this.fallowPosts[index].vote = 0,
-                ).catch((error)=>{
-                    console.log(error);
-                })
-                this.modifyVote(this.id, postId, vote)
-            },
             voteUp: function(postId, index, vote){
                 axios.get('http://127.0.0.1:8000/api/vote', {
                     params:{
@@ -176,21 +157,6 @@
                 }).then(
                     this.fallowPosts[index].votes++,
                     this.fallowPosts[index].vote = 1,
-                ).catch((error)=>{
-                    console.log(error);
-                })
-                this.modifyVote(this.id, postId, vote)
-            },
-            voteDown: function(postId, index, vote){
-                axios.get('http://127.0.0.1:8000/api/vote', {
-                    params:{
-                        token: localStorage.getItem('token'),
-                        postId: postId,
-                        vote: -1,
-                    }
-                }).then(
-                    this.fallowPosts[index].votes--,
-                    this.fallowPosts[index].vote = -1,
                 ).catch((error)=>{
                     console.log(error);
                 })
@@ -321,6 +287,7 @@
         font-weight: bold;
     }
     #posts{
+        align-content: center;
         overflow: scroll;
         -ms-overflow-style: none;  /* IE and Edge */
         scrollbar-width: none;  /* Firefox */

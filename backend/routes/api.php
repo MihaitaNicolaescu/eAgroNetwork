@@ -37,6 +37,8 @@ Route::get('/vote', [PostController::class, 'postVote']);
 Route::get('/modifyVote',[PostVoteController::class, 'modifyVote']);
 
 Route::post('/fallowUser', [UserController::class, 'addFallower']);
+Route::post('/cancelFallowUser', [UserController::class, 'deleteFallower']);
 
 Route::get('/fetchFallowList', [UserController::class, 'fetchFallowList']);
 Route::get('/fetchFallowPosts', [PostController::class, 'fetchFallowPosts']);
+Route::get('/getFallow', [UserController::class, 'getFallow']);
