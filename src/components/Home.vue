@@ -1,9 +1,9 @@
 <template>
-    <div class="container">
+    <div class="container container-view">
         <nav class="navbar navbar-light bg-light">
            <button class="btn btn-outline-secondary" v-on:click="logout">Log out</button>
               <form style="float: left" class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2 input-search" type="search" placeholder="Search" aria-label="Search" v-model="query">
+                <input class="search-input form-control mr-sm-2 input-search" type="search" placeholder="Search" aria-label="Search" v-model="query">
                 <button class="btn btn-icons  icon-search" type="button"><i class="material-icons">search</i></button>
               </form>
             <div class="ml-auto">
@@ -34,8 +34,8 @@
                 </li>
             </ul>
         </div>
-        <div class="container d-flex align-items-center flex-column">
-            <div id="posts" class="col-7">
+        <div class="posts-container d-flex align-items-center flex-column">
+            <div id="posts">
                 <div v-for="(post, index) in fallowPosts" :key="post.id">
                     <div class="container-post sn p-3">
                         <div class="user-info">
@@ -225,154 +225,7 @@
 </script>
 
 <style scoped>
-    #label-post{
-        width: 500px;
-    }
-    #post-description{
-        width: 500px;
-    }
-    textarea{
-        resize:none;
-    }
-    #search-image{
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-    .icon-search{
-        margin-left: -50px;
-        background: transparent;
-    }
-    .input-search{
-        width: 400px;
-    }
-    .list-search{
-        position: fixed;
-        width: 400px;
-        margin-left: 98px;
-        z-index: 2;
-    }
-    .search-item:hover{
-        background-color: #d1d1d1 !important;
-    }
-    .link{
-        display: block;
-        width: 400px;
-        height: 52px;
-        margin-bottom: -13px;
-        margin-top: -10px;
-    }
-    .btn-icons{
-        background: transparent;
-    }
-    #notifications-box{
-        position: fixed;
-        width: 400px;
-        margin-left: 342px;
-        z-index: 2;
-        display: none;
-    }
-    .list-notifications{
-        background-color: #f8f9fa !important;
-        margin-left: 368px;
-    }
-
-    .btn-react{
-        background: transparent;
-    }
-    .user-info{
-        display: block ruby;
-        font-size: 15px;
-        font-weight: bold;
-    }
-    #posts{
-        align-content: center;
-        overflow: scroll;
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
-        height: 850px;
-    }
-    #post::-webkit-scrollbar {
-        display: none;
-    }
-    .container-post{
-        background-color: #d9d9d9!important;
-        width: 600px;
-        height: auto;
-        padding: 10px;
-        box-shadow: 5px 10px #888888;
-        margin-top:20px;
-        
-    }
-    .user-info-img{
-        width: 50px;
-        height: 50px;
-        border-radius: 50px;
-        object-fit: cover;
-    }
-    .post-add{
-        margin-top: 100px;
-    }
-    .description-post{
-        margin-top: 10px;
-        resize: none;
-        width: 460px;
-    }
-    .btn-profile{
-        width: 225px;
-        font-size: 20px;
-        margin-top: 5px;
-    }
-    .info{
-        margin: 0px;
-    }
-    #profile{
-        font-size: 20px;
-    }
-    #overlay{
-        position: fixed;
-        display: none;
-        width: 500px;
-        height: 500px;
-        background-color: rgb(77,74,73);
-        z-index: 2;
-        cursor: pointer;
-        margin-left: 300px;
-        margin-top: -140px;
-    }
-    #post-overlay{
-        position: fixed;
-        display: none;
-        width: 500px;
-        height: 500px;
-        background-color: rgb(77,74,73);
-        z-index: 2;
-        cursor: pointer;
-        margin-left: 300px;
-        margin-top: -140px;
-    }
-    .form-control{
-        font-size: 20px !important;
-        font-weight: bold;
-    }
-    .input-group-text{
-        font-size: 1.2rem !important;
-        font-weight: bold;
-    }
-    .profile-image{
-        border-radius: 50%;
-        object-fit: cover;
-        width: 200px;
-        height: 200px;
-    }
-    .post-image{
-        max-width: 550px;
-        min-width: 550px;
-        max-height: 700px;
-        margin: auto;
-        object-fit: scale-down;
-    }
-
+    @import '../style/style.css';
+    @import '../style/screenSizes.css';
 </style> 
 

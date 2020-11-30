@@ -1,0 +1,42 @@
+
+@media screen and (max-width: 760px){
+    .container{
+        max-width: 720px !important;
+    }
+    
+}
+
+@media screen and (max-width: 630px){
+    .post-image{
+        
+        width: 100%;
+        margin: auto;
+        object-fit: scale-down;
+    }
+    .posts-container{
+        width: 100%;
+    }
+    
+}
+
+@media screen and (min-width: 320px) and (max-width: 480px){
+    .post-image{
+        width: 300px;
+        object-fit: cover;
+    }
+    .image-post{
+        width: 365px;
+    }
+    #posts{
+        width: 100%;
+    }
+    .container-post{
+        width: 400px;;
+    }
+    .search-input{
+        width: 375px;
+    }
+    #notifications-box{
+        margin-left: -371px;
+    }
+}
