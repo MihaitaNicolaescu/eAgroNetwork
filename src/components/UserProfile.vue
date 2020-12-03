@@ -1,10 +1,10 @@
 <template>
     <div class="container">
-        <nav class="navbar navbar-light bg-light">
+        <nav v-if="invalidUser == false" class="navbar navbar-light bg-light">
            <button style="" class="btn btn-outline-secondary" v-on:click="home">Home</button>
         </nav> 
         <div class="container">
-            <div class="d-flex align-items-left flex-column" style="height: 100px; margin-top: 50px;">
+            <div v-if="invalidUser == false" class="d-flex align-items-left flex-column" style="height: 100px; margin-top: 50px;">
                 <div class="row">
                     <div class="col-3">
                         <div id="profile">
@@ -14,9 +14,10 @@
                                 <p class="info">Last name: {{ lastName }}</p>
                                 <p class="info">Email: {{ email }}</p>
                                 <p class="info">Birthday: {{ birthday }}</p>
+                                <p class="info">Producator atestat <img style="width:45px" src="../assets/Logo.png"></p>
                             </div>
-                            <button v-if="!fallowed && fallowed!=null" class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste</button>
-                            <button v-if="fallowed && fallowed!=null" class="btn btn-danger btn-sm" type="button" v-on:click="cancelFallow()">Nu mai urmari</button>
+                            <button v-if="!fallowed && fallowed!=null && isProducer == 1" class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste</button>
+                            <button v-if="fallowed && fallowed!=null && isProducer == 1" class="btn btn-danger btn-sm" type="button" v-on:click="cancelFallow()">Nu mai urmari</button>
                         </div>
                     </div>
                     <div id="posts" class="col-7">
@@ -38,10 +39,18 @@
                                 <button class="btn btn-react" type="button"><span class="material-icons">insert_comment</span></button>
                             </div>
                         </div>
+                        <div v-if="isProducer == 0">
+                            <img class="logo" src="../assets/Logo_cos.png">
+                        </div>
                         
                     </div>
-
+                        <p v-if="isProducer == 0" class="info-paragraph">Acest utlizator nu este inca inregistrat pe aplicatie ca fiind un producator.</p>
                 </div>
+            </div>
+            <div class="container">
+                <p style="margin-top: 200px;" class="not-found">（ ﾟДﾟ）</p>
+                <p class="not-found">Utilizator invalid.</p>
+                <p class="go-home">Apasa <router-link :to="{path: '/'}">aici</router-link> pentru a te intoarce la pagina principala.</p>
             </div>
         </div>
     </div>
@@ -50,6 +59,7 @@
 <script>
 
 import axios from 'axios';
+import {backend} from '../constants.js';
     export default{
         data(){
             return{
@@ -65,6 +75,8 @@ import axios from 'axios';
                 tempBirthday: '',
                 userPosts: {},
                 fallowed:null,
+                isProducer: null,
+                invalidUser: true,
             }
         },
         async created(){
@@ -81,7 +93,7 @@ import axios from 'axios';
         },
         methods: {
             getFallowed:function(){
-                axios.get('http://127.0.0.1:8000/api/getFallow', {
+                axios.get(backend + '/api/getFallow', {
                     params:{
                         token: localStorage.getItem('token'),
                         id_user: this.id,
@@ -91,7 +103,7 @@ import axios from 'axios';
                 })
             },
             fallow: function(){
-                 axios.post('http://127.0.0.1:8000/api/fallowUser', {
+                 axios.post(backend + '/api/fallowUser', {
                     token: localStorage.getItem('token'),
                     fallowId: this.id,
                 }).then(
@@ -102,7 +114,7 @@ import axios from 'axios';
                 })
             },
             cancelFallow: function(){
-                 axios.post('http://127.0.0.1:8000/api/cancelFallowUser', {
+                 axios.post(backend + '/api/cancelFallowUser', {
                     token: localStorage.getItem('token'),
                     fallowId: this.id,
                 }).then(
@@ -113,7 +125,7 @@ import axios from 'axios';
                 })
             },
             modifyVote: function(userId, postId, vote){ // functia modifica reactia userului de la o anumita postare cand reactioneaza cu up sau down
-                axios.get('http://127.0.0.1:8000/api/modifyVote',{
+                axios.get(backend + '/api/modifyVote',{
                     params:{
                         token: localStorage.getItem('token'),
                         userId: userId,
@@ -123,7 +135,7 @@ import axios from 'axios';
                 })
             },
             cancelVoteUp: function(postId, index, vote){
-                axios.get('http://127.0.0.1:8000/api/vote', {
+                axios.get(backend + '/api/vote', {
                     params:{
                         token: localStorage.getItem('token'),
                         postId: postId,
@@ -139,7 +151,7 @@ import axios from 'axios';
             },
             voteUp: function(postId, index, vote){
                 let response = false;
-                axios.get('http://127.0.0.1:8000/api/vote', {
+                axios.get(backend + '/api/vote', {
                     params:{
                         token: localStorage.getItem('token'),
                         postId: postId,
@@ -162,7 +174,7 @@ import axios from 'axios';
             getUserPosts: function(){
                const sendGetRequest = async() => {
                     try{
-                        const resp = await axios.get('http://127.0.0.1:8000/api/fetchUserPosts', {
+                        const resp = await axios.get(backend + '/api/fetchUserPosts', {
                     params:{
                         user_id: this.id,
                         token: localStorage.getItem('token'),
@@ -176,25 +188,31 @@ import axios from 'axios';
 
             },
             getUserInformations: function(){
-                axios.get('http://127.0.0.1:8000/api/fetchProfile', {
+                axios.get(backend + '/api/fetchProfile', {
                 params: {
                     id: this.$route.params.id
                 }
                 }).then((response)=>{
-                    this.firstName = response.data['firstName'],
-                    this.lastName = response.data['lastName'],
-                    this.email = response.data['email'],
-                    this.birthday = response.data['birthday'],
-                    this.id = response.data['id'],
-                    this.userPhoto = response.data['profile_image']
-                    if(this.userPhoto == null)
-                        this.userPhoto = 'default.jpg'
+                    if(response.data == "INVALID_USER"){
+                        this.invalidUser = true;
+                    }else{
+                        this.invalidUser = false;
+                        this.firstName = response.data['firstName'],
+                        this.lastName = response.data['lastName'],
+                        this.email = response.data['email'],
+                        this.birthday = response.data['birthday'],
+                        this.id = response.data['id'],
+                        this.userPhoto = response.data['profile_image'],
+                        this.isProducer = response.data['producer']
+                        if(this.userPhoto == null)
+                            this.userPhoto = 'default.jpg'
+                    }
                 }).catch((error) =>{
                     console.log(error)
                 })
             },
             verifyToken: function(){
-                axios.get('http://127.0.0.1:8000/api/fetchUserData', {
+                axios.get(backend + '/api/fetchUserData', {
                     params: {
                         token: localStorage.getItem('token'),
                     }
@@ -209,6 +227,32 @@ import axios from 'axios';
     }
 </script>
 <style scoped>
+    /*Fonts from frontend server*/
+    @font-face {
+        font-family: "NerkoOne";
+        src: url("../fonts/NerkoOne-Regular.ttf");
+    }
+    /*For invalid user*/
+    .not-found{
+        font-size: 80px;
+        font-family: "Courier New";
+        text-align: center;
+    }
+    .go-home{
+        font-size: 20px;
+        font-family: "Courier New";
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .info-paragraph{
+        font-family: "NerkoOne";
+        font-size: 55px;
+        margin-top: -450px;
+        text-align: center;
+        
+    }
+
     .btn-react{
         background: transparent;
     }
@@ -302,5 +346,9 @@ import axios from 'axios';
         max-height: 700px;
         margin: auto;
         object-fit: scale-down;
+    }
+    .logo{
+        z-index: 2;
+        width: 500px;
     }
 </style>

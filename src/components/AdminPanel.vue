@@ -6,9 +6,9 @@
             <button class="btn btn-outline-secondary" >Applications</button>
             <form class="search-user d-flex justify-content-center">
                 <input v-model="searchedUser" class="form-control mr-sm-2 input-search" type="search" placeholder="Search a user here" aria-label="Search">
-                <button class="btn search-btn" type="button" v-on:click="searchUser()"><i class="material-icons icon-search">search</i></button>
+                <button v-if="!active || active != 1" class="btn search-btn" type="button" v-on:click="searchUser()"><i class="material-icons icon-search">search</i></button>
             </form>
-            <button class="btn btn-outline-secondary cancel-search" :disabled="active == 0" type="button" v-on:click="usersButton();"><span class="material-icons">search_off</span></button>
+            <button v-if="active" class="btn btn-outline-secondary cancel-search" type="button" v-on:click="usersButton();"><span class="material-icons">search_off</span></button>
         </nav>
         <div class="users">
             <table class="table">
@@ -67,10 +67,12 @@
 <script>
     import alertBox from './templates/invalidToken'; 
     import axios from 'axios';
+    import {backend} from '../constants.js';
+
     export default{
         data(){
             return{
-                url: 'http://127.0.0.1:8000/api/admin/users',
+                url: backend+'/api/admin/users',
                 pagination: [],
                 users: null,
                 searchedUser: '',
@@ -80,7 +82,7 @@
         
         mounted(){
             //verificarea userului pentru a se determina daca este un administrator valid
-            axios.get('http://127.0.0.1:8000/api/verifyData', {
+            axios.get(backend+'/api/verifyData', {
                 params: { 
                     token: localStorage.getItem('token'),
                 }
@@ -98,7 +100,7 @@
         },
         methods: {
             deleteUser: function(id){
-                axios.post('http://127.0.0.1:8000/api/admin/delete', {
+                axios.post(backend+'/api/admin/delete', {
                     id: id,
                 }).then(() =>{
                     alert('Utilizatorul a fost sters cu succes!')
@@ -152,7 +154,7 @@
 <style scoped>
     .search-btn{
         background-color: transparent;
-        margin-left: -60px;
+        margin-left: 0px;
         width: 50px;
     }
     #confirm-text{

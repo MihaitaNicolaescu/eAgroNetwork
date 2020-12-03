@@ -7,6 +7,7 @@
                 <button class="btn btn-icons  icon-search" type="button"><i class="material-icons">search</i></button>
               </form>
             <div class="ml-auto">
+                <button v-if="isProducer == 0 && isProducer!=null " class="btn btn-success" v-on:click="aplica()">Devino producator</button>
                 <button v-if="admin" class="btn btn-icons" v-on:click="adminPanel"><span class="material-icons">admin_panel_settings</span></button>
                 <button class="btn btn-icons" v-on:click="profile"><span class="material-icons">account_circle</span></button>
                 <button v-if="this.hasNotifications > 0" v-on:click="showNotifications()" class="btn btn-icons"><span class="material-icons">mark_email_unread</span></button>
@@ -63,6 +64,7 @@
 <script>
     import alertBox from './templates/invalidToken'; 
     import axios from 'axios';
+    import {backend} from '../constants.js';
 
     export default{
         data(){
@@ -73,6 +75,7 @@
                 hasNotifications: 0,
                 fallowList: [],
                 fallowPosts: [],
+                isProducer: null,
             }
         },
         components: {
@@ -81,7 +84,7 @@
         mounted(){
             
 
-            axios.get('http://127.0.0.1:8000/api/fetchProfile', {
+            axios.get(backend+'/api/fetchProfile', {
                 params: {
                     id: this.$route.params.id
                 }
@@ -98,18 +101,19 @@
                 console.log(error)
             })
 
-            axios.get('http://127.0.0.1:8000/api/fetchUserData', {
+            axios.get(backend+'/api/fetchUserData', {
                 params: {
                     token: localStorage.getItem('token'),
                 }
             }).then((response)=>{
                this.admin = response.data['admin'];
+               this.isProducer = response.data['producer'];
                this.hasNotifications = response.data['notifications'];
             }).catch(() =>{
                 this.$router.push('login');    
             })
 
-            this.getUserInformatios();
+            this.getUserFallowList();
         },
         watch: {
             query: function(){
@@ -123,7 +127,7 @@
         },
         methods:{
              modifyVote: function(userId, postId, vote){ // functia modifica reactia userului de la o anumita postare cand reactioneaza cu up sau down
-                axios.get('http://127.0.0.1:8000/api/modifyVote',{
+                axios.get(backend+'/api/modifyVote',{
                     params:{
                         token: localStorage.getItem('token'),
                         userId: userId,
@@ -133,7 +137,7 @@
                 })
             },
             cancelVoteUp: function(postId, index, vote){
-                axios.get('http://127.0.0.1:8000/api/vote', {
+                axios.get(backend+'/api/vote', {
                     params:{
                         token: localStorage.getItem('token'),
                         postId: postId,
@@ -148,7 +152,7 @@
                 this.modifyVote(this.id, postId, vote)
             },
             voteUp: function(postId, index, vote){
-                axios.get('http://127.0.0.1:8000/api/vote', {
+                axios.get(backend+'/api/vote', {
                     params:{
                         token: localStorage.getItem('token'),
                         postId: postId,
@@ -166,7 +170,7 @@
                 let listConverted = JSON.stringify(this.fallowList);
                const sendGetRequest = async() => {
                     try{
-                        const resp = await axios.get('http://127.0.0.1:8000/api/fetchFallowPosts', {
+                        const resp = await axios.get(backend+'/api/fetchFallowPosts', {
                     params:{
                         fallowList: listConverted,
                         token: localStorage.getItem('token'),
@@ -179,10 +183,10 @@
                 sendGetRequest();
 
             },
-            getUserInformatios: function(){
+            getUserFallowList: function(){
                  const sendGetRequest = async() => {
                     try{
-                        const response = await axios.get('http://127.0.0.1:8000/api/fetchFallowList', {
+                        const response = await axios.get(backend+'/api/fetchFallowList', {
                     params: {
                         token: localStorage.getItem('token'),
                     }});
@@ -205,12 +209,15 @@
             adminPanel: function(){
                 this.$router.push('admin');
             },
+            aplica: function(){
+                this.$router.push('aplica');
+            },
             logout: function(){
                 localStorage.clear();
                 this.$router.push('login');
             },
             searchMembers() {
-                axios.get('http://127.0.0.1:8000/api/user/search',  { params :{
+                axios.get(backend+'/api/user/search',  { params :{
                     query: this.query 
                 }})
                 .then(response => {

@@ -1,4 +1,4 @@
-#label-post{
+    #label-post{
         width: 500px;
     }
     #post-description{
@@ -133,11 +133,7 @@
     .form-control{
         font-size: 20px !important;
         font-weight: bold;
-    }
-    .input-group-text{
-        font-size: 1.2rem !important;
-        font-weight: bold;
-    }
+    }   
     .profile-image{
         border-radius: 50%;
         object-fit: cover;
@@ -150,4 +146,9 @@
         max-height: 700px;
         margin: auto;
         object-fit: scale-down;
+    }
+
+    /*BUTTONS*/
+    .btn-home{
+        background: transparent;
     }

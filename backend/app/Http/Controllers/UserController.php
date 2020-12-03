@@ -139,7 +139,11 @@ class UserController extends Controller
 
     public function fetchProfile(Request $request){
         $user = User::where('id', $request->id)->first();
-        return response()->json($user);
+        if($user==null){
+            return response()->json('INVALID_USER');
+        }else{
+            return response()->json($user);
+        }
     }
     public function createUser(Request $request){
         try{

@@ -19,19 +19,24 @@
     
 }
 
-@media screen and (min-width: 320px) and (max-width: 480px){
+@media screen  and (max-width: 480px){
+    .body{
+        min-width: 440px;
+    }
     .post-image{
         width: 300px;
         object-fit: cover;
+        padding: 0;
     }
     .image-post{
         width: 365px;
+
     }
     #posts{
         width: 100%;
     }
     .container-post{
-        width: 400px;;
+        width: 400px;
     }
     .search-input{
         width: 375px;

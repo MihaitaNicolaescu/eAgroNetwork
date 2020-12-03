@@ -14,7 +14,7 @@ class AddFallowedListToUsers extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('fallowed');
+            $table->string('fallowed')->default('[]');
         });
     }
 

@@ -40,8 +40,14 @@
                             </div>
                         </div>
                         
+                        <div v-if="isProducer == 0 && isProducer!=null">
+                            <img class="logo d-flex align-items-center flex-column" src="../assets/Logo_cos.png">
+                        </div>
+                        
                     </div>
-
+                        <p v-if="isProducer == 0 && isProducer!=null" class="info-paragraph">Daca detii esti un producator local poti sa trimiti un formular pentru a primi gradul de producator pe aplicatie. Detinatorii acestui grad au posibilitatea sa posteze fotografii
+                            cu produsele agricole si sa poata primi recenzi de la alti utilizatori.
+                        </p>
                 </div>
             </div>
         </div>
@@ -99,17 +105,20 @@
             </div>
         </div>
         <alert-box></alert-box>
+        <div class="container overlay" id="confirm">
+            
+        </div>
     </div>
 </template>
 
 <script>
 import alertBox from './templates/invalidToken';
-
+import {backend} from '../constants.js';
 import axios from 'axios';
     export default{
         data(){
             return{
-                isProducer: 0,
+                isProducer: null,
                 id: -1,
                 userPhoto: 'default.jpg',
                 firstName: '',
@@ -142,7 +151,7 @@ import axios from 'axios';
         },
         methods: {
             modifyVote: function(userId, postId, vote){ // functia modifica reactia userului de la o anumita postare cand reactioneaza cu up sau down
-                axios.get('http://127.0.0.1:8000/api/modifyVote',{
+                axios.get(backend + '/api/modifyVote',{
                     params:{
                         token: localStorage.getItem('token'),
                         userId: userId,
@@ -152,7 +161,7 @@ import axios from 'axios';
                 })
             },
             cancelVoteUp: function(postId, index, vote){
-                axios.get('http://127.0.0.1:8000/api/vote', {
+                axios.get(backend + '/api/vote', {
                     params:{
                         token: localStorage.getItem('token'),
                         postId: postId,
@@ -167,7 +176,7 @@ import axios from 'axios';
                 this.modifyVote(this.id, postId, vote)
             },
             voteUp: function(postId, index, vote){
-                axios.get('http://127.0.0.1:8000/api/vote', {
+                axios.get(backend + '/api/vote', {
                     params:{
                         token: localStorage.getItem('token'),
                         postId: postId,
@@ -182,7 +191,7 @@ import axios from 'axios';
                 this.modifyVote(this.id, postId, vote)
             },
             verifyToken: function(){
-                axios.get('http://127.0.0.1:8000/api/fetchUserData', {
+                axios.get(backend + '/api/fetchUserData', {
                     params: {
                         token: localStorage.getItem('token'),
                     }
@@ -193,7 +202,7 @@ import axios from 'axios';
             getUserPosts: function(){
                 const sendGetRequest = async() => {
                     try{
-                        const resp = await axios.get('http://127.0.0.1:8000/api/fetchUserPosts', {
+                        const resp = await axios.get(backend + '/api/fetchUserPosts', {
                     params:{
                         user_id: this.id,
                         token: localStorage.getItem('token'),
@@ -208,7 +217,7 @@ import axios from 'axios';
             getUserInformatios: function(){
                  const sendGetRequest = async() => {
                     try{
-                        const response = await axios.get('http://127.0.0.1:8000/api/fetchUserData', {
+                        const response = await axios.get(backend + '/api/fetchUserData', {
                     params: {
                         token: localStorage.getItem('token'),
                     }});
@@ -219,7 +228,6 @@ import axios from 'axios';
                     this.id = response.data['id'],
                     this.userPhoto = response.data['profile_image'],
                     this.isProducer = response.data['producer']
-                    console.log(this.isProducer);
                     if(this.userPhoto == null)
                         this.userPhoto = 'default.jpg'
                     }catch(error){
@@ -314,6 +322,22 @@ import axios from 'axios';
     }
 </script>
 <style scoped>
+    /*Fonts from frontend server*/
+    @font-face {
+        font-family: "NerkoOne";
+        src: url("../fonts/NerkoOne-Regular.ttf");
+    }
+    .logo{
+        width: 400px;
+        margin: auto;
+    }
+    .info-paragraph{
+        font-family: "NerkoOne";
+        font-size: 30px;
+        margin-top: -450px;
+        text-align: center;
+        
+    }
     .btn-react{
         background: transparent;
     }

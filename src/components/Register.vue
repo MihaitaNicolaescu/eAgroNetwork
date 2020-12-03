@@ -1,18 +1,19 @@
 <template>
-    <div class="container">
-    <h2>Register an account</h2>
+    <div class="container d-flex align-items-center flex-column">
+        <img class="logo" src="../assets/Logo.png">
+        <h2>Creaza un cont</h2>
         <form class="form-group">
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">First name</span>
+                    <span class="input-group-text">Nume de familie</span>
                 </div>
-                <input v-model="firstName" type="text" class="form-control" placeholder="First name" aria-label="nameFRegisterField" aria-describedby="basic-addon1" name="nameFRegisterField" id="nameFRegisterField">
+                <input v-model="firstName" type="text" class="form-control" placeholder="Nume de familie" aria-label="nameFRegisterField" aria-describedby="basic-addon1" name="nameFRegisterField" id="nameFRegisterField">
             </div>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">Last name</span>
+                    <span class="input-group-text">Prenume</span>
                 </div>
-                <input v-model="lastName" type="text" class="form-control" placeholder="Last name" aria-label="nameLRegisterField" aria-describedby="basic-addon1" name="nameLRegisterField" id="nameLRegisterField">
+                <input v-model="lastName" type="text" class="form-control" placeholder="Prenume" aria-label="nameLRegisterField" aria-describedby="basic-addon1" name="nameLRegisterField" id="nameLRegisterField">
             </div>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
@@ -22,26 +23,26 @@
             </div>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">Password</span>
+                    <span class="input-group-text">Parola</span>
                 </div>
-                <input v-model="password" type="password" class="form-control" placeholder="Password" aria-label="passwordField" aria-describedby="basic-addon1" name="passwordField" id="passwordField">
+                <input v-model="password" type="password" class="form-control" placeholder="Parola" aria-label="passwordField" aria-describedby="basic-addon1" name="passwordField" id="passwordField">
             </div>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">Check password</span>
+                    <span class="input-group-text">Verificare parola</span>
                 </div>
-                <input v-model="checkPassword" type="password" class="form-control" placeholder="Passwrod" aria-label="checkPasswordField" aria-describedby="basic-addon1" name="checkPasswordField" id="checkPasswordField">
+                <input v-model="checkPassword" type="password" class="form-control" placeholder="Confirmarea parolei" aria-label="checkPasswordField" aria-describedby="basic-addon1" name="checkPasswordField" id="checkPasswordField">
             </div>
              <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">Birthday</span>
+                    <span class="input-group-text">Data nasterii</span>
                 </div>
-                <input v-model="birthday" type="date" class="form-control" value="2020-01-01" aria-label="birthdayField" aria-describedby="basic-addon1" name="birthdayField" id="birthdayField">
+                <input v-model="birthday" type="date" class="form-control" value="01-01-2020" aria-label="birthdayField" aria-describedby="basic-addon1" name="birthdayField" id="birthdayField">
             </div>
             
         </form>
-        <button class="btn btn-outline-success" v-on:click="verifyFields">Register</button>
-        <router-link :to="{path: 'login'}">    Have already an account? Click here to sign in</router-link>
+        <button class="btn btn-outline-success" v-on:click="verifyFields">Creeaza cont</button>
+        <router-link :to="{path: 'login'}">    Detii deja un cont? Conecteaza-te aici</router-link>
     </div>
 </template>
 
@@ -49,7 +50,7 @@
 
 
     import axios from 'axios';
-
+import {backend} from '../constants.js';
     export default{
         data(){
             return{
@@ -65,7 +66,7 @@
         },
         methods: {
             registerUser: function(){
-                axios.post('http://127.0.0.1:8000/api/addUser', {
+                axios.post(backend + '/api/addUser', {
                     firstName: this.firstName,
                     lastName: this.lastName,
                     email: this.email,
@@ -98,13 +99,14 @@
 </script>
 
 <style scoped>
-    .container{
-        width: 500px;
-        margin-top:100px;
-    }
-
     .input-group-text{
         width: 140px !important;
+    }
+    .logo{
+        margin-bottom: 10px;
+        width: 450px;
+        height: 400px;
+        z-index: 2;
     }
 </style>
 

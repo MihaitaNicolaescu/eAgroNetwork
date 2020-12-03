@@ -50,6 +50,16 @@ export default new Router({
                 
         },
         {
+            path: '/aplica',
+            name: 'aplica',
+            component: () => import('./components/Aplica.vue'),
+            beforeEnter: (to, from, next) => {
+                if(!localStorage.getItem('token')) next('/login')
+                else next();
+            }
+                
+        },
+        {
             path :'*',
             component: () => import('./components/404.vue')
         }
