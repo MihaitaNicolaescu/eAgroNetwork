@@ -10,6 +10,22 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function cancelProducer(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            return response()->json(['error' => 'INVALID_TOKEN'], 401);
+        }
+        try{
+            $user = User::where('id', '=', $request->producer_id)->first();
+            $user->producer = 0;
+            $user->save();
+            return response()->json(['message' => 'SUCCESS']);
+        }catch(Exception $e){
+            return response()->json(['message' => 'Error on accesing database!'], 417);
+        }
+    }
+
     public function getFallow(Request $request){
         try{
             $recived = auth()->userOrFail();
@@ -42,13 +58,13 @@ class UserController extends Controller
             $array = User::where('id', '=', $recived['id'])->first();
             $fallowList = json_decode($array->fallowed);
             $key = array_search($request->fallowId, $fallowList);
-            
-            
+
+
             unset($fallowList[$key]);
             $fallowList = array_values($fallowList);
             $array->fallowed = json_encode($fallowList);
             $array->save();
-        }catch(Exception $e){    
+        }catch(Exception $e){
             return response()->json(['message' => 'Error on save data in database!'], 417);
         }
     }
@@ -69,7 +85,7 @@ class UserController extends Controller
             $user->fallowed = $fallowList;
             $user->save();
             $recived['fallowed'] = $fallowList;
-        }catch(Exception $e){    
+        }catch(Exception $e){
             return response()->json(['message' => 'Error on save data in database!'], 417);
         }
     }
@@ -88,7 +104,7 @@ class UserController extends Controller
             $user = User::where('id', $recived['id'])->first();
             $user->profile_image = $imageName;
             $user->save();
-            return response()->json(['message' => 'Image uploaded!'], 200); 
+            return response()->json(['message' => 'Image uploaded!'], 200);
         }catch(Exception $e){
             return response()->json(['message' => 'Error on save data in database!'], 417);
         }
@@ -108,7 +124,7 @@ class UserController extends Controller
             $user->email = $request->email;
             $user->birthday = $request->birthday;
             $user->save();
-            return response() -> json(['message' => 'Succes'], 200);  
+            return response() -> json(['message' => 'Succes'], 200);
         }catch(Exception $e){
             return response()->json(['message' => 'Error on save data in database!'], 417);
         }
@@ -174,7 +190,7 @@ class UserController extends Controller
                 $credentials = $request->only(['email', 'password']);
                 if (!$token = auth('api')->attempt($credentials)) {
                     return response()->json(['error' => 'Unauthorized'], 401);
-                }        
+                }
                 return response()->json(['token' => $token, 'admin' => $user->admin], 200);
             }else{
                 return response() -> json([

@@ -3,7 +3,7 @@
         <nav class="navbar navbar-light bg-light d-flex justify-content-center">
            <button class="btn btn-outline-secondary" v-on:click="back">Back</button>
             <button class="btn btn-outline-secondary" >Reports</button>
-            <button class="btn btn-outline-secondary" >Applications</button>
+            <button class="btn btn-outline-secondary" v-on:click="aplications">Applications</button>
             <form class="search-user d-flex justify-content-center">
                 <input v-model="searchedUser" class="form-control mr-sm-2 input-search" type="search" placeholder="Search a user here" aria-label="Search">
                 <button v-if="!active || active != 1" class="btn search-btn" type="button" v-on:click="searchUser()"><i class="material-icons icon-search">search</i></button>
@@ -21,6 +21,7 @@
                     <th scope="col">EMAIL</th>
                     <th scope="col">PRODUCATOR</th>
                     <th scope="col"></th>
+                    <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -33,7 +34,10 @@
                         <td v-if="user.producer == true"><span class="material-icons">done_outline</span></td>
                         <td v-else><span class="material-icons">clear</span></td>
                         <td>
-                            <button class="btn btn-outline-danger" type="button" v-on:click="deleteUser(user.id)">Delete</button> 
+                            <button class="btn btn-outline-danger" type="button" v-on:click="deleteUser(user.id)">Sterge utilizator</button>
+                        </td>
+                        <td>
+                          <button v-if="user.producer == true" style="width: 170px" class="btn btn-outline-danger" type="button" v-on:click="cancelProducer(user.id)">Anulare producator</button>
                         </td>
                     </tr>
                 </tbody>
@@ -99,6 +103,19 @@
             'alert-box': alertBox,
         },
         methods: {
+            cancelProducer: function(producerID){
+              axios.post(backend+ '/api/cancelProducer',{
+                token: localStorage.getItem('token'),
+                producer_id: producerID,
+              }).then(()=>{
+                this.getUsers()
+              }).catch((e)=>{
+                console.log(e)
+              })
+            },
+            aplications: function(){
+              this.$router.push('/admin/applications');
+            },
             deleteUser: function(id){
                 axios.post(backend+'/api/admin/delete', {
                     id: id,

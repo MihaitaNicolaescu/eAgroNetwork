@@ -283,7 +283,7 @@ import axios from 'axios';
                 this.lastName = this.tempLName;
                 this.email = this.tempEmail;
                 this.birthday = this.tempBirthday;
-                axios.post('http://127.0.0.1:8000/api/updateUserData', {
+                axios.post(backend+'/api/updateUserData', {
                         firstName: this.firstName,
                         lastName: this.lastName,
                         email: this.email,
@@ -302,7 +302,7 @@ import axios from 'axios';
                 const fd = new FormData();
                 fd.append('image', this.selectedFile, 'profile_image_'+this.id);
                 fd.append('token', localStorage.getItem('token'));
-                axios.post('http://127.0.0.1:8000/api/updateUserProfilePhoto', fd, {
+                axios.post(backend+'/api/updateUserProfilePhoto', fd, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }

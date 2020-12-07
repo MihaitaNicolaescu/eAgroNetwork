@@ -1,10 +1,10 @@
 <template>
     <div class="container">
-        <nav v-if="invalidUser == false" class="navbar navbar-light bg-light">
+        <nav v-if="invalidUser === false" class="navbar navbar-light bg-light">
            <button style="" class="btn btn-outline-secondary" v-on:click="home">Home</button>
         </nav> 
         <div class="container">
-            <div v-if="invalidUser == false" class="d-flex align-items-left flex-column" style="height: 100px; margin-top: 50px;">
+            <div v-if="invalidUser === false" class="d-flex align-items-left flex-column" style="height: 100px; margin-top: 50px;">
                 <div class="row">
                     <div class="col-3">
                         <div id="profile">
@@ -16,8 +16,8 @@
                                 <p class="info">Birthday: {{ birthday }}</p>
                                 <p class="info">Producator atestat <img style="width:45px" src="../assets/Logo.png"></p>
                             </div>
-                            <button v-if="!fallowed && fallowed!=null && isProducer == 1" class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste</button>
-                            <button v-if="fallowed && fallowed!=null && isProducer == 1" class="btn btn-danger btn-sm" type="button" v-on:click="cancelFallow()">Nu mai urmari</button>
+                            <button v-if="!fallowed && fallowed!=null && isProducer === 1" class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste</button>
+                            <button v-if="fallowed && fallowed!=null && isProducer === 1" class="btn btn-danger btn-sm" type="button" v-on:click="cancelFallow()">Nu mai urmari</button>
                         </div>
                     </div>
                     <div id="posts" class="col-7">
@@ -33,22 +33,21 @@
                                 <div class="d-flex align-items-center flex-column image-post">
                                     <img class="post-image" :src="require('../assets/posts/' + post.filename)">
                                 </div>
-                                <button v-show="post.vote == 0 || post.vote == null || post.vote == -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
-                                <button v-show="post.vote == 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
+                                <button v-show="post.vote === 0 || post.vote == null || post.vote === -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
+                                <button v-show="post.vote === 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
                                 <span>{{post.votes}}</span>
                                 <button class="btn btn-react" type="button"><span class="material-icons">insert_comment</span></button>
                             </div>
                         </div>
-                        <div v-if="isProducer == 0">
+                        <div v-if="isProducer === 0">
                             <img class="logo" src="../assets/Logo_cos.png">
                         </div>
                         
                     </div>
-                        <p v-if="isProducer == 0" class="info-paragraph">Acest utlizator nu este inca inregistrat pe aplicatie ca fiind un producator.</p>
+                        <p v-if="isProducer === 0" class="info-paragraph">Acest utlizator nu este inca inregistrat pe aplicatie ca fiind un producator.</p>
                 </div>
             </div>
-            <div class="container">
-                <p style="margin-top: 200px;" class="not-found">（ ﾟДﾟ）</p>
+            <div v-if="invalidUser === true" class="container">
                 <p class="not-found">Utilizator invalid.</p>
                 <p class="go-home">Apasa <router-link :to="{path: '/'}">aici</router-link> pentru a te intoarce la pagina principala.</p>
             </div>

@@ -50,6 +50,16 @@ export default new Router({
                 
         },
         {
+            path: '/admin/applications',
+            name: 'applications',
+            component: () => import('./components/Applications.vue'),
+            beforeEnter: (to, from, next) => {
+                if(!localStorage.getItem('token')) next('/login')
+                else next();
+            }
+
+        },
+        {
             path: '/aplica',
             name: 'aplica',
             component: () => import('./components/Aplica.vue'),
@@ -59,6 +69,16 @@ export default new Router({
             }
                 
         },
+        {
+            path: '/admin/applications/:id',
+            name: 'aplicationID',
+            component: () => import('./components/Application.vue'),
+            beforeEnter: (to, from, next) => {
+                if(!localStorage.getItem('token')) next('/login')
+                else next();
+            }
+        },
+
         {
             path :'*',
             component: () => import('./components/404.vue')

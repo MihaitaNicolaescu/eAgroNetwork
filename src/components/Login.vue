@@ -2,7 +2,7 @@
     <div id="login">
         <div class="container d-flex align-items-center flex-column">
             <img class="logo" src="../assets/Logo.png">
-            <h2>Conecteaza-te in cont</h2>
+            <h2>Conectează-te în cont</h2>
             <div class="container my-5">
                 <div class="row">
                     <div class="col-md-6 mx-auto">
@@ -15,8 +15,8 @@
                             <label class="form-control-placeholder" for="password">Parola</label>
                         </div>
                         <div>
-                            <button type="button" class="btn-login d-inline p-2" v-on:click="checkForms">Login</button>
-                            <p  class="d-inline p-2">Nu ai un cont? <router-link :to="{path: 'register'}">   Apasa aici</router-link></p>
+                            <button type="button" class="btn-login d-inline p-2" v-on:click="checkForms">Conectează-te</button>
+                            <p  class="d-inline p-2">Nu ai un cont? <router-link :to="{path: 'register'}">   Apasă aici</router-link></p>
                         </div>
                     </div>
                 </div>
@@ -81,7 +81,6 @@
         color:#9f5ac7;
         border: 2px#9f5ac7 solid;
         border-radius: 4px;
-        text-transform: uppercase;
         outline: 0;
         overflow:hidden;
         background: none;

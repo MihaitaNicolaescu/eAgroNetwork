@@ -19,8 +19,8 @@
                 <li style="display: block ruby !important;" class="list-group-item search-item" v-for="result in results.slice(0,10)" :key="result.id">
                     <a class="link" :href="'/profile/' + result.searchable.id">
                         <div class="link-profile" style="display: block ruby;">
-                            <img v-if="result.searchable.profile_image !== 'default.jpg'" id="search-image" :src="require('@/assets/profiles/profile_image_' + result.searchable.id + '.jpg')" alt="Prof. img" width="50" height="50">
-                            <img v-else id="search-image" :src="require('@/assets/profiles/default.jpg')" alt="Prof. img" width="50" height="50">
+                            <img v-if="result.searchable.profile_image !== 'default.jpg'" class="search-image" :src="require('@/assets/profiles/profile_image_' + result.searchable.id + '.jpg')" alt="Prof. img" width="50" height="50">
+                            <img v-else class="search-image" :src="require('@/assets/profiles/default.jpg')" alt="Prof. img" width="50" height="50">
                             <p style="color:black;" v-text="result.searchable.lastName + ' ' + result.title"></p>
                         </div>
                     </a>

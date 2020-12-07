@@ -6,13 +6,16 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DetailsController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostVoteController;
+use App\Http\Controllers\AplicationController;
 
 
 Route::post('/addUser', [UserController::class, 'createUser']); // inregistrarea unui user
 Route::post('/logout', [UserController::class, 'logoutUser']); // deconectarea userului actual
 Route::post('/login', [UserController::class, 'loginUser']); // conectarea unui user
 Route::get('/fetchUserData', [UserController::class, 'fetchUserData']); // preluarea datelor unui user
-Route::get('/fetchProfile', [UserController::class, 'fetchProfile']); 
+Route::get('/fetchProfile', [UserController::class, 'fetchProfile']);
+Route::post('/cancelProducer', [UserController::class, 'cancelProducer']); // anuleaza gradul unui producator
+
 
 Route::post('/updateUserData', [UserController::class, 'updateUserData']);
 
@@ -42,3 +45,13 @@ Route::post('/cancelFallowUser', [UserController::class, 'deleteFallower']);
 Route::get('/fetchFallowList', [UserController::class, 'fetchFallowList']);
 Route::get('/fetchFallowPosts', [PostController::class, 'fetchFallowPosts']);
 Route::get('/getFallow', [UserController::class, 'getFallow']);
+
+Route::post('/addApplication', [AplicationController::class, 'addApplication']);
+Route::post('/addApplicationDocsCI', [AplicationController::class, 'uploadFormCI']);
+Route::post('/addApplicationDocsCertificat', [AplicationController::class, 'uploadFormCertificat']);
+Route::get('/checkApplication', [AplicationController::class, 'checkForApplication']);
+Route::post('/deleteApplication', [AplicationController::class, 'deleteApplication']);
+Route::get('/getApplications', [AplicationController::class, 'getApplications']);
+Route::get('/getApplication', [AplicationController::class, 'getApplication']); // returneaza informatiile afernte unei anumite aplicatii
+Route::post('/acceptApplication', [AplicationController::class, 'acceptApplication']); // returneaza informatiile afernte unei anumite aplicatii
+
