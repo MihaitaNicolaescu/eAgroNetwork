@@ -34,10 +34,7 @@
                         <td v-if="user.producer == true"><span class="material-icons">done_outline</span></td>
                         <td v-else><span class="material-icons">clear</span></td>
                         <td>
-                            <button class="btn btn-outline-danger" type="button" v-on:click="deleteUser(user.id)">Sterge utilizator</button>
-                        </td>
-                        <td>
-                          <button v-if="user.producer == true" style="width: 170px" class="btn btn-outline-danger" type="button" v-on:click="cancelProducer(user.id)">Anulare producator</button>
+                          <button data-toggle="modal" data-target="#modal-user" class="btn btn-secondary" v-on:click="actualUser(user.id, index)">Administrare</button>
                         </td>
                     </tr>
                 </tbody>
@@ -47,6 +44,33 @@
                 <span>Page {{pagination.current_page}} of {{pagination.last_page}}</span>
                 <button class="btn btn-default" v-on:click="fetchPaginateUsers(pagination.next_page)" :disabled="!pagination.next_page">Next</button>
             </div>
+          <!-- Modal pentru administrarea unui user -->
+          <div class="modal fade bd-example-modal-sm" id="modal-user" tabindex="-1" role="dialog" aria-labelledby="modal-user" aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modal-user-title">Administrare utilizator</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="d-flex align-items-center flex-column">
+                    <button class="btn btn-danger btn-modal" type="button" v-on:click="deleteUser(actualUserId)">Sterge utilizator</button>
+                    <div v-if="this.actualUserIndex !== null && this.actualUserId !== null">
+                      <button v-if="users[this.actualUserIndex].producer === 1" class="btn btn-danger btn-modal" type="button" v-on:click="cancelProducer(actualUserId)">Sterge grad</button>
+                    </div>
+                    <button class="btn btn-danger btn-modal">Restrictionare</button>
+                    <button class="btn btn-warning btn-modal">Averitare</button>
+                  </div>
+
+                </div>
+                <div class="modal-footer d-flex align-items-center flex-column">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Inchide</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <alert-box></alert-box>
         <div id="confirm-box">
@@ -59,6 +83,9 @@
 </template>
 
 <style scoped>
+    .btn-modal{
+      margin-bottom: 5px;
+    }
     .btn{
         margin-right: 10px;
         width:130px
@@ -81,6 +108,8 @@
                 users: null,
                 searchedUser: '',
                 active: 0,
+                actualUserId: null,
+                actualUserIndex: null,
             }
         }, 
         
@@ -103,6 +132,10 @@
             'alert-box': alertBox,
         },
         methods: {
+            actualUser: function(id, index){
+              this.actualUserId = id;
+              this.actualUserIndex = index;
+            },
             cancelProducer: function(producerID){
               axios.post(backend+ '/api/cancelProducer',{
                 token: localStorage.getItem('token'),

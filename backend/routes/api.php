@@ -47,11 +47,12 @@ Route::get('/fetchFallowPosts', [PostController::class, 'fetchFallowPosts']);
 Route::get('/getFallow', [UserController::class, 'getFallow']);
 
 Route::post('/addApplication', [AplicationController::class, 'addApplication']);
-Route::post('/addApplicationDocsCI', [AplicationController::class, 'uploadFormCI']);
-Route::post('/addApplicationDocsCertificat', [AplicationController::class, 'uploadFormCertificat']);
+Route::post('/addApplicationDocs', [AplicationController::class, 'uploadForm']);
 Route::get('/checkApplication', [AplicationController::class, 'checkForApplication']);
 Route::post('/deleteApplication', [AplicationController::class, 'deleteApplication']);
 Route::get('/getApplications', [AplicationController::class, 'getApplications']);
 Route::get('/getApplication', [AplicationController::class, 'getApplication']); // returneaza informatiile afernte unei anumite aplicatii
 Route::post('/acceptApplication', [AplicationController::class, 'acceptApplication']); // returneaza informatiile afernte unei anumite aplicatii
+Route::post('/rejectApplication', [AplicationController::class, 'rejectApplication']);
+Route::post('/enableEditApplication', [AplicationController::class, 'enableEditApplication']);
 

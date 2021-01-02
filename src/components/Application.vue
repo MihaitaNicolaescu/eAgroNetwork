@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="col-md-12 text-center">
-        <button style="margin-right: 10px;" class="btn btn-danger" type="button">Respinge</button>
+        <button style="margin-right: 10px;" data-toggle="modal" data-target="#rejectModal" class="btn btn-danger" type="button">Respinge</button>
         <button class="btn btn-success" data-toggle="modal" data-target="#acceptModal" type="button">Aproba</button>
       </div>
     </div>
@@ -47,12 +47,32 @@
             <h5 class="modal-title" id="deleteModalLongTitle">Confirmare</h5>
           </div>
           <div class="modal-body">
-            <p>Dupa confirmare utilizatorul {{applicationDetails.user_firstName}} {{applicationDetails.user_lastName}}
-            va primi gradul de producator in aplicatie.</p>
+            <p>Dupa confirmare {{applicationDetails.user_firstName}} {{applicationDetails.user_lastName}} cu emailul
+              {{applicationDetails.user_email}} va primi gradul de producator in aplicatie.</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuleaza</button>
             <button type="button" class="btn btn-success" data-dismiss="modal" v-on:click="acceptApplication">Accepta aplicatia</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Modal pentru respingerea aplicatiei -->
+    <div v-if="applicationDetails!=null" class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="jerectModalLongTitle">Confirmare respingere aplicatie</h5>
+          </div>
+          <div class="modal-body">
+            <p id="infoRespingere">Obligatoriu specificati motivul respingeri!</p>
+            <div class="form-group">
+              <textarea v-model="motiv" class="form-control" id="motivRespingere" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuleaza</button>
+            <button type="button" class="btn btn-success" id="reject" v-on:click="rejectApplication">Confirma respingerea aplicatiei</button>
           </div>
         </div>
       </div>
@@ -64,11 +84,13 @@
   import axios from "axios";
   import {backend} from "@/constants";
 
+
   export default{
     data(){
       return{
         applicationDetails: null,
         userId: this.$route.params.id,
+        motiv: null,
       }
     },
     mounted(){
@@ -87,12 +109,28 @@
       this.getApplicationInfo();
     },
     methods:{
+      rejectApplication: function(){
+        if(this.motiv !== null && this.motiv !== '') {
+          axios.post(backend + '/api/rejectApplication', {
+            token: localStorage.getItem('token'),
+            user_id: this.userId,
+            motiv: this.motiv,
+          }).then(()=>{
+            // eslint-disable-next-line no-undef
+            $('#rejectModal').modal('hide');
+            this.$router.push('/admin/applications');
+          })
+        }else{
+          document.getElementById('infoRespingere').style.color= "red";
+        }
+      },
       acceptApplication: function(){
         axios.post(backend + '/api/acceptApplication', {
           token: localStorage.getItem('token'),
-          resp: true,
           user_id: this.userId,
         }).then(()=>{
+          // eslint-disable-next-line no-undef
+          $('#rejectModal').modal('hide');
           this.$router.push('/admin/applications');
         })
       },
@@ -109,7 +147,7 @@
         })
       },
       back: function(){
-        this.$router.push('/admin');
+        this.$router.push('/admin/applications');
       },
     }
   }

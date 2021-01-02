@@ -108,7 +108,7 @@ import {backend} from '../constants.js';
                 }).then(
                     this.fallowed = true,
                 ).catch((error)=>{
-                    if(error['message'] == "token") document.getElementById('overlay-alert').style.display ="block";
+                    if(error['message'] === "token") document.getElementById('overlay-alert').style.display ="block";
                     else console.log(error);
                 })
             },

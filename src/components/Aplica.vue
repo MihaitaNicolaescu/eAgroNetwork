@@ -4,7 +4,7 @@
            <button class="btn btn-home" v-on:click="home"><span class="material-icons">home</span></button>              
         </nav>
         <h3 style="text-align: center;">Aplicatie pentru gradul de producator</h3>
-        <div class="edit" v-if="checkIfHasAplication === false && checkIfHasAplication !=null">
+        <div class="edit" v-if="checkIfHasAplication === false || (application.pending === 0 && application != null && application.status !== -1)">
             <form class="form-group">
                 <div class="d-flex align-items-center flex-column">
                     <div class="d-flex flex-row">
@@ -76,12 +76,12 @@
                         </div>
                     </div>
                     <div class="custom-file">
-                        <input type="file" @change="selectCertificat" class="custom-file-input" id="certificat_producator" required>
-                        <label class="custom-file-label" for="certificat_producator">Selectati copia certificatului de producator</label>
+                        <input type="file" class="custom-file-input" id="copie_certificat" @change="onCopieCertificatSelected" accept=".jpg, .png, .pdf" required>
+                        <label class="custom-file-label" for="copie_certificat">Selectati copia certificatului de producator</label>
                         <div class="invalid-feedback">Invalid file</div>
                     </div>
                     <div class="custom-file">
-                        <input type="file"  @change="selectCI" class="custom-file-input" id="copie_ci" required>
+                        <input type="file"  class="custom-file-input" id="copie_ci" @change="onCopieCISelected" required accept=".jpg, .png,.pdf">
                         <label class="custom-file-label" for="copie_ci">Selectati copia C.I/B.I</label>
                         <div class="invalid-feedback">Invalid file</div>
                     </div>
@@ -101,9 +101,9 @@
         <p>Aplicatia a fost respinsa, motivul se poate regasi mai jos!</p>
         <p>Puteti trimite o noua aplicatie corectand greselile specificate in motivul respingeri, daca trimiteti o aplicatie de mai multe ori
           puteti primi interdictie la acest grad.</p>
-        <button data-toggle="modal" class="btn btn-danger" data-target="#">Editeaza aplicatia</button>
+          <p>Motivul respingeri: {{application.motiv_respingere}}</p>
+        <button class="btn btn-danger" v-on:click="enableEditApplication">Editeaza aplicatia</button>
       </div>
-      <!-- DE FACUT FUNCTIA CARE LASA UTILIZATORUL SA O EDITEZE SI DE PUS CONDITIILE LA AFISAREA CAMPURILOR -->
       <!--Modal pentru confirmarea stergerii aplicatiei -->
       <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -182,6 +182,7 @@
             this.verifyIfAplciationExists();
         },
         methods:{
+
             deleteApplication: function(){
                 axios.post(backend + '/api/deleteApplication', {
                     token: localStorage.getItem('token'),
@@ -191,6 +192,15 @@
                   console.log(error)
               })
             },
+
+            enableEditApplication: function(){
+              axios.post(backend + '/api/enableEditApplication',{
+                token: localStorage.getItem('token'),
+              }).then(()=>{
+                window.location.reload();
+              })
+            },
+
             verifyIfAplciationExists: function(){
                 axios.get(backend + '/api/checkApplication', {
                   params:{
@@ -213,6 +223,7 @@
                     this.nr_certificat =  this.application.nr_certificat;
                     this.primaria = this.application.primaria;
                     this.alte_precizari = this.application.alte_precizari;
+                    this.checkIfHasAplication = true;
                   }
                 }).catch((error)=>{
                   console.log(error);
@@ -236,8 +247,10 @@
                       email: this.email,
                       altele: this.alte_precizari,
                       token: localStorage.getItem('token'),
+                      existApp: this.checkIfHasAplication,
                     }).then(()=>{
-                      this.$router.go(0);
+                      //this.$router.go(0);
+                      this.onUploadDocs();
                     })
                 }else{
                   console.log('Urmeaza afisarea erorilor :D');
@@ -246,7 +259,7 @@
             verifyForm: function(){
                 if(this.firstName!=='' && this.lastName!=='' && this.judet!=='' && this.localitate!==''
                 && this.adresa!=='' && this.seria!=='' && this.numar_serie!=='' && this.cnp!==''
-                && this.nr_certificat!=='' && this.primaria!==''){
+                && this.nr_certificat!=='' && this.primaria!=='' && this.copie_ci !== null && this.copie_certificat !== null){
                   this.infoForm = 'Va rog sa confirmați trimiterea formularului. Daca formularul nu contine date reale riscati sa primiti interdictie pentru a accesa acest grad.';
                   this.validForm = true;
                 }else{
@@ -261,39 +274,34 @@
                   if(this.cnp === '') this.errors.push('Campul CNP este necesar.');
                   if(this.nr_certificat === '') this.errors.push('Campul Nr.Certificat este necesar');
                   if(this.primaria === '') this.errors.push('Campul primaria este necesar');
-                  this.infoForm = 'Aplicatia are campuri necompletate!';
+                  if(this.copie_certificat === null) this.errors.push('Este necesara selectarea unei copii in format jpg sau png a certificatului de producator');
+                  if(this.copie_ci === null) this.errors.push('Este necesara selectarea unei copii in format jpg sau png a C.I');
+                  this.infoForm = 'Aplicatia are campuri necompletate sau nu sunt selectate documentele cerute!';
                   this.validForm = false;
                 }
             },
-            onUploadCI: function(){
+            onCopieCISelected(){
+              this.copie_ci = null;
+              this.copie_ci = document.getElementById("copie_ci").files[0];
+            },
+            onCopieCertificatSelected(){
+              this.copie_certificat = null;
+              this.copie_certificat = document.getElementById("copie_certificat").files[0];
+            },
+            onUploadDocs: function() {
               const fd = new FormData();
-              fd.append('copie_certificat', this.copie_certificat, 'copie_ci_'+this.id);
+              fd.append('copie_ci', this.copie_ci, 'copie_ci_' + this.id + '.jpg');
+              fd.append('copie_certificat', this.copie_certificat, 'copie_certificat_' + this.id+ '.jpg');
               fd.append('token', localStorage.getItem('token'));
-              axios.post(backend+'/api/addApplicationDocsCI', fd, {
+              axios.post(backend + '/api/addApplicationDocs', fd, {
                 headers: {
                   'Content-Type': 'multipart/form-data'
                 }
-              }).catch((error)=>{
+              }).then(() =>{
+                this.$router.push("/")
+              }).catch((error) => {
                 console.log(error);
               })
-            },
-            onUploadCertificat: function(){
-                const fd = new FormData();
-                fd.append('copie_certificat', this.copie_certificat, 'copie_certificat_'+this.id);
-                fd.append('token', localStorage.getItem('token'));
-                axios.post(backend+'/api/addApplicationDocsCertificat', fd, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                })
-            },
-            selectCI(event){
-                this.copie_ci = null;
-                this.copie_ci = event.target.files[0]
-            },
-            selectCertificat(event){
-                this.copie_certificat = null;
-                this.copie_certificat = event.target.files[0]
             },
             verifyToken: function(){
                 axios.get(backend + '/api/fetchUserData', {
@@ -313,6 +321,8 @@
                         token: localStorage.getItem('token'),
                     }
                 }).then((response)=>{
+                    if(response.data['producer'] === 1)
+                        this.$router.push("/");
                     this.id = response.data['id'];
                     this.firstName = response.data['firstName'];
                     this.lastName = response.data['lastName'];
