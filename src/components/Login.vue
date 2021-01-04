@@ -22,12 +22,44 @@
                 </div>
             </div>      
         </div>
+      <!-- Modal pentru invalid credentials -->
+        <div class="modal fade" id="modalError" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Date incorecte</h5>
+              </div>
+              <div class="modal-body">
+                Adresa de email sau parola nu sunt corecte!
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      <!-- Modal pentru ban -->
+      <div class="modal fade" id="bannedModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">BANNED</h5>
+            </div>
+            <div class="modal-body">
+              <div class="pre-formatted">{{ info }}</div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Inchide</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 </template>
 <script>
 
     import axios from 'axios';
-    import {backend} from '../constants.js';
+    import {backend} from '@/constants';
 
     export default {
         data(){
@@ -35,7 +67,8 @@
                 email: '',
                 password: '',
                 //eslint-disable-next-line
-                reg: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
+                reg: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/,
+                info: '',
             }
         },
         methods: {
@@ -48,20 +81,33 @@
                         'Content-Type': 'application/json',
                     }
                 }).then((res) =>{
+                  if(res.data['message'] === "failed"){
+                    // eslint-disable-next-line no-undef
+                    $('#modalError').modal('show');
+                  }else if(res.data['message'] === "IS_BANNED"){
+                     this.info = res.data['info'];
+                    // eslint-disable-next-line no-undef
+                    $('#bannedModal').modal('show');
+                  }else{
                     localStorage.setItem('token', res.data['token']);
                     localStorage.setItem('admin', res.data['admin']);
                     this.$router.push('/');
+                  }
                 }).catch((error)=>{
                     console.log(error);
                 });
             },
             checkForms: function(){
-                if(!this.email && !this.password)  alert('Please insert email and password');
-                else if(!this.password) alert('Please insert password');
+                if(!this.email && !this.password)   // eslint-disable-next-line no-undef
+                  $('#modalError').modal('show');
+                else if(!this.password)  // eslint-disable-next-line no-undef
+                  $('#modalError').modal('show');
                 else if(!this.email){
-                    alert('Please insert email');
+                  // eslint-disable-next-line no-undef
+                  $('#modalError').modal('show');
                 }
-                else if(!this.reg.test(this.email)) alert('Invalid email! Example for a valid email: example@domain.com');
+                else if(!this.reg.test(this.email))  // eslint-disable-next-line no-undef
+                  $('#modalError').modal('show');
                 else this.login();
             },
         }
@@ -69,6 +115,9 @@
 </script>
 
 <style scoped>
+    .pre-formatted {
+      white-space: pre;
+    }
     button {
         position: relative;
         height: 45px;

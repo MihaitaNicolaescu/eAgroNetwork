@@ -10,29 +10,52 @@
                 <button v-if="isProducer == 0 && isProducer!=null " class="btn btn-success" v-on:click="aplica()">Devino producator</button>
                 <button v-if="admin" class="btn btn-icons" v-on:click="adminPanel"><span class="material-icons">admin_panel_settings</span></button>
                 <button class="btn btn-icons" v-on:click="profile"><span class="material-icons">account_circle</span></button>
-                <button v-if="this.hasNotifications > 0" v-on:click="showNotifications()" class="btn btn-icons"><span class="material-icons">mark_email_unread</span></button>
-                <button v-else class="btn btn-icons" v-on:click="showNotifications()"><span class="material-icons">email</span></button>
+                <button v-if="this.hasNotifications === 1" v-on:click="showNotifications()" class="btn btn-icons"><span class="material-icons">mark_email_unread</span></button>
+                <button v-if="this.hasNotifications === 0" class="btn btn-icons" v-on:click="showNotifications()"><span class="material-icons">email</span></button>
             </div>
         </nav>
         <ul class="list-group list-search" v-if="results.length > 0 && query">
-                
-                <li style="display: block ruby !important;" class="list-group-item search-item" v-for="result in results.slice(0,10)" :key="result.id">
+                <li class="list-group-item search-item" v-for="result in results.slice(0,10)" :key="result.id">
                     <a class="link" :href="'/profile/' + result.searchable.id">
-                        <div class="link-profile" style="display: block ruby;">
-                            <img v-if="result.searchable.profile_image !== 'default.jpg'" class="search-image" :src="require('@/assets/profiles/profile_image_' + result.searchable.id + '.jpg')" alt="Prof. img" width="50" height="50">
-                            <img v-else class="search-image" :src="require('@/assets/profiles/default.jpg')" alt="Prof. img" width="50" height="50">
-                            <p style="color:black;" v-text="result.searchable.lastName + ' ' + result.title"></p>
-                        </div>
+                      <div class="link-profile" style="display: block ruby;">
+                          <img v-if="result.searchable.profile_image !== 'default.jpg'" class="search-image" :src="require('@/assets/profiles/profile_image_' + result.searchable.id + '.jpg')" alt="Prof. img" width="50" height="50">
+                          <img v-else class="search-image" :src="require('@/assets/profiles/default.jpg')" alt="Prof. img" width="50" height="50">
+                          <p style="color:black; display: inline-block;" v-text="result.searchable.lastName + ' ' + result.title"></p>
+                      </div>
                     </a>
                 </li>
         </ul>
         <div id="notifications-box">
-             
-            <ul class="list-group list-search list-notifications" v-if="hasNotifications == 0">
+
+            <ul class="list-group list-search list-notifications">
+              <div v-if="hasNotifications === 0">
                 <li class="list-group-item">
-                    <p>Nu ai notificari necitite</p>
-                    <button style="float:right;" class="btn btn-danger btn-sm" type="button" v-on:click="closeNotifications()">Close</button>
+                  <p>Nu ai notificari necitite</p>
+                  <button class="btn btn-danger btn-sm" type="button" v-on:click="closeNotifications()">Close</button>
                 </li>
+              </div>
+              <div v-else>
+                <li class="list-group-item">
+                  <button style="" class="btn btn-danger btn-sm" type="button" v-on:click="closeNotifications()">Close</button>
+                  <button style="float:right;" class="btn btn-danger btn-sm" type="button">Marcheaza tot ca citit</button>
+                  <button style="margin-left: 10px;" class="btn btn-danger btn-sm" type="button">Afisare notificari</button>
+                </li>
+                <div v-for="notification in notifications.slice(0,5)" :key="notification.id">
+                  <li class="list-group-item">
+                    <div style="display: block;" class="user-info">
+                      <div style="margin-bottom: 5px;" class="row">
+                        <div class="col-2">
+                          <img class="user-info-img" src="../assets/profiles/profile_image_1.jpg">
+                        </div>
+                        <div class="col-10">
+                          <p style="margin-bottom: 0px;">{{notification.firstName}} {{notification.lastName}}</p>
+                          <p style="display: block; font-weight: normal;" >{{notification.message}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </div>
+              </div>
             </ul>
         </div>
         <div class="posts-container d-flex align-items-center flex-column">
@@ -41,7 +64,7 @@
                     <div class="container-post sn p-3">
                         <div class="user-info">
                             <img class="user-info-img" :src="require('@/assets/profiles/' + post.profile_image)">
-                            <p>{{post.firstName + " " + post.lastName}}</p>
+                            <a style="color: black; text-decoration: none;" :href="'/profile/' + post.user_id">{{post.firstName + " " + post.lastName}}</a>
                         </div>
                         <div class="post-description">
                         {{post.description}} 
@@ -72,18 +95,22 @@
                 query: null,
                 results: [],
                 admin: 0,
-                hasNotifications: 0,
+                hasNotifications: null,
                 fallowList: [],
                 fallowPosts: [],
                 isProducer: null,
+                notifications: [],
             }
         },
         components: {
             'alert-box': alertBox,
         },
+        created(){
+          setInterval(() => {
+              this.getNotifications();
+            }, 30000)
+        },
         mounted(){
-            
-
             axios.get(backend+'/api/fetchProfile', {
                 params: {
                     id: this.$route.params.id
@@ -108,11 +135,11 @@
             }).then((response)=>{
                this.admin = response.data['admin'];
                this.isProducer = response.data['producer'];
-               this.hasNotifications = response.data['notifications'];
+               //this.hasNotifications = response.data['notifications'];
             }).catch(() =>{
                 this.$router.push('login');    
             })
-
+            this.getNotifications();
             this.getUserFallowList();
         },
         watch: {
@@ -126,6 +153,19 @@
             }
         },
         methods:{
+             getNotifications: function(){
+               axios.get(backend+'/api/getUnreadNotifications', {
+                 params:{
+                   token: localStorage.getItem('token'),
+                 }
+               }).then((res) =>{
+                    this.notifications = res.data['notifications'];
+                    if(this.notifications.length > 0) this.hasNotifications = 1;
+                    else this.hasNotifications = 0;
+               }).catch((error)=>{
+                 console.log(error);
+               })
+             },
              modifyVote: function(userId, postId, vote){ // functia modifica reactia userului de la o anumita postare cand reactioneaza cu up sau down
                 axios.get(backend+'/api/modifyVote',{
                     params:{

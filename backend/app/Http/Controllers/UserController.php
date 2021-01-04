@@ -2,6 +2,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Notification;
+use http\Exception;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use App\Http\Controllers\Controller;
@@ -64,6 +66,8 @@ class UserController extends Controller
             $fallowList = array_values($fallowList);
             $array->fallowed = json_encode($fallowList);
             $array->save();
+            $notification = Notification::where('from', '=', $recived['id'])->where('type', '=', 1)->where('id_user', '=', $request->fallowId)->first();
+            $notification->delete();
         }catch(Exception $e){
             return response()->json(['message' => 'Error on save data in database!'], 417);
         }
@@ -85,6 +89,15 @@ class UserController extends Controller
             $user->fallowed = $fallowList;
             $user->save();
             $recived['fallowed'] = $fallowList;
+            $notification = new Notification();
+            $notification->id_user = $request->fallowId;
+            $notification->from = $recived['id'];
+            $notification->message = "A inceput sa te urmareasca.";
+            $notification->read = 0;
+            $notification->type = 1;
+            $notification->firstName = $user->firstName;
+            $notification->lastName = $user->lastName;
+            $notification->save();
         }catch(Exception $e){
             return response()->json(['message' => 'Error on save data in database!'], 417);
         }
@@ -170,6 +183,13 @@ class UserController extends Controller
             $user->password = Hash::make($request->password);
             $user->birthday = $request->birthday;
             $user->profile_image = "default.jpg";
+            $user->admin = 0;
+            $user->producer = 0;
+            $user->notifications = 0;
+            $user->fallowed = '[]';
+            $user->banned = 0;
+            $user->reason = '';
+            $user->warnings = 0;
             $user->save();
             return response()->json([
                 'message' => 'success'
@@ -177,6 +197,7 @@ class UserController extends Controller
         }
         catch(Exception $e){
             $e->getMessage();
+            return response() -> json(['message' => $e->getMessage()]);
         }
     }
 
@@ -186,19 +207,65 @@ class UserController extends Controller
             $password = $request->password;
             $user = new User();
             $user = User::where('email', $email)->first();
-            if(Hash::check($password, $user->password)){
-                $credentials = $request->only(['email', 'password']);
-                if (!$token = auth('api')->attempt($credentials)) {
-                    return response()->json(['error' => 'Unauthorized'], 401);
-                }
-                return response()->json(['token' => $token, 'admin' => $user->admin], 200);
+            if(empty($user)){
+                return response() -> json(['message' => "failed"]);
             }else{
-                return response() -> json([
-                    'message' => 'failed'
-                ]);
+                if(Hash::check($password, $user->password)){
+                    if($user->banned === 1){
+                        $credentials = $request->only(['email', 'password']);
+                        return response()->json(['message' => 'IS_BANNED', 'info' => "Nu puteti sa accesati contul sa descoperit incalcarea regulamentului\n si am fost nevoiti sa va restrictionam accesul in aplicatie!\n\n\nMotivul restrictiei: " . $user->reason], 200);
+                    }else{
+                        $credentials = $request->only(['email', 'password']);
+                        if (!$token = auth('api')->attempt($credentials)) {
+                            return response()->json(['error' => 'Unauthorized'], 401);
+                        }
+                        return response()->json(['token' => $token, 'admin' => $user->admin], 200);
+                    }
+                }else{
+                    return response() -> json([
+                        'message' => 'failed'
+                    ]);
+                }
             }
         }catch(Exception $e){
             $e->getMessage();
+            return response() -> json(['message' => $e->getMessage()]);
+        }
+    }
+
+    public function banUser(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            error_log($e);
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+        try{
+            $user = User::where('id', $request->userID)->first();
+            $user->banned = 1;
+            $user->reason = $request->reason;
+            $user->save();
+            return response() -> json(['message' => 'Succes'], 200);
+        }catch(Exception $e){
+            return response()->json(['message' => 'Error on save data in database!'], 417);
+        }
+    }
+
+    public function unbanUser(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            error_log($e);
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+        try{
+            $user = User::where('id', $request->userID)->first();
+            $user->banned = 0;
+            $user->reason = '';
+            $user->save();
+            return response() -> json(['message' => 'Succes'], 200);
+        }catch(Exception $e){
+            return response()->json(['message' => 'Error on save data in database!'], 417);
         }
     }
 }

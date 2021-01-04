@@ -18,7 +18,6 @@ class CreateNotificationsTable extends Migration
             $table->integer('id_user');
             $table->integer('from');
             $table->string('message');
-            $table->date('recived_date');
             $table->boolean('read')->default(false);
             $table->timestamps();
         });

@@ -7,6 +7,7 @@ use App\Http\Controllers\DetailsController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostVoteController;
 use App\Http\Controllers\AplicationController;
+use App\Http\Controllers\NotificationController;
 
 
 Route::post('/addUser', [UserController::class, 'createUser']); // inregistrarea unui user
@@ -15,6 +16,12 @@ Route::post('/login', [UserController::class, 'loginUser']); // conectarea unui 
 Route::get('/fetchUserData', [UserController::class, 'fetchUserData']); // preluarea datelor unui user
 Route::get('/fetchProfile', [UserController::class, 'fetchProfile']);
 Route::post('/cancelProducer', [UserController::class, 'cancelProducer']); // anuleaza gradul unui producator
+Route::post('/banUser', [UserController::class, 'banUser']);
+Route::post('/unbanUser', [UserController::class, 'unbanUser']);
+
+
+//Notificari
+Route::get('/getUnreadNotifications', [NotificationController::class, 'getUnreadNotifications']);
 
 
 Route::post('/updateUserData', [UserController::class, 'updateUserData']);

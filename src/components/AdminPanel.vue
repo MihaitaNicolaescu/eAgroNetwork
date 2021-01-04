@@ -20,13 +20,12 @@
                     <th scope="col">PRENUME</th>
                     <th scope="col">EMAIL</th>
                     <th scope="col">PRODUCATOR</th>
-                    <th scope="col"></th>
-                    <th scope="col"></th>
+
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(user, index) in users" :key="user.id">
-                        <td>{{index}}</td>
+                        <td>{{index}}<span v-if="user.banned === 1" class="badge badge-danger">Banned</span></td>
                         <td>{{user.id}}</td>
                         <td>{{user.firstName}}</td>
                         <td>{{user.lastName}}</td>
@@ -40,10 +39,71 @@
                 </tbody>
             </table>
             <div class="pagination d-flex justify-content-center">
-                <button class="btn btn-default" v-on:click="fetchPaginateUsers(pagination.prev_page)" :disabled="!pagination.prev_page">Previos</button>
+                <button class="btn btn-outline-secondary" v-on:click="fetchPaginateUsers(pagination.prev_page)" :disabled="!pagination.prev_page">Previos</button>
                 <span>Page {{pagination.current_page}} of {{pagination.last_page}}</span>
-                <button class="btn btn-default" v-on:click="fetchPaginateUsers(pagination.next_page)" :disabled="!pagination.next_page">Next</button>
+                <button class="btn btn-outline-secondary" v-on:click="fetchPaginateUsers(pagination.next_page)" :disabled="!pagination.next_page">Next</button>
             </div>
+          <!-- Modal ban user -->
+          <div class="modal fade" id="modal-info-user" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Succes</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  Utilizatorul a primit restrictionare cu succes. Acesta nu mai are acces sa aceseze contul.
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Modal info delete user -->
+          <div class="modal fade" id="modal-info-delete-user" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Succes</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p>Utilizatorul nu poate fi sters deoarece este activ.</p>
+                  <p>Pentru a putea fi sters un cont acesta trebuie sa fie banat sau email-ul sa nu fie confirmat.</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Modal confirm ban user -->
+          <div class="modal fade" id="modal-confirm-ban" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-body">
+                  <div class="form-row">
+                    <div class="">
+                      <label for="validationServer03">Motiv ban</label>
+                      <input type="text" v-model="reason" class="form-control" id="validationServer03" required>
+                      <div class="invalid-feedback">
+                        Este necesara specificarea motivului pentru care utilizatorul urmeaza sa fie banat.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" v-on:click="banUser(actualUserId, reason)">Ban utilizator</button>
+                </div>
+              </div>
+            </div>
+          </div>
           <!-- Modal pentru administrarea unui user -->
           <div class="modal fade bd-example-modal-sm" id="modal-user" tabindex="-1" role="dialog" aria-labelledby="modal-user" aria-hidden="true">
             <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
@@ -59,8 +119,10 @@
                     <button class="btn btn-danger btn-modal" type="button" v-on:click="deleteUser(actualUserId)">Sterge utilizator</button>
                     <div v-if="this.actualUserIndex !== null && this.actualUserId !== null">
                       <button v-if="users[this.actualUserIndex].producer === 1" class="btn btn-danger btn-modal" type="button" v-on:click="cancelProducer(actualUserId)">Sterge grad</button>
+                      <button v-if="users[this.actualUserIndex].banned === 0" class="btn btn-danger btn-modal" v-on:click="confirm_ban()" >Ban</button>
+                      <button v-if="users[this.actualUserIndex].banned === 1" class="btn btn-danger btn-modal" v-on:click="unbanUser(actualUserId)">Unban</button>
+
                     </div>
-                    <button class="btn btn-danger btn-modal">Restrictionare</button>
                     <button class="btn btn-warning btn-modal">Averitare</button>
                   </div>
 
@@ -110,6 +172,8 @@
                 active: 0,
                 actualUserId: null,
                 actualUserIndex: null,
+                reason: '',
+                info: '',
             }
         }, 
         
@@ -132,6 +196,12 @@
             'alert-box': alertBox,
         },
         methods: {
+            confirm_ban: function(){
+              // eslint-disable-next-line no-undef
+              $('#modal-user').modal('hide');
+              // eslint-disable-next-line no-undef
+              $('#modal-confirm-ban').modal('show');
+            },
             actualUser: function(id, index){
               this.actualUserId = id;
               this.actualUserIndex = index;
@@ -141,23 +211,62 @@
                 token: localStorage.getItem('token'),
                 producer_id: producerID,
               }).then(()=>{
+                // eslint-disable-next-line no-undef
+                $('#modal-user').modal('hide');
                 this.getUsers()
               }).catch((e)=>{
                 console.log(e)
+              })
+            },
+            banUser: function(userID, reason){
+              axios.post(backend +'/api/banUser', {
+                token: localStorage.getItem('token'),
+                userID: userID,
+                reason: reason,
+              }).then(()=>{
+                // eslint-disable-next-line no-undef
+                $('#modal-user').modal('hide');
+                // eslint-disable-next-line no-undef
+                $('#modal-confirm-ban').modal('hide');
+                // eslint-disable-next-line no-undef
+                $('#modal-ban-user').modal('show');
+                this.getUsers();
+                this.actualUserId = null;
+                this.actualUserIndex = null;
+              }).catch((error) => {
+                console.log(error)
+              })
+            },
+            unbanUser: function(userID){
+              axios.post(backend +'/api/unbanUser', {
+                token: localStorage.getItem('token'),
+                userID: userID,
+              }).then(()=>{
+                // eslint-disable-next-line no-undef
+                $('#modal-user').modal('hide');
+                this.getUsers();
+              }).catch((error) => {
+                console.log(error)
               })
             },
             aplications: function(){
               this.$router.push('/admin/applications');
             },
             deleteUser: function(id){
-                axios.post(backend+'/api/admin/delete', {
+                if(this.users[this.actualUserIndex].banned === 1){
+                  axios.post(backend+'/api/admin/delete', {
                     id: id,
-                }).then(() =>{
-                    alert('Utilizatorul a fost sters cu succes!')
+                  }).then(() =>{
+                    // eslint-disable-next-line no-undef
+                    $('#modal-user').modal('hide');
                     this.getUsers();
-                }).catch((error) =>{
-                    alert('Incercarea a esuat: ' + error['message'])
-                })
+                  })
+                }else{
+                  // eslint-disable-next-line no-undef
+                  $('#modal-user').modal('hide');
+                  // eslint-disable-next-line no-undef
+                  $('#modal-info-delete-user').modal('show');
+                }
             },
             searchUser: function(){ // functie pentru a cauta un anumit utilizator
                 if(this.searchedUser != ''){

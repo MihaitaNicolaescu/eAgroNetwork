@@ -75,7 +75,7 @@ import {backend} from '../constants.js';
                 userPosts: {},
                 fallowed:null,
                 isProducer: null,
-                invalidUser: true,
+                invalidUser: null,
             }
         },
         async created(){
@@ -192,7 +192,7 @@ import {backend} from '../constants.js';
                     id: this.$route.params.id
                 }
                 }).then((response)=>{
-                    if(response.data == "INVALID_USER"){
+                    if(response.data === "INVALID_USER"){
                         this.invalidUser = true;
                     }else{
                         this.invalidUser = false;
