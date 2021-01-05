@@ -70,6 +70,16 @@ export default new Router({
                 
         },
         {
+            path: '/notifications',
+            name: 'notifications',
+            component: () => import('./components/Notifications.vue'),
+            beforeEnter: (to, from, next) => {
+                if(!localStorage.getItem('token')) next('/login')
+                else next();
+            }
+
+        },
+        {
             path: '/admin/applications/:id',
             name: 'aplicationID',
             component: () => import('./components/Application.vue'),

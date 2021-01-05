@@ -22,6 +22,8 @@ Route::post('/unbanUser', [UserController::class, 'unbanUser']);
 
 //Notificari
 Route::get('/getUnreadNotifications', [NotificationController::class, 'getUnreadNotifications']);
+Route::post('/markReadNotifications', [NotificationController::class, 'markReadNotifications']);
+Route::get('/getNotifications', [NotificationController::class, 'getNotifications']);
 
 
 Route::post('/updateUserData', [UserController::class, 'updateUserData']);

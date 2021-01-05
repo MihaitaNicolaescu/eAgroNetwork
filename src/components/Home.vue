@@ -32,23 +32,24 @@
                 <li class="list-group-item">
                   <p>Nu ai notificari necitite</p>
                   <button class="btn btn-danger btn-sm" type="button" v-on:click="closeNotifications()">Close</button>
+                  <button style="margin-left: 10px;" class="btn btn-danger btn-sm" type="button" v-on:click="goToNotifications">Afisare notificari mai vechi</button>
                 </li>
               </div>
               <div v-else>
                 <li class="list-group-item">
                   <button style="" class="btn btn-danger btn-sm" type="button" v-on:click="closeNotifications()">Close</button>
-                  <button style="float:right;" class="btn btn-danger btn-sm" type="button">Marcheaza tot ca citit</button>
-                  <button style="margin-left: 10px;" class="btn btn-danger btn-sm" type="button">Afisare notificari</button>
+                  <button style="float:right;" class="btn btn-danger btn-sm" type="button" v-on:click="markReadNotifications">Marcheaza tot ca citit</button>
+                  <button style="margin-left: 10px;" class="btn btn-danger btn-sm" type="button" v-on:click="goToNotifications">Afisare notificari</button>
                 </li>
                 <div v-for="notification in notifications.slice(0,5)" :key="notification.id">
                   <li class="list-group-item">
                     <div style="display: block;" class="user-info">
                       <div style="margin-bottom: 5px;" class="row">
                         <div class="col-2">
-                          <img class="user-info-img" src="../assets/profiles/profile_image_1.jpg">
+                          <img class="user-info-img" :src="require('@/assets/profiles/' + notification.profile_image)">
                         </div>
                         <div class="col-10">
-                          <p style="margin-bottom: 0px;">{{notification.firstName}} {{notification.lastName}}</p>
+                          <p style="margin-bottom: 0;">{{notification.firstName}} {{notification.lastName}}</p>
                           <p style="display: block; font-weight: normal;" >{{notification.message}}</p>
                         </div>
                       </div>
@@ -135,7 +136,6 @@
             }).then((response)=>{
                this.admin = response.data['admin'];
                this.isProducer = response.data['producer'];
-               //this.hasNotifications = response.data['notifications'];
             }).catch(() =>{
                 this.$router.push('login');    
             })
@@ -153,6 +153,19 @@
             }
         },
         methods:{
+             goToNotifications: function(){
+               this.$router.push('/notifications');
+             },
+             markReadNotifications: function(){
+               axios.post(backend +'/api/markReadNotifications', {
+                 token: localStorage.getItem('token'),
+               }).then(()=>{
+                 this.notifications = [];
+                 this.hasNotifications = 0;
+               }).catch((error)=>{
+                 console.log(error);
+               })
+             },
              getNotifications: function(){
                axios.get(backend+'/api/getUnreadNotifications', {
                  params:{
