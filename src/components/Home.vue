@@ -71,6 +71,34 @@
                       </div>
                     </li>
                   </div>
+                  <div v-if="notification.type === -124">
+                    <li class="list-group-item">
+                      <div style="display: block;" class="user-info">
+                        <div style="margin-bottom: 5px;" class="row">
+                          <div class="col-2">
+                            <p style="font-size: 30px">⚠️</p>
+                          </div>
+                          <div class="col-10">
+                            <p  class="pre-formatted" style="display: block; font-weight: normal;" >{{notification.message}}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  </div>
+                  <div v-if="notification.type === -125">
+                    <li class="list-group-item">
+                      <div style="display: block;" class="user-info">
+                        <div style="margin-bottom: 5px;" class="row">
+                          <div class="col-2">
+                            <p style="font-size: 30px">❌️</p>
+                          </div>
+                          <div class="col-10">
+                            <p  class="pre-formatted" style="display: block; font-weight: normal;" >{{notification.message}}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  </div>
                 </div>
               </div>
             </ul>
@@ -92,7 +120,7 @@
                         <button v-show="post.vote == 0 || post.vote == null || post.vote == -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
                         <button v-show="post.vote == 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
                         <span>{{post.votes}}</span>
-                        <button class="btn btn-react" type="button"><span class="material-icons">insert_comment</span></button>
+                        <button class="btn btn-react" type="button" v-on:click="gotToComments(post.id)"><span class="material-icons">insert_comment</span></button>
                     </div>
                 </div>
             </div>
@@ -169,6 +197,9 @@
             }
         },
         methods:{
+              gotToComments: function(postID){
+                this.$router.push('/post/'+postID);
+              },
              goToNotifications: function(){
                this.$router.push('/notifications');
              },

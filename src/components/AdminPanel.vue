@@ -1,15 +1,25 @@
 <template>
     <div class="container">
-        <nav class="navbar navbar-light bg-light d-flex justify-content-center">
-           <button class="btn btn-outline-secondary" v-on:click="back">Back</button>
-            <button class="btn btn-outline-secondary" >Reports</button>
-            <button class="btn btn-outline-secondary" v-on:click="aplications">Applications</button>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Home</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/reports">Raportari</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="/admin/applications">Aplicatii</a>
+            </li>
+          </ul>
+          <form class="form-inline my-2 my-lg-0">
             <form class="search-user d-flex justify-content-center">
-                <input v-model="searchedUser" class="form-control mr-sm-2 input-search" type="search" placeholder="Search a user here" aria-label="Search">
-                <button v-if="!active || active != 1" class="btn search-btn" type="button" v-on:click="searchUser()"><i class="material-icons icon-search">search</i></button>
+              <input v-model="searchedUser" class="form-control mr-sm-2 input-search" type="search" placeholder="Cautati un utilizator" aria-label="Search">
+              <button style="border: 0; background: transparent; color:black;" v-if="!active || active != 1" class="btn search-btn" type="button" v-on:click="searchUser()"><i class="material-icons icon-search">search</i></button>
             </form>
-            <button v-if="active" class="btn btn-outline-secondary cancel-search" type="button" v-on:click="usersButton();"><span class="material-icons">search_off</span></button>
-        </nav>
+            <button style="border: 0; background: transparent; color:black;" v-if="active" class="btn cancel-search" type="button" v-on:click="usersButton();"><span class="material-icons">search_off</span></button>
+          </form>
+        </div>
+      </nav>
         <div class="users">
             <table class="table">
                 <thead>
@@ -104,6 +114,28 @@
               </div>
             </div>
           </div>
+          <!-- Modal confirm warn user -->
+          <div class="modal fade" id="modal-confirm-warn" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-body">
+                  <div class="form-row">
+                    <div class="">
+                      <label for="validationServer03">Motiv averizare</label>
+                      <input type="text" v-model="reason" class="form-control" id="warnInput" required>
+                      <div class="invalid-feedback">
+                        Este necesara specificarea motivului pentru care utilizatorul urmeaza sa fie avertizat.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" v-on:click="warnUser(actualUserId, reason)">Aplica avertizarea</button>
+                </div>
+              </div>
+            </div>
+          </div>
           <!-- Modal pentru administrarea unui user -->
           <div class="modal fade bd-example-modal-sm" id="modal-user" tabindex="-1" role="dialog" aria-labelledby="modal-user" aria-hidden="true">
             <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
@@ -114,18 +146,14 @@
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                <div class="modal-body">
-                  <div class="d-flex align-items-center flex-column">
+                <div style="display: grid;" class="modal-body">
                     <button class="btn btn-danger btn-modal" type="button" v-on:click="deleteUser(actualUserId)">Sterge utilizator</button>
                     <div v-if="this.actualUserIndex !== null && this.actualUserId !== null">
                       <button v-if="users[this.actualUserIndex].producer === 1" class="btn btn-danger btn-modal" type="button" v-on:click="cancelProducer(actualUserId)">Sterge grad</button>
                       <button v-if="users[this.actualUserIndex].banned === 0" class="btn btn-danger btn-modal" v-on:click="confirm_ban()" >Ban</button>
                       <button v-if="users[this.actualUserIndex].banned === 1" class="btn btn-danger btn-modal" v-on:click="unbanUser(actualUserId)">Unban</button>
-
+                      <button v-if="users[this.actualUserIndex].banned === 0" class="btn btn-warning btn-modal" v-on:click="confirm_warn">Avertizare</button>
                     </div>
-                    <button class="btn btn-warning btn-modal">Averitare</button>
-                  </div>
-
                 </div>
                 <div class="modal-footer d-flex align-items-center flex-column">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Inchide</button>
@@ -144,23 +172,10 @@
     </div>
 </template>
 
-<style scoped>
-    .btn-modal{
-      margin-bottom: 5px;
-    }
-    .btn{
-        margin-right: 10px;
-        width:130px
-    }
-    .input-search{
-        width: 300px;
-    }
-</style>
-
 <script>
-    import alertBox from './templates/invalidToken'; 
+    import alertBox from './templates/invalidToken';
     import axios from 'axios';
-    import {backend} from '../constants.js';
+    import {backend} from '@/constants.js';
 
     export default{
         data(){
@@ -196,6 +211,30 @@
             'alert-box': alertBox,
         },
         methods: {
+            confirm_warn: function(){
+              // eslint-disable-next-line no-undef
+              $('#modal-user').modal('hide');
+              // eslint-disable-next-line no-undef
+              $('#modal-confirm-warn').modal('show');
+            },
+            warnUser: function(userID, reason){
+              axios.post(backend +'/api/warnUser', {
+                token: localStorage.getItem('token'),
+                userID: userID,
+                reason: reason,
+              }).then(()=>{
+                // eslint-disable-next-line no-undef
+                $('#modal-user').modal('hide');
+                // eslint-disable-next-line no-undef
+                $('#modal-confirm-warn').modal('hide');
+                // eslint-disable-next-line no-undef
+                this.actualUserId = null;
+                this.actualUserIndex = null;
+                this.reason = '';
+              }).catch((error) => {
+                console.log(error)
+              })
+            },
             confirm_ban: function(){
               // eslint-disable-next-line no-undef
               $('#modal-user').modal('hide');
@@ -233,6 +272,7 @@
                 this.getUsers();
                 this.actualUserId = null;
                 this.actualUserIndex = null;
+                this.reason = '';
               }).catch((error) => {
                 console.log(error)
               })
@@ -251,6 +291,9 @@
             },
             aplications: function(){
               this.$router.push('/admin/applications');
+            },
+            reports: function(){
+              this.$router.push('/admin/reports');
             },
             deleteUser: function(id){
                 if(this.users[this.actualUserIndex].banned === 1){
@@ -311,6 +354,13 @@
 </script>
 
 <style scoped>
+    .btn-modal{
+      margin-bottom: 5px;
+      width: 100%;
+    }
+    .input-search{
+      width: 300px;
+    }
     .search-btn{
         background-color: transparent;
         margin-left: 0px;

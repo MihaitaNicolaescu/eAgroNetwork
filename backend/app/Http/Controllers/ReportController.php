@@ -7,6 +7,22 @@ use App\Models\Report;
 
 class ReportController extends Controller
 {
+    public function markSolved(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+        try{
+            $report = Report::where('id', '=', $request->reportID)->first();
+            $report->solved = 1;
+            $report->save();
+            return response() -> json(['message' => "success"], 200);
+        }catch(Exception $e){
+            return response()->json(['error' => $e->getMessage()], 417);
+        }
+    }
+
     public function sendReport(Request $request){
         try{
             $recived = auth()->userOrFail();
@@ -22,6 +38,15 @@ class ReportController extends Controller
             $report->link = $request->link;
             $report->save();
             return response() -> json(['message' => "success"], 200);
+        }catch(Exception $e){
+            return response()->json(['error' => $e->getMessage()], 417);
+        }
+    }
+
+    public function getReports(Request $request){
+        try{
+            $reports = Report::where('solved', '=', 0)->get();
+            return response()->json(['reports' => $reports], 200);
         }catch(Exception $e){
             return response()->json(['error' => $e->getMessage()], 417);
         }

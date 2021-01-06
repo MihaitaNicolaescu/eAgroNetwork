@@ -38,6 +38,16 @@ class AplicationController extends Controller
             $application->status = -1;
             $application->motiv_respingere = $request->motiv;
             $application->save();
+            $notification = new Notification();
+            $notification->id_user = $request->user_id;
+            $notification->from = $recived['id'];
+            $notification->message = "Un administrator ti-a respins aplicatia la gradul de producator.
+            Motivul respingeri este:" . $request->motiv. ".";
+            $notification->read = 0;
+            $notification->type = -125;
+            $notification->firstName = '';
+            $notification->lastName = '';
+            $notification->save();
             return response()->json(['message' => 'SUCCESS']);
         }catch(Exception $e){
             return response()->json(['message' => $e->getMessage() ]);

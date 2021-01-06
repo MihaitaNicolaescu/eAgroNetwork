@@ -8,6 +8,7 @@ use App\Http\Controllers\PostVoteController;
 use App\Http\Controllers\AplicationController;
 use App\Http\Controllers\NotificationController;
 use \App\Http\Controllers\ReportController;
+use \App\Http\Controllers\CommentController;
 
 
 Route::post('/addUser', [UserController::class, 'createUser']); // inregistrarea unui user
@@ -17,13 +18,21 @@ Route::get('/fetchUserData', [UserController::class, 'fetchUserData']); // prelu
 Route::get('/fetchProfile', [UserController::class, 'fetchProfile']);
 Route::post('/cancelProducer', [UserController::class, 'cancelProducer']); // anuleaza gradul unui producator
 Route::post('/banUser', [UserController::class, 'banUser']);
+Route::post('/warnUser', [UserController::class, 'warnUser']);
 Route::post('/unbanUser', [UserController::class, 'unbanUser']);
 Route::post('/updateUserData', [UserController::class, 'updateUserData']);
 Route::post('/updateUserProfilePhoto', [UserController::class, 'updateUserProfilePhoto']);
+Route::post('/fallowUser', [UserController::class, 'addFallower']);
+Route::post('/cancelFallowUser', [UserController::class, 'deleteFallower']);
+Route::get('/fetchFallowList', [UserController::class, 'fetchFallowList']);
+Route::get('/fetchFallowPosts', [PostController::class, 'fetchFallowPosts']);
+Route::get('/getFallow', [UserController::class, 'getFallow']);
 
 
 //Raportare
 Route::post('/sendReport', [ReportController::class, 'sendReport']);
+Route::get('/getReports', [ReportController::class, 'getReports']);
+Route::post('/markSolved', [ReportController::class, 'markSolved']);
 
 //Notificari
 Route::get('/getUnreadNotifications', [NotificationController::class, 'getUnreadNotifications']);
@@ -46,14 +55,9 @@ Route::get('/fetchUserPosts', [PostController::class, 'fetchUserPosts']); // ret
 Route::get('fetchPostsVoted', [PostVoteController::class, 'fetchUserPostsVoted']);
 Route::get('/vote', [PostController::class, 'postVote']);
 Route::get('/modifyVote',[PostVoteController::class, 'modifyVote']);
+Route::get('/getPost', [PostController::class, 'getPost']);
+Route::post('/deletePost', [PostController::class, 'deletePost']);
 
-
-Route::post('/fallowUser', [UserController::class, 'addFallower']);
-Route::post('/cancelFallowUser', [UserController::class, 'deleteFallower']);
-
-Route::get('/fetchFallowList', [UserController::class, 'fetchFallowList']);
-Route::get('/fetchFallowPosts', [PostController::class, 'fetchFallowPosts']);
-Route::get('/getFallow', [UserController::class, 'getFallow']);
 
 //Aplicatiii
 Route::post('/addApplication', [AplicationController::class, 'addApplication']);
@@ -65,4 +69,9 @@ Route::get('/getApplication', [AplicationController::class, 'getApplication']); 
 Route::post('/acceptApplication', [AplicationController::class, 'acceptApplication']); // returneaza informatiile afernte unei anumite aplicatii
 Route::post('/rejectApplication', [AplicationController::class, 'rejectApplication']);
 Route::post('/enableEditApplication', [AplicationController::class, 'enableEditApplication']);
+
+//Comments
+Route::post('addComment', [CommentController::class, 'addComment']);
+Route::get('getComments', [CommentController::class, 'getComments']);
+Route::post('deleteComment', [CommentController::class, 'deleteComment']);
 

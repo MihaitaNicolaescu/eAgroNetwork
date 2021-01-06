@@ -2,12 +2,61 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
+    function deletePost(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+            try{
+                $post = Post::where('id', '=', $request->postID)->delete();
+                $comments = Comment::where('post_id', '=', $request->postID)->delete();
+                return response()->json([],200);
+
+            }catch(Exception $e){
+                return response()->json(['message' => $e]);
+            }
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            error_log($e);
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+    }
+
+    function getPost(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+            try{
+                $result = DB::table('posts')->leftJoin('post_votes', function($join)
+                {
+                    $recived = auth()->userOrFail();
+                    $join->on('posts.id', '=', 'post_votes.post_id')->where('post_votes.user_id', '=', $recived['id']);
+
+                })
+                    ->join('users', function($join)
+                    {
+                        $recived = auth()->userOrFail();
+                        $join->on('users.id', '=', 'posts.user_id');
+
+                    })
+                    ->select('posts.id', 'posts.user_id', 'posts.description', 'vote', 'posts.votes',
+                        'posts.filename', 'users.lastName', 'users.firstName', 'users.profile_image')
+                    ->where('posts.id', '=', $request->postID)->first();
+                if($result != NULL) return response()->json(['post' => $result], 200);
+                else return response()->json(['post' => "INVALID_POSTING"], 200);
+
+            }catch(Exception $e){
+                return response()->json(['message' => $e]);
+            }
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            error_log($e);
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+    }
+
     function addPost(Request $request){
         try{
             $recived = auth()->userOrFail();
@@ -22,7 +71,7 @@ class PostController extends Controller
                 $idCount++;
                 error_log($idCount);
                 $imageName = $request->image->getClientOriginalName(). "_".$idCount . '.jpg';
-                
+
             }
             else
                 $imageName = $request->image->getClientOriginalName(). "_0". '.jpg';
@@ -44,18 +93,18 @@ class PostController extends Controller
         try{
             $recived = auth()->userOrFail();
             try{
-                
+
                 $result = DB::table('posts')->leftJoin('post_votes', function($join)
                 {
                     $recived = auth()->userOrFail();
                     $join->on('posts.id', '=', 'post_votes.post_id')->where('post_votes.user_id', '=', $recived['id']);
-               
+
                 })
                 ->select('posts.id', 'posts.user_id', 'posts.description', 'vote', 'posts.votes', 'posts.filename')
                 ->where('posts.user_id', '=', $request->user_id)
                 ->orderBy('posts.id', 'desc')->get();
                 return response()->json(['posts' => $result], 200);
-    
+
             }catch(Exception $e){
                 return response()->json(['message' => $e]);
             }
@@ -74,19 +123,19 @@ class PostController extends Controller
                 {
                     $recived = auth()->userOrFail();
                     $join->on('posts.id', '=', 'post_votes.post_id')->where('post_votes.user_id', '=', $recived['id']);
-               
+
                 })
                 ->join('users', function($join)
                 {
                     $recived = auth()->userOrFail();
                     $join->on('users.id', '=', 'posts.user_id');
-               
+
                 })
                 ->select('posts.id', 'posts.user_id', 'posts.description', 'vote', 'posts.votes', 'posts.filename', 'users.lastName', 'users.firstName', 'users.profile_image')
                 ->whereIn('posts.user_id', $arrayRecived)
                 ->orderBy('posts.created_at', 'desc')->get();
                 return response()->json(['posts' => $result], 200);
-    
+
             }catch(Exception $e){
                 return response()->json(['message' => $e]);
             }

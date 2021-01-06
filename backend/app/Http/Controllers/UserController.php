@@ -213,7 +213,7 @@ class UserController extends Controller
                 if(Hash::check($password, $user->password)){
                     if($user->banned === 1){
                         $credentials = $request->only(['email', 'password']);
-                        return response()->json(['message' => 'IS_BANNED', 'info' => "Nu puteti sa accesati contul sa descoperit incalcarea regulamentului\n si am fost nevoiti sa va restrictionam accesul in aplicatie!\n\n\nMotivul restrictiei: " . $user->reason], 200);
+                        return response()->json(['message' => 'IS_BANNED', 'info' => " Nu puteti sa accesati contul deoarece s-a descoperit incalcarea\n regulamentului si am fost nevoiti sa va restrictionam accesul\n in aplicatie!\n\n\nMotivul restrictiei: " . $user->reason], 200);
                     }else{
                         $credentials = $request->only(['email', 'password']);
                         if (!$token = auth('api')->attempt($credentials)) {
@@ -244,6 +244,40 @@ class UserController extends Controller
             $user = User::where('id', $request->userID)->first();
             $user->banned = 1;
             $user->reason = $request->reason;
+            $user->save();
+            return response() -> json(['message' => 'Succes'], 200);
+        }catch(Exception $e){
+            return response()->json(['message' => 'Error on save data in database!'], 417);
+        }
+    }
+
+    public function warnUser(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            error_log($e);
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+        try{
+            $user = User::where('id', $request->userID)->first();
+            $user->warnings += 1;
+            if($user->warnings === 3){
+                $user->reason = "3/3 Averizari.";
+                $user->warnings = 0;
+                $user->banned = 1;
+            }else{
+                $notification = new Notification();
+                $notification->id_user = $request->userID;
+                $notification->from = $recived['id'];
+                $notification->message = "Un administrator te-a sanctionat cu un advertisment pentru incalcarea
+                 regulamentului. Aveti " . $user->warnings ."/3 avertizari. La 3 avertizari o sa primiti interdictie
+                 in aplicatie.\nMotivul: ". $request->reason;
+                $notification->read = 0;
+                $notification->type = -124;
+                $notification->firstName = '';
+                $notification->lastName = '';
+                $notification->save();
+            }
             $user->save();
             return response() -> json(['message' => 'Succes'], 200);
         }catch(Exception $e){

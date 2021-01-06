@@ -6,7 +6,7 @@
     <div v-if="!applications.length && applications != null">
       <h2>Momentan nu este nici o aplicatie in asteptare.</h2>
     </div>
-    <div v-if="applications.length && applications != null">
+    <div v-if="applications.length !== 0 && applications != null">
       <h2>Momentan sunt {{applications.length}} aplicatii in asteptare.</h2>
       <table class="table">
         <thead class="thead-dark">

@@ -4,7 +4,7 @@
            <button style="" class="btn btn-outline-secondary" v-on:click="home">Home</button>
         </nav> 
         <div class="container">
-            <div v-if="invalidUser === false" class="d-flex align-items-left flex-column" style="height: 100px; margin-top: 50px;">
+            <div v-if="invalidUser === false && isBanned === 0" class="d-flex align-items-left flex-column" style="height: 100px; margin-top: 50px;">
                 <div class="row">
                     <div class="col-3">
                         <div id="profile">
@@ -37,7 +37,7 @@
                                 <button v-show="post.vote === 0 || post.vote == null || post.vote === -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
                                 <button v-show="post.vote === 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
                                 <span>{{post.votes}}</span>
-                                <button class="btn btn-react" type="button"><span class="material-icons">insert_comment</span></button>
+                                <button class="btn btn-react" type="button" v-on:click="gotToComments(post.id)"><span class="material-icons">insert_comment</span></button>
                             </div>
                         </div>
                         <div v-if="isProducer === 0">
@@ -48,7 +48,7 @@
                         <p v-if="isProducer === 0" class="info-paragraph">Acest utlizator nu este inca inregistrat pe aplicatie ca fiind un producator.</p>
                 </div>
             </div>
-            <div v-if="invalidUser === true" class="container">
+            <div v-if="invalidUser === true || isBanned === 1" class="container">
                 <p class="not-found">Utilizator invalid.</p>
                 <p class="go-home">Apasa <router-link :to="{path: '/'}">aici</router-link> pentru a te intoarce la pagina principala.</p>
             </div>
@@ -138,6 +138,7 @@ import {backend} from '../constants.js';
                 isProducer: null,
                 invalidUser: null,
                 reportReason: null,
+                isBanned: null,
             }
         },
         async created(){
@@ -153,7 +154,9 @@ import {backend} from '../constants.js';
             }
         },
         methods: {
-
+            gotToComments: function(postID){
+              this.$router.push('/post/'+postID);
+            },
             sendReport: function(){
                axios.post(backend+'/api/sendReport', {
                  token: localStorage.getItem('token'),
@@ -233,26 +236,19 @@ import {backend} from '../constants.js';
                 this.modifyVote(this.id, postId, vote)
             },
             voteUp: function(postId, index, vote){
-                let response = false;
-                axios.get(backend + '/api/vote', {
-                    params:{
-                        token: localStorage.getItem('token'),
-                        postId: postId,
-                        vote: 1,
-                    }
-                }).then(
-                    response = true,
-                ).catch((error)=>{
-                    console.log(error);
-                })
-                if(response == true){
-                    this.modifyVote(this.id, postId, vote)
-                    if(this.userPosts[index].vote == -1){
-                        this.cancelVoteDown(postId, index, 0);
-                        this.userPosts[index].votes++,
-                        this.userPosts[index].vote = 1
-                    }
+              axios.get(backend+'/api/vote', {
+                params:{
+                  token: localStorage.getItem('token'),
+                  postId: postId,
+                  vote: 1,
                 }
+              }).then(
+                  this.userPosts[index].votes++,
+                  this.userPosts[index].vote = 1,
+              ).catch((error)=>{
+                console.log(error);
+              })
+              this.modifyVote(this.id, postId, vote)
             },
             getUserPosts: function(){
                const sendGetRequest = async() => {
@@ -280,13 +276,14 @@ import {backend} from '../constants.js';
                         this.invalidUser = true;
                     }else{
                         this.invalidUser = false;
-                        this.firstName = response.data['firstName'],
-                        this.lastName = response.data['lastName'],
-                        this.email = response.data['email'],
-                        this.birthday = response.data['birthday'],
-                        this.id = response.data['id'],
-                        this.userPhoto = response.data['profile_image'],
-                        this.isProducer = response.data['producer']
+                        this.firstName = response.data['firstName'];
+                        this.lastName = response.data['lastName'];
+                        this.email = response.data['email'];
+                        this.birthday = response.data['birthday'];
+                        this.id = response.data['id'];
+                        this.userPhoto = response.data['profile_image'];
+                        this.isProducer = response.data['producer'];
+                        this.isBanned = response.data['banned'];
                         if(this.userPhoto == null)
                             this.userPhoto = 'default.jpg'
                     }
