@@ -11,7 +11,7 @@
       <div style="margin-top: 20px;" class="container">
         <div class="row">
           <div class="col">
-            <img alt="profile image" class="profile-image" :src="require('@/assets/profiles/' + 'profile_image_' +applicationDetails.user_id+ '.jpg')">
+            <img alt="profile image" class="profile-image" :src="require('@/assets/profiles/' +applicationDetails.profile_image)">
           </div>
           <div class="col">
             <p>Numele: {{applicationDetails.user_firstName}}</p>

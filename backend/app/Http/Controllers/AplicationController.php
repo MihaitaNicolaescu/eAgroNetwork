@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Aplication;
 use App\Models\User;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -57,6 +58,17 @@ class AplicationController extends Controller
             $user = User::where('id', $request->user_id)->first();
             $user->producer = 1;
             $user->save();
+
+            $notification = new Notification();
+            $notification->id_user = $request->user_id;
+            $notification->from = $recived['id'];
+            $notification->message = "Un administrator ti-a acceptat aplicatia la gradul de producator. Felicitari!";
+            $notification->read = 0;
+            $notification->type = -123;
+            $notification->firstName = '';
+            $notification->lastName = '';
+            $notification->save();
+
             return response()->json(['message' => 'SUCCESS']);
         }catch(Exception $e){
             return response()->json(['message' => $e->getMessage() ]);
@@ -70,7 +82,18 @@ class AplicationController extends Controller
             return response()->json(['error' => $e->getMessage()]);
         }
         try{
-            $result = Aplication::where('user_id', '=', $request->id)->first();
+            $result = DB::table('aplications')->leftJoin('users', function($join){
+                $recived = auth()->userOrFail();
+                $join->on('aplications.user_id', '=', 'users.id');
+            })->select('aplications.user_id', 'aplications.user_firstName', 'aplications.user_lastName',
+                'aplications.user_email', 'aplications.judet', 'aplications.adresa', 'aplications.serie_ci',
+                'aplications.numar_serie_ci', 'aplications.cnp', 'aplications.nr_certificat', 'aplications.primaria',
+                'aplications.alte_precizari', 'aplications.copie_ci', 'aplications.copie_certificat', 'aplications.pending',
+                'aplications.status', 'aplications.motiv_respingere', 'aplications.created_at', 'aplications.updated_at', 'users.profile_image')
+                ->where('aplications.user_id', '=', $request->id)->first();
+
+
+           // $result = Aplication::where('user_id', '=', $request->id)->first();
 
             if(!is_null($result)) return response()->json(['application' => $result], 200);
             else return response()->json(['application' => false], 200);

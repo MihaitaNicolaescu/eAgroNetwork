@@ -42,19 +42,35 @@
                   <button style="margin-left: 10px;" class="btn btn-danger btn-sm" type="button" v-on:click="goToNotifications">Afisare notificari</button>
                 </li>
                 <div v-for="notification in notifications.slice(0,5)" :key="notification.id">
-                  <li class="list-group-item">
-                    <div style="display: block;" class="user-info">
-                      <div style="margin-bottom: 5px;" class="row">
-                        <div class="col-2">
-                          <img class="user-info-img" :src="require('@/assets/profiles/' + notification.profile_image)">
-                        </div>
-                        <div class="col-10">
-                          <p style="margin-bottom: 0;">{{notification.firstName}} {{notification.lastName}}</p>
-                          <p style="display: block; font-weight: normal;" >{{notification.message}}</p>
+                  <div v-if="notification.type === 1">
+                    <li class="list-group-item">
+                      <div style="display: block;" class="user-info">
+                        <div style="margin-bottom: 5px;" class="row">
+                          <div class="col-2">
+                            <img class="user-info-img" :src="require('@/assets/profiles/' + notification.profile_image)">
+                          </div>
+                          <div class="col-10">
+                            <p style="margin-bottom: 0;">{{notification.firstName}} {{notification.lastName}}</p>
+                            <p style="display: block; font-weight: normal;" >{{notification.message}}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </li>
+                    </li>
+                  </div>
+                  <div v-if="notification.type === -123">
+                    <li class="list-group-item">
+                      <div style="display: block;" class="user-info">
+                        <div style="margin-bottom: 5px;" class="row">
+                          <div class="col-2">
+                            <p style="font-size: 30px">🎇</p>
+                          </div>
+                          <div class="col-10">
+                            <p style="display: block; font-weight: normal;" >{{notification.message}}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  </div>
                 </div>
               </div>
             </ul>

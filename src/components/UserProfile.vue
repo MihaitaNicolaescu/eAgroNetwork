@@ -18,6 +18,7 @@
                             </div>
                             <button v-if="!fallowed && fallowed!=null && isProducer === 1" class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste</button>
                             <button v-if="fallowed && fallowed!=null && isProducer === 1" class="btn btn-danger btn-sm" type="button" v-on:click="cancelFallow()">Nu mai urmari</button>
+                            <button class="btn btn-danger btn-sm" type="button" data-toggle="modal" data-target="#reportModal">Raporteaza utilizatorul</button>
                         </div>
                     </div>
                     <div id="posts" class="col-7">
@@ -52,6 +53,66 @@
                 <p class="go-home">Apasa <router-link :to="{path: '/'}">aici</router-link> pentru a te intoarce la pagina principala.</p>
             </div>
         </div>
+      <!-- Modal raportare -->
+      <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="reportModalTitle">Raportare utilizator</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <input v-model="reportReason" type="text" class="input-group-text" style="width: 100%; font-weight: normal" placeholder="Motivul raportari. Ex: Postari cu continut inadecvat." required>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuleaza</button>
+              <button type="button" class="btn btn-primary" v-on:click="sendReport">Trimite</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal succes send raportare -->
+      <div class="modal fade" id="succesReportSend" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="reportSendModalTitle">Success</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Raportul a fost trimis cu succes, in scurt timp un administrator se va ocupa de acest lucru.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Inchide</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal failed send raportare -->
+      <div class="modal fade" id="failedReportSend" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="reportFailedSendModalTitle">Success</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Am intampinat o problema la trimiterea sesizari tale, te rugam sa incerci mai tarziu, iti multumim!</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Inchide</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 </template>
 
@@ -76,6 +137,7 @@ import {backend} from '../constants.js';
                 fallowed:null,
                 isProducer: null,
                 invalidUser: null,
+                reportReason: null,
             }
         },
         async created(){
@@ -91,6 +153,28 @@ import {backend} from '../constants.js';
             }
         },
         methods: {
+
+            sendReport: function(){
+               axios.post(backend+'/api/sendReport', {
+                 token: localStorage.getItem('token'),
+                 reason: this.reportReason,
+                 link: document.location.href,
+                 type: 1,
+                 reported_id: this.id,
+              }).then(()=>{
+                    // eslint-disable-next-line no-undef
+                    $('#reportModal').modal('hide');
+                    // eslint-disable-next-line no-undef
+                    $('#succesReportSend').modal('show');
+
+               }).catch((error)=>{
+                 // eslint-disable-next-line no-undef
+                 $('#reportModal').modal('hide');
+                 // eslint-disable-next-line no-undef
+                 $('#failedReportSend').modal('show');
+                 console.log(error);
+               })
+            },
             getFallowed:function(){
                 axios.get(backend + '/api/getFallow', {
                     params:{
