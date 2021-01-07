@@ -16,36 +16,52 @@
                                 <p class="info">Birthday: {{ birthday }}</p>
                             </div>
                         </div>
-                        <button class="btn btn-outline-danger btn-profile" v-on:click="on()">Edit profile</button>
-                        <button v-show="isProducer" class="btn btn-outline-success btn-profile" type="button" v-on:click="post_on()">Add a new post</button>
+                        <button class="btn btn-secondary btn-sm btn-profile" v-on:click="on()">Edit profile</button>
+                        <button v-show="isProducer" class="btn btn-secondary btn-sm btn-profile" type="button" v-on:click="post_on()">Add a new post</button>
+                        <div v-if="reviews!==null" class="review-form-users">
+                          <div v-for="review in reviews" :key="review.id">
+                            <div class="row" style="margin-top: 5px">
+                              <div class="col-sm-1">
+                                <div class="user-info">
+                                  <img alt="user profile photo" style="width: 50px; height: 50px;" class="profile-image" :src="require('../assets/profiles/'+ review.profile_image)">
+                                </div>
+                              </div>
+                              <div class="col-9">
+                                <p style="margin-left: 25px; word-wrap: break-word; font-size: 12px;"><a  style="color: black;
+                                       text-decoration: none; font-weight: bold" :href="'/profile/'+review.reviewer_id">{{review.firstName}} {{review.lastName}}</a><br>{{review.message}}
+                                  <br><span v-for="n in review.rating" :key="n" style="font-size: 15px;" class="material-icons" :id="'starRev'+ n">star_rate</span></p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                     </div>
                     <div id="posts" class="col-7">
                         <div v-for="(post, index) in userPosts" :key="post.id">
                             <div class="container-post sn p-3">
                                 <div class="user-info">
-                                    <img class="user-info-img" :src="require('@/assets/profiles/' + userPhoto)">
+                                    <img  alt="user profile photo" class="user-info-img" :src="require('@/assets/profiles/' + userPhoto)">
                                     <p>{{firstName + " " + lastName}}</p>
                                 </div>
                                 <div class="post-description">
                                 {{post.description}} 
                                 </div>
                                 <div class="d-flex align-items-center flex-column image-post">
-                                    <img class="post-image" :src="require('../assets/posts/' + post.filename)">
+                                    <img alt="user post photo" class="post-image" :src="require('../assets/posts/' + post.filename)">
                                 </div>
-                                <button v-show="post.vote == 0 || post.vote == null || post.vote == -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
-                                <button v-show="post.vote == 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
+                                <button v-show="post.vote === 0 || post.vote === null || post.vote === -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
+                                <button v-show="post.vote === 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
                                 <span>{{post.votes}}</span>
                                 <button class="btn btn-react" type="button" v-on:click="gotToComments(post.id)"><span class="material-icons">insert_comment</span></button>
                                 <button class="btn btn-react" type="button" style="float: right;" v-on:click="confirm_post(post.id, index)"><span><span class="material-icons">edit</span></span></button>
                             </div>
                         </div>
                         
-                        <div v-if="isProducer == 0 && isProducer!=null">
-                            <img class="logo d-flex align-items-center flex-column" src="../assets/Logo_cos.png">
+                        <div v-if="isProducer === 0 && isProducer!==null">
+                            <img alt="logo_cos" class="logo d-flex align-items-center flex-column" src="../assets/Logo_cos.png">
                         </div>
                         
                     </div>
-                        <p v-if="isProducer == 0 && isProducer!=null" class="info-paragraph">Daca detii esti un producator local poti sa trimiti un formular pentru a primi gradul de producator pe aplicatie. Detinatorii acestui grad au posibilitatea sa posteze fotografii
+                        <p v-if="isProducer === 0 && isProducer!=null" class="info-paragraph">Daca detii esti un producator local poti sa trimiti un formular pentru a primi gradul de producator pe aplicatie. Detinatorii acestui grad au posibilitatea sa posteze fotografii
                             cu produsele agricole si sa poata primi recenzi de la alti utilizatori.
                         </p>
                 </div>
@@ -159,7 +175,7 @@
 
 <script>
 import alertBox from './templates/invalidToken';
-import {backend} from '../constants.js';
+import {backend} from '@/constants.js';
 import axios from 'axios';
     export default{
         data(){
@@ -181,6 +197,7 @@ import axios from 'axios';
                 actualPost: null,
                 actualIndex: null,
                 newDescription: '',
+                reviews: null,
             }
         },
         components:{
@@ -199,6 +216,18 @@ import axios from 'axios';
             this.verifyToken();
         },
         methods: {
+            getReviews: function(){
+              axios.get(backend+'/api/getReviews',{
+                params:{
+                  token: localStorage.getItem('token'),
+                  userID: this.id,
+                }
+              }).then((res)=>{
+                this.reviews = res.data['reviews'];
+              }).catch((error)=>{
+                console.log(error);
+              })
+            },
             editPost: function(){
               // eslint-disable-next-line no-undef
               $('#modalPostare').modal('hide');
@@ -313,15 +342,16 @@ import axios from 'axios';
                     params: {
                         token: localStorage.getItem('token'),
                     }});
-                    this.firstName = response.data['firstName'],
-                    this.lastName = response.data['lastName'],
-                    this.email = response.data['email'],
-                    this.birthday = response.data['birthday'],
-                    this.id = response.data['id'],
-                    this.userPhoto = response.data['profile_image'],
-                    this.isProducer = response.data['producer']
+                    this.firstName = response.data['firstName'];
+                    this.lastName = response.data['lastName'];
+                    this.email = response.data['email'];
+                    this.birthday = response.data['birthday'];
+                    this.id = response.data['id'];
+                    this.userPhoto = response.data['profile_image'];
+                    this.isProducer = response.data['producer'];
                     if(this.userPhoto == null)
-                        this.userPhoto = 'default.jpg'
+                        this.userPhoto = 'default.jpg';
+                    this.getReviews();
                     }catch(error){
                         console.log(error);
                     }
@@ -424,7 +454,7 @@ import axios from 'axios';
         margin: auto;
     }
     .info-paragraph{
-        font-family: "NerkoOne";
+        font-family: "NerkoOne",serif;
         font-size: 30px;
         margin-top: -450px;
         text-align: center;
@@ -443,9 +473,6 @@ import axios from 'axios';
         -ms-overflow-style: none;  /* IE and Edge */
         scrollbar-width: none;  /* Firefox */
         height: 850px;
-    }
-    #post::-webkit-scrollbar {
-        display: none;
     }
     .container-post{
         background-color: #d9d9d9!important;
@@ -470,13 +497,22 @@ import axios from 'axios';
         resize: none;
         width: 460px;
     }
+    .review-form-users{
+      overflow: scroll;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+      height: 360px;
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
     .btn-profile{
-        width: 225px;
-        font-size: 20px;
+        width: 100%;
         margin-top: 5px;
+        margin-bottom: 5px;
     }
     .info{
-        margin: 0px;
+        margin: 0;
     }
     #profile{
         font-size: 20px;

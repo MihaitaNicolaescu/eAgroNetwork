@@ -4,11 +4,11 @@
            <button style="" class="btn btn-outline-secondary" v-on:click="home">Home</button>
         </nav> 
         <div class="container">
-            <div v-if="invalidUser === false && isBanned === 0" class="d-flex align-items-left flex-column" style="height: 100px; margin-top: 50px;">
+            <div v-if="invalidUser === false && isBanned === 0" class="d-flex align-items-left flex-column" style="height: 100px;">
                 <div class="row">
                     <div class="col-3">
                         <div id="profile">
-                            <img alt="profile image" class="profile-image" :src="require('@/assets/profiles/' + userPhoto)">  
+                            <img style="margin-top: 20px;" alt="profile image" class="profile-image" :src="require('@/assets/profiles/' + userPhoto)">
                             <div id="profile-info">
                                 <p class="info">First name: {{ firstName }}</p>
                                 <p class="info">Last name: {{ lastName }}</p>
@@ -19,7 +19,7 @@
                             <button v-if="!fallowed && fallowed!=null && isProducer === 1 && visitorID !== id" style="width: 100%" class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste</button>
                             <button v-if="fallowed && fallowed!=null && isProducer === 1 && visitorID !== id" style="width: 100%" class="btn btn-danger btn-sm" type="button" v-on:click="cancelFallow()">Nu mai urmari</button>
                             <button v-if="visitorID !== id" class="btn btn-danger btn-sm" type="button"  style="margin-top: 5px; width: 100%;" data-toggle="modal" data-target="#reportModal">Raporteaza utilizatorul</button>
-                            <button v-if="isProducer === 1" style="margin-bottom: 10px; margin-top: 5px; width: 100%;" type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalReview" v-on:click="show_MyReview">Scrie o recenzie producatorului</button>
+                            <button v-if="isProducer === 1 && this.id !== this.visitorID" style="margin-bottom: 10px; margin-top: 5px; width: 100%;" type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalReview" v-on:click="show_MyReview">Scrie o recenzie producatorului</button>
                             <div v-if="reviews!==null" class="review-form-users">
                               <div v-for="review in reviews" :key="review.id">
                                   <div class="row" style="margin-top: 5px">
@@ -498,7 +498,9 @@ import alertBox from "@/components/templates/invalidToken";
       scrollbar-width: none;  /* Firefox */
       height: 360px;
     }
-
+    ::-webkit-scrollbar {
+      display: none;
+    }
     #posts{
         overflow: scroll;
         -ms-overflow-style: none;  /* IE and Edge */

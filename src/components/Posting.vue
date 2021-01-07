@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <nav v-if="post !== 'INVALID_POSTING'" class="navbar navbar-light bg-light">
-      <button style="" class="btn btn-outline-secondary" v-on:click="home">Home</button>
+      <button style="" class="btn btn-outline-secondary" v-on:click="home">Back</button>
     </nav>
     <div class="container">
       <div v-if="invalidPost === true && invalidPost !== null" class="container">
@@ -311,7 +311,7 @@ export default{
       })
     },
     home: function(){
-      this.$router.push('/');
+      this.$router.go(-1);
     },
   }
 }
@@ -405,6 +405,10 @@ export default{
   max-height: 700px;
   margin: auto;
   object-fit: scale-down;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
 /*BUTTONS*/
 .btn-react{

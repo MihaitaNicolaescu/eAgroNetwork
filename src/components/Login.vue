@@ -54,6 +54,25 @@
           </div>
         </div>
       </div>
+      <!-- Modal pentru verificare -->
+      <div class="modal fade" id="verifyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Este necesara verificarea contului.</h5>
+            </div>
+            <div class="modal-body">
+              <div class="pre-formatted">Pentru a v-a putea accesa contul este necesara activarea acestuia.
+                <br>Pe email a fost trimis un link care trebuie accesat pentru a verifica<br> daca dumneavoastra detineti acel email.
+                <br>Daca nu regasiti emailul in lista, cautati si in spam, daca nu sa trimis<br>va rugam sa apasati butonul de mai jos pentru a retrimite un email<br>care contine acel link.</div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" v-on:click="sendEmail">Retrimite</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Inchide</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 </template>
 <script>
@@ -72,6 +91,16 @@
             }
         },
         methods: {
+            sendEmail: function(){
+              axios.post(backend + '/api/sendEmail', {
+                email: this.email,
+              }).then(()=>{
+                // eslint-disable-next-line no-undef
+                $('#verifyModal').modal('hide');
+              }).catch((error)=>{
+                console.log(error);
+              })
+            },
             login: function(){
                 axios.post(backend + '/api/login', {
                     email: this.email,
@@ -88,6 +117,10 @@
                      this.info = res.data['info'];
                     // eslint-disable-next-line no-undef
                     $('#bannedModal').modal('show');
+                  }else if(res.data['message'] === "NOT_VERIFY"){
+                    this.info = res.data['info'];
+                    // eslint-disable-next-line no-undef
+                    $('#verifyModal').modal('show');
                   }else{
                     localStorage.setItem('token', res.data['token']);
                     localStorage.setItem('admin', res.data['admin']);

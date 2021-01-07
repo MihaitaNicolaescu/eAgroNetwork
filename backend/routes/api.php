@@ -29,6 +29,8 @@ Route::post('/cancelFallowUser', [UserController::class, 'deleteFallower']);
 Route::get('/fetchFallowList', [UserController::class, 'fetchFallowList']);
 Route::get('/fetchFallowPosts', [PostController::class, 'fetchFallowPosts']);
 Route::get('/getFallow', [UserController::class, 'getFallow']);
+Route::post('/sendEmail', [UserController::class, 'resendEmail']);
+Route::post('/verifyAccount', [UserController::class, 'verifyAccount']);
 
 
 //Raportare

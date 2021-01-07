@@ -8,7 +8,10 @@
         <li v-for="notification in notifications" :key="notification.id" class="list-group-item">
           <div class="row">
             <div class="col-sm-1">
-              <img :src="require('@/assets/profiles/'+ notification.profile_image)" width="50" height="50" style="object-fit: cover">
+              <img  v-if="notification.type === 1" :src="require('@/assets/profiles/'+ notification.profile_image)" width="50" height="50" style="object-fit: cover">
+              <p v-if="notification.type === -123" style="font-size: 30px">🎇</p>
+              <p v-if="notification.type === -124" style="font-size: 30px">⚠️</p>
+              <p v-if="notification.type === -125" style="font-size: 30px">❌️</p>
             </div>
             <div class="col-sm-9">
 

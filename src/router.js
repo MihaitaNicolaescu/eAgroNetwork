@@ -70,6 +70,12 @@ export default new Router({
 
         },
         {
+            path: '/verifica/:email/:code',
+            name: 'verifica',
+            component: () => import('./components/Verifica.vue'),
+
+        },
+        {
             path: '/admin/applications',
             name: 'applications',
             component: () => import('./components/Applications.vue'),

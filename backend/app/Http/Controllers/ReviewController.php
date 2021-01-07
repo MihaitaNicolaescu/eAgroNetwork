@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\Review;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -67,10 +69,32 @@ class ReviewController extends Controller
                     $review->message = $request->message . " ";
                     $review->rating = $request->scor;
                     $review->save();
+
+                    $user = User::where('id', '=', $recived['id'])->first();
+                    $notification = new Notification();
+                    $notification->id_user = $request->for;
+                    $notification->from = $recived['id'];
+                    $notification->message = "A adaugat o recenzie la profilul tau!";
+                    $notification->read = 0;
+                    $notification->type = 1;
+                    $notification->firstName = $user->firstName;
+                    $notification->lastName = $user->lastName;
+                    $notification->save();
                 }else{
                     $review->message = $request->message. " ";
                     $review->rating = $request->scor;
                     $review->save();
+
+                    $user = User::where('id', '=', $recived['id'])->first();
+                    $notification = new Notification();
+                    $notification->id_user = $request->for;
+                    $notification->from = $recived['id'];
+                    $notification->message = "A modificat recenzia lasata la profilul tau!";
+                    $notification->read = 0;
+                    $notification->type = 1;
+                    $notification->firstName = $user->firstName;
+                    $notification->lastName = $user->lastName;
+                    $notification->save();
                 }
                 return response()->json([],200);
 

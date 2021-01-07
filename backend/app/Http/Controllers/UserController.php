@@ -7,6 +7,7 @@ use http\Exception;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Hash;
 
@@ -190,8 +191,73 @@ class UserController extends Controller
             return response()->json($user);
         }
     }
+    public  function generateRandomString($length = 20) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
+    }
+
+    public function sendEmail($email, $firstName, $lastName, $link){
+        $to_name = $lastName;
+        $to_email = $email;
+        $to_link = $link;
+        $data = array('name'=>"eAgro Network(sender_name)", "body" => "Bine ai venit!", 'firstName' => $lastName, 'link'=>$link );
+
+        Mail::send('email.emailVerify', $data, function($message) use ($to_name, $to_email, $to_link) {
+            $message->to($to_email, $to_name, $to_link)
+                ->subject("Confirmare cont eAgro Network");
+            $message->from("eagronetwork@gmail.com","eAgro Network");
+        });
+    }
+
+    public function resendEmail(Request $request){
+        try{
+            $email = $request->email;
+            $user = User::where('email', $email)->first();
+            $special_code = $user->code_verify;
+            $link="http://192.168.1.6:8081/verifica/". $request->email . "/".$special_code;
+            $this->sendEmail($user->email, $user->firstName, $user->lastName, $link);
+            return response()->json([
+                'message' => 'success'
+            ]);
+        }
+        catch(Exception $e){
+            $e->getMessage();
+            return response() -> json(['message' => $e->getMessage()]);
+        }
+    }
+
+    public function verifyAccount(Request $request){
+        try{
+            $email = $request->email;
+            $code = $request->code;
+            $user = User::where('email', '=', $email)->first();
+            if($user->code_verify === $code) {
+                $user->verified = 1;
+                $user->save();
+                return response()->json([
+                    'message' => 'success'
+                ]);
+
+            }else{
+                return response()->json([
+                    'message' => 'INVALID'
+                ]);
+            }
+        }
+        catch(Exception $e){
+            $e->getMessage();
+            return response() -> json(['message' => $e->getMessage()]);
+        }
+    }
+
     public function createUser(Request $request){
         try{
+            $special_code = $this->generateRandomString();
             $user = new User();
             $user->firstName = $request->firstName;
             $user->lastName = $request->lastName;
@@ -206,7 +272,10 @@ class UserController extends Controller
             $user->banned = 0;
             $user->reason = '';
             $user->warnings = 0;
+            $user->code_verify = $special_code;
             $user->save();
+            $link="http://192.168.1.6:8081/verifica/" . $request->email . "/".$special_code;
+            $this->sendEmail($request->email, $request->firstName, $request->lastName, $link);
             return response()->json([
                 'message' => 'success'
             ]);
@@ -230,6 +299,9 @@ class UserController extends Controller
                     if($user->banned === 1){
                         $credentials = $request->only(['email', 'password']);
                         return response()->json(['message' => 'IS_BANNED', 'info' => " Nu puteti sa accesati contul deoarece s-a descoperit incalcarea\n regulamentului si am fost nevoiti sa va restrictionam accesul\n in aplicatie!\n\n\nMotivul restrictiei: " . $user->reason], 200);
+
+                    }elseif($user->verified == 0) {
+                        return response()->json(['message' => 'NOT_VERIFY']);
                     }else{
                         $credentials = $request->only(['email', 'password']);
                         if (!$token = auth('api')->attempt($credentials)) {

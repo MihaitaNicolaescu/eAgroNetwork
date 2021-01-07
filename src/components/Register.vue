@@ -43,6 +43,25 @@
         </form>
         <button class="btn btn-outline-success" v-on:click="verifyFields">Creeaza cont</button>
         <router-link :to="{path: 'login'}">    Detii deja un cont? Conecteaza-te aici</router-link>
+        <!-- Modal -->
+        <div class="modal fade" id="confirmEmailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Contul a fost creeat cu succes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                Mai este doar un pas pana sa iti poti accesa contul. Pe emailul {{ email }} a fost trimis un link pentru activarea contului.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" v-on:click="login">Am inteles</button>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
 </template>
 
@@ -65,6 +84,9 @@ import {backend} from '../constants.js';
             }
         },
         methods: {
+            login: function(){
+              this.$router.push('login');
+            },
             registerUser: function(){
                 axios.post(backend + '/api/addUser', {
                     firstName: this.firstName,
@@ -78,7 +100,8 @@ import {backend} from '../constants.js';
                     }
                 }).then((res) => {
                      if(res.data['message'] === 'success'){
-                         this.$router.push('login');
+                       // eslint-disable-next-line no-undef
+                       $('#confirmEmailModal').modal('show');
                      }
                     })
                     .catch((err) => {

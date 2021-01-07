@@ -21,7 +21,7 @@ class NotificationController extends Controller
                 $recived = auth()->userOrFail();
                 $join->on('notifications.from', '=', 'users.id');
             })->select('notifications.id_user', 'notifications.message', 'notifications.from','notifications.read',
-                'notifications.firstName', 'notifications.lastName', 'users.profile_image')
+                'notifications.firstName', 'notifications.type', 'notifications.lastName', 'users.profile_image')
                 ->where('notifications.id_user', '=', $recived['id'])
                 ->orderBy('notifications.id', 'DESC')->get();
             return response()->json(['notifications' => $result], 200);
