@@ -36,7 +36,7 @@
                                 <button v-show="post.vote == 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
                                 <span>{{post.votes}}</span>
                                 <button class="btn btn-react" type="button" v-on:click="gotToComments(post.id)"><span class="material-icons">insert_comment</span></button>
-                                <button class="btn btn-react" tyoe="button" style="float: right;"><span><span class="material-icons">edit</span></span></button>
+                                <button class="btn btn-react" type="button" style="float: right;" v-on:click="confirm_post(post.id, index)"><span><span class="material-icons">edit</span></span></button>
                             </div>
                         </div>
                         
@@ -50,6 +50,49 @@
                         </p>
                 </div>
             </div>
+          <!-- Modal setari postare -->
+          <div class="modal fade bd-example-modal-sm" id="modalPostare" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLongTitle">Actiuni postare</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div style="display: grid;" class="modal-body">
+                  <button style="margin-top: 5px;" class="btn btn-secondary" type="button" v-on:click="editPost">Editeaza postarea</button>
+                  <button style="margin-top: 5px;" class="btn btn-secondary" type="button" v-on:click="deletePost">Sterge postarea</button>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Inchide</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal editare descriere postare -->
+          <div class="modal fade" id="modalPostareEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modalPostareEditTitle">Actiuni postare</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div style="display: grid;" class="modal-body">
+                  <div class="form-group">
+                    <textarea v-model="newDescription" style="resize: none; height: 60px;" class="form-control" id="exampleFormControlTextarea1" required></textarea>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Inchide</button>
+                  <button style="margin-top: 5px;" class="btn btn-success btn-sm" type="button" v-on:click="modifyDescription">Modifica descrierea</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div id="overlay">
             <div class="container">
@@ -89,6 +132,8 @@
                 </div>
             </div>
         </div>
+
+
         <div id="post-overlay">
             <div class="container">
                 <div class="d-flex align-items-center flex-column">
@@ -103,6 +148,7 @@
                     <button class="btn btn-danger btn-profile" type="button" v-on:click="off()">Cancel</button>
                 </div>
             </div>
+
         </div>
         <alert-box></alert-box>
         <div class="container overlay" id="confirm">
@@ -132,6 +178,9 @@ import axios from 'axios';
                 description: '',
                 selectedFile: null,
                 userPosts: {},
+                actualPost: null,
+                actualIndex: null,
+                newDescription: '',
             }
         },
         components:{
@@ -150,6 +199,46 @@ import axios from 'axios';
             this.verifyToken();
         },
         methods: {
+            editPost: function(){
+              // eslint-disable-next-line no-undef
+              $('#modalPostare').modal('hide');
+              // eslint-disable-next-line no-undef
+              $('#modalPostareEdit').modal('show');
+              this.newDescription = this.userPosts[this.actualIndex].description;
+            },
+            deletePost: function(){
+              axios.post(backend+'/api/deletePost',{
+                token: localStorage.getItem('token'),
+                postID: this.actualPost,
+              }).then(()=>{
+                // eslint-disable-next-line no-undef
+                $('#modalPostare').modal('hide');
+                // eslint-disable-next-line no-undef
+                this.getUserPosts();
+              }).catch((error)=>{
+                console.log(error);
+              })
+            },
+            modifyDescription: function(){
+              axios.post(backend+'/api/modifyDescriptionPost',{
+                token: localStorage.getItem('token'),
+                postID: this.actualPost,
+                description: this.newDescription,
+              }).then(()=>{
+                // eslint-disable-next-line no-undef
+                $('#modalPostareEdit').modal('hide');
+                // eslint-disable-next-line no-undef
+                this.getUserPosts();
+              }).catch((error)=>{
+                console.log(error);
+              })
+            },
+            confirm_post: function(postID, index){
+              this.actualPost = postID;
+              this.actualIndex = index;
+              // eslint-disable-next-line no-undef
+              $('#modalPostare').modal('show');
+            },
             gotToComments: function(postID){
               this.$router.push('/post/'+postID);
             },
@@ -245,7 +334,7 @@ import axios from 'axios';
                 fd.append('token', localStorage.getItem('token'));
                 fd.append('description', this.description);
                 fd.append('user_id', this.id);
-                axios.post('http://127.0.0.1:8000/api/addPost',fd, {
+                axios.post(backend+'/api/addPost',fd, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }

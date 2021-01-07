@@ -14,11 +14,28 @@
                                 <p class="info">Last name: {{ lastName }}</p>
                                 <p class="info">Email: {{ email }}</p>
                                 <p class="info">Birthday: {{ birthday }}</p>
-                                <p class="info">Producator atestat <img style="width:45px" src="../assets/Logo.png"></p>
+                                <p v-if="isProducer === 1" class="info">Producator atestat <img style="width:45px" src="../assets/Logo.png"></p>
                             </div>
-                            <button v-if="!fallowed && fallowed!=null && isProducer === 1" class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste</button>
-                            <button v-if="fallowed && fallowed!=null && isProducer === 1" class="btn btn-danger btn-sm" type="button" v-on:click="cancelFallow()">Nu mai urmari</button>
-                            <button class="btn btn-danger btn-sm" type="button" data-toggle="modal" data-target="#reportModal">Raporteaza utilizatorul</button>
+                            <button v-if="!fallowed && fallowed!=null && isProducer === 1 && visitorID !== id" style="width: 100%" class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste</button>
+                            <button v-if="fallowed && fallowed!=null && isProducer === 1 && visitorID !== id" style="width: 100%" class="btn btn-danger btn-sm" type="button" v-on:click="cancelFallow()">Nu mai urmari</button>
+                            <button v-if="visitorID !== id" class="btn btn-danger btn-sm" type="button"  style="margin-top: 5px; width: 100%;" data-toggle="modal" data-target="#reportModal">Raporteaza utilizatorul</button>
+                            <button v-if="isProducer === 1" style="margin-bottom: 10px; margin-top: 5px; width: 100%;" type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalReview" v-on:click="show_MyReview">Scrie o recenzie producatorului</button>
+                            <div v-if="reviews!==null" class="review-form-users">
+                              <div v-for="review in reviews" :key="review.id">
+                                  <div class="row" style="margin-top: 5px">
+                                    <div class="col-sm-1">
+                                      <div class="user-info">
+                                        <img style="width: 50px; height: 50px;" class="profile-image" :src="require('../assets/profiles/'+ review.profile_image)">
+                                      </div>
+                                    </div>
+                                    <div class="col-9">
+                                      <p style="margin-left: 25px; word-wrap: break-word; font-size: 12px;"><a  style="color: black;
+                                   text-decoration: none; font-weight: bold" :href="'/profile/'+review.reviewer_id">{{review.firstName}} {{review.lastName}}</a><br>{{review.message}}
+                                        <br><span v-for="n in review.rating" :key="n" style="font-size: 15px;" class="material-icons" :id="'starRev'+ n">star_rate</span></p>
+                                    </div>
+                                  </div>
+                              </div>
+                            </div>
                         </div>
                     </div>
                     <div id="posts" class="col-7">
@@ -73,7 +90,35 @@
           </div>
         </div>
       </div>
-
+      <!-- Modal pentru review -->
+      <div v-if="isProducer === 1" class="modal fade" id="modalReview" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Scrie un review</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="review">
+                <fieldset class="rating">
+                  <input type="radio" v-model="stars" id="star5" name="rating" value="5" /><label class = "full" for="star5"></label>
+                  <input type="radio" v-model="stars" id="star4" name="rating" value="4" /><label class = "full" for="star4"></label>
+                  <input type="radio" v-model="stars" id="star3" name="rating" value="3" /><label class = "full" for="star3"></label>
+                  <input type="radio" v-model="stars" id="star2" name="rating" value="2" /><label class = "full" for="star2"></label>
+                  <input type="radio" v-model="stars" id="star1" name="rating" value="1" /><label class = "full" for="star1"></label>
+                </fieldset>
+                <input v-model="review_text" type="text" class="form-control">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+              <button class="btn btn-success btn-sm" v-on:click="sendReview">Trimite parerea</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Modal succes send raportare -->
       <div class="modal fade" id="succesReportSend" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -113,13 +158,16 @@
           </div>
         </div>
       </div>
+      <alert-box></alert-box>
     </div>
+
 </template>
 
 <script>
 
 import axios from 'axios';
 import {backend} from '../constants.js';
+import alertBox from "@/components/templates/invalidToken";
     export default{
         data(){
             return{
@@ -139,7 +187,15 @@ import {backend} from '../constants.js';
                 invalidUser: null,
                 reportReason: null,
                 isBanned: null,
+                visitorID: null,
+                stars: null,
+                review_text: "",
+                reviews: null,
+                myReview: null,
             }
+        },
+        components: {
+          'alert-box': alertBox,
         },
         async created(){
             await this.getUserInformations();
@@ -151,9 +207,60 @@ import {backend} from '../constants.js';
             id: function(){
                 this.getUserPosts();
                 this.getFallowed();
+                this.getReviews();
             }
         },
         methods: {
+            show_MyReview: function(){
+              this.getMyReview()
+              // eslint-disable-next-line no-undef
+              $('#modalReview').modal('show');
+            },
+            getMyReview: function(){
+              axios.get(backend+'/api/getMyReview',{
+                params:{
+                  token: localStorage.getItem('token'),
+                  userID: this.visitorID,
+                  userPageID: this.id,
+                }
+              }).then((res)=>{
+                this.myReview = res.data['review'];
+                this.stars = this.myReview.rating;
+                this.review_text = this.myReview.message;
+              }).catch((error)=>{
+                console.log(error);
+              })
+            },
+            getReviews: function(){
+              axios.get(backend+'/api/getReviews',{
+                params:{
+                  token: localStorage.getItem('token'),
+                  userID: this.id,
+                }
+              }).then((res)=>{
+                  this.reviews = res.data['reviews'];
+              }).catch((error)=>{
+                console.log(error);
+              })
+            },
+            sendReview: function(){
+                if(this.stars !== null){
+                  axios.post(backend + '/api/sendReview',{
+                    token: localStorage.getItem('token'),
+                    scor: this.stars,
+                    message: this.review_text,
+                    for: this.id,
+                  }).then(()=>{
+                    //this.getReviews(this.id);
+                    this.review_text = '';
+                    // eslint-disable-next-line no-undef
+                    $('#modalReview').modal('hide');
+                    this.getReviews();
+                  }).catch((error)=>{
+                    console.log(error);
+                  })
+                }
+            },
             gotToComments: function(postID){
               this.$router.push('/post/'+postID);
             },
@@ -286,6 +393,7 @@ import {backend} from '../constants.js';
                         this.isBanned = response.data['banned'];
                         if(this.userPhoto == null)
                             this.userPhoto = 'default.jpg'
+
                     }
                 }).catch((error) =>{
                     console.log(error)
@@ -296,6 +404,8 @@ import {backend} from '../constants.js';
                     params: {
                         token: localStorage.getItem('token'),
                     }
+                }).then((res)=>{
+                    this.visitorID = res.data['id'];
                 }).catch(() =>{
                     document.getElementById('overlay-alert').style.display ="block";    
                 })
@@ -307,7 +417,48 @@ import {backend} from '../constants.js';
     }
 </script>
 <style scoped>
-    /*Fonts from frontend server*/
+
+
+  /*Review style*/
+
+  @import url(https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
+  fieldset, label { margin: 0; padding: 0; }
+  body{ margin: 20px; }
+  h1 { font-size: 1.5em; margin: 10px; }
+
+  /****** Style Star Rating Widget *****/
+
+  .rating {
+    border: none;
+    float: left;
+  }
+
+  .rating > input { display: none; }
+  .rating > label:before {
+    margin: 5px;
+    font-size: 2.5em;
+    font-family: FontAwesome;
+    display: inline-block;
+    content: "\f005";
+  }
+
+  .rating > label {
+    color: gray;
+    float: right;
+  }
+
+  /***** CSS Magic to Highlight Stars on Hover *****/
+
+  .rating > input:checked ~ label, /* show gold star when clicked */
+  .rating:not(:checked) > label:hover, /* hover current star */
+  .rating:not(:checked) > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */
+
+  .rating > input:checked + label:hover, /* hover current star when changing rating */
+  .rating > input:checked ~ label:hover,
+  .rating > label:hover ~ input:checked ~ label, /* lighten current selection */
+  .rating > input:checked ~ label:hover ~ label { color: #FFED85;  }
+
+  /*Fonts from frontend server*/
     @font-face {
         font-family: "NerkoOne";
         src: url("../fonts/NerkoOne-Regular.ttf");
@@ -341,6 +492,13 @@ import {backend} from '../constants.js';
         font-size: 15px;
         font-weight: bold;
     }
+    .review-form-users{
+      overflow: scroll;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+      height: 360px;
+    }
+
     #posts{
         overflow: scroll;
         -ms-overflow-style: none;  /* IE and Edge */

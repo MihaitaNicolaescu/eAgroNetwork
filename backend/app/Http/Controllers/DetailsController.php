@@ -8,7 +8,7 @@ use Spatie\Searchable\Search;
 
 class DetailsController extends Controller
 {
-    public function search(Request $request){ // functie pentru cautarea unui user folosita in home page (cautare dinamica) 
+    public function search(Request $request){ // functie pentru cautarea unui user folosita in home page (cautare dinamica)
         $result = (new Search())->registerModel(User::class, ['firstName', 'lastName'])->search($request->input('query'));
 
         return response()->json($result);
@@ -17,7 +17,7 @@ class DetailsController extends Controller
     public function pagination(Request $request){//functie pentru paginare
         try{
             if($request->searchedUser == ''){
-                $users = User::where('admin', 0)->paginate(5);
+                $users = User::paginate(10);
                 return response()->json($users, 200);
             }else{
                 $users = User::where('firstName','like','%'.$request->searchedUser.'%')->orWhere('lastName','like', '%'.$request->searchedUser.'%')->orWhere('email', 'like', '%'.$request->searchedUser.'%')->paginate(10);
@@ -39,7 +39,7 @@ class DetailsController extends Controller
             $user = User::where('id', $recived['id'])->first();
             error_log($user->admin);
             if($user->admin === 1) return response() -> json(['isAdmin' => 1], 200);
-            else return response()-> json(['isAdmin' => 0],200);  
+            else return response()-> json(['isAdmin' => 0],200);
         }catch(Exception $e){
             return response()->json(417);
         }

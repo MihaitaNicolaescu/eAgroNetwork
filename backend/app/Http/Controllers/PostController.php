@@ -26,6 +26,24 @@ class PostController extends Controller
         }
     }
 
+    function modifyDescriptionPost(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+            try{
+                $post = Post::where('id', '=', $request->postID)->first();
+                $post->description = $request->description;
+                $post->save();
+                return response()->json([],200);
+
+            }catch(Exception $e){
+                return response()->json(['message' => $e]);
+            }
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            error_log($e);
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+    }
+
     function getPost(Request $request){
         try{
             $recived = auth()->userOrFail();
@@ -132,7 +150,7 @@ class PostController extends Controller
 
                 })
                 ->select('posts.id', 'posts.user_id', 'posts.description', 'vote', 'posts.votes', 'posts.filename', 'users.lastName', 'users.firstName', 'users.profile_image')
-                ->whereIn('posts.user_id', $arrayRecived)
+                ->whereIn('posts.user_id', $arrayRecived)->orWhere('posts.user_id', $recived['id'])
                 ->orderBy('posts.created_at', 'desc')->get();
                 return response()->json(['posts' => $result], 200);
 

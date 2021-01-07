@@ -149,7 +149,8 @@
                 <div style="display: grid;" class="modal-body">
                     <button class="btn btn-danger btn-modal" type="button" v-on:click="deleteUser(actualUserId)">Sterge utilizator</button>
                     <div v-if="this.actualUserIndex !== null && this.actualUserId !== null">
-                      <button v-if="users[this.actualUserIndex].producer === 1" class="btn btn-danger btn-modal" type="button" v-on:click="cancelProducer(actualUserId)">Sterge grad</button>
+                      <button v-if="users[this.actualUserIndex].producer === 1" class="btn btn-danger btn-modal" type="button" v-on:click="cancelProducer(actualUserId)">Sterge grad de producator</button>
+                      <button v-if="users[this.actualUserIndex].producer === 0" class="btn btn-danger btn-modal" type="button" v-on:click="giveProducer(actualUserId)">Adauga grad de producator</button>
                       <button v-if="users[this.actualUserIndex].banned === 0" class="btn btn-danger btn-modal" v-on:click="confirm_ban()" >Ban</button>
                       <button v-if="users[this.actualUserIndex].banned === 1" class="btn btn-danger btn-modal" v-on:click="unbanUser(actualUserId)">Unban</button>
                       <button v-if="users[this.actualUserIndex].banned === 0" class="btn btn-warning btn-modal" v-on:click="confirm_warn">Avertizare</button>
@@ -231,6 +232,7 @@
                 this.actualUserId = null;
                 this.actualUserIndex = null;
                 this.reason = '';
+                this.getUsers();
               }).catch((error) => {
                 console.log(error)
               })
@@ -247,6 +249,18 @@
             },
             cancelProducer: function(producerID){
               axios.post(backend+ '/api/cancelProducer',{
+                token: localStorage.getItem('token'),
+                producer_id: producerID,
+              }).then(()=>{
+                // eslint-disable-next-line no-undef
+                $('#modal-user').modal('hide');
+                this.getUsers()
+              }).catch((e)=>{
+                console.log(e)
+              })
+            },
+            giveProducer: function(producerID){
+              axios.post(backend+ '/api/giveProducer',{
                 token: localStorage.getItem('token'),
                 producer_id: producerID,
               }).then(()=>{
@@ -331,7 +345,7 @@
                     this.users = response.data.data
                     $this.makePagination(response.data)
                     if(this.users.length == 0){
-                        alert("Utilizatorul cautat nu exista in baza de date");
+                        //alert("Utilizatorul cautat nu exista in baza de date");
                         this.usersButton();
                     }
                 })

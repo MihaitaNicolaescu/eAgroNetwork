@@ -8,7 +8,7 @@
         <li v-for="notification in notifications" :key="notification.id" class="list-group-item">
           <div class="row">
             <div class="col-sm-1">
-              <img src="@/assets/profiles/profile_image_1.jpg" width="50" height="50" style="object-fit: cover">
+              <img :src="require('@/assets/profiles/'+ notification.profile_image)" width="50" height="50" style="object-fit: cover">
             </div>
             <div class="col-sm-9">
 

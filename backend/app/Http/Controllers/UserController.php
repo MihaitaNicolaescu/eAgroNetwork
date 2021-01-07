@@ -12,6 +12,22 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function giveProducer(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            return response()->json(['error' => 'INVALID_TOKEN'], 401);
+        }
+        try{
+            $user = User::where('id', '=', $request->producer_id)->first();
+            $user->producer = 1;
+            $user->save();
+            return response()->json(['message' => 'SUCCESS']);
+        }catch(Exception $e){
+            return response()->json(['message' => 'Error on accesing database!'], 417);
+        }
+    }
+
     public function cancelProducer(Request $request){
         try{
             $recived = auth()->userOrFail();

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DetailsController;
@@ -17,6 +18,7 @@ Route::post('/login', [UserController::class, 'loginUser']); // conectarea unui 
 Route::get('/fetchUserData', [UserController::class, 'fetchUserData']); // preluarea datelor unui user
 Route::get('/fetchProfile', [UserController::class, 'fetchProfile']);
 Route::post('/cancelProducer', [UserController::class, 'cancelProducer']); // anuleaza gradul unui producator
+Route::post('/giveProducer', [UserController::class, 'giveProducer']); // adauga gradul de producator unui utilizator
 Route::post('/banUser', [UserController::class, 'banUser']);
 Route::post('/warnUser', [UserController::class, 'warnUser']);
 Route::post('/unbanUser', [UserController::class, 'unbanUser']);
@@ -57,6 +59,7 @@ Route::get('/vote', [PostController::class, 'postVote']);
 Route::get('/modifyVote',[PostVoteController::class, 'modifyVote']);
 Route::get('/getPost', [PostController::class, 'getPost']);
 Route::post('/deletePost', [PostController::class, 'deletePost']);
+Route::post('/modifyDescriptionPost', [PostController::class, 'modifyDescriptionPost']);
 
 
 //Aplicatiii
@@ -74,4 +77,9 @@ Route::post('/enableEditApplication', [AplicationController::class, 'enableEditA
 Route::post('addComment', [CommentController::class, 'addComment']);
 Route::get('getComments', [CommentController::class, 'getComments']);
 Route::post('deleteComment', [CommentController::class, 'deleteComment']);
+
+//Review
+Route::post('sendReview', [ReviewController::class, 'sendReview']);
+Route::get('getReviews', [ReviewController::class, 'getReviews']);
+Route::get('getMyReview', [ReviewController::class, 'getMyReview']);
 
