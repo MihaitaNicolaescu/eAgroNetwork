@@ -1,10 +1,10 @@
 <template>
   <div id="login">
     <div class="container d-flex align-items-center flex-column">
-      <div v-if="valid === false && valid !== null || valid === null" class="container">
+      <div v-if="valid === false && valid !== null" class="container">
         <p class="not-found">Link invalid.</p>
       </div>
-      <div v-else class="container my-5 d-flex align-items-center flex-column">
+      <div v-if="valid === true && valid !== null" class="container my-5 d-flex align-items-center flex-column">
         <img class="logo" src="../assets/Logo.png">
         <h2>Resetare parola</h2>
         <div class="container my-5">

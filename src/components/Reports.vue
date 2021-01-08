@@ -26,7 +26,7 @@
             <td v-if="report.report_type === 2">Postare</td>
             <td>{{report.reason}}</td>
             <td><a :href="report.link">{{report.link}}</a></td>
-            <td><a :href="'http://192.168.1.6:8081/profile/' + report.sender_id">{{report.sender_id}}</a></td>
+            <td><a :href="'http://192.168.1.100:8080/profile/' + report.sender_id">{{report.sender_id}}</a></td>
             <td><button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#modalReport" v-on:click="actualReport(report.reported_id, report.id)">Raspunde</button></td>
           </tr>
         </tbody>

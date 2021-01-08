@@ -11,8 +11,8 @@
               <label class="form-control-placeholder" for="name">Email</label>
             </div>
             <div>
-              <button type="button" class="btn-login d-inline p-2" v-on:click="back">Anuleaza</button>
-              <button type="button" class="btn-login d-inline p-2" v-on:click="recoveryPassword">Trimite email</button>
+              <button type="button" class="btn-login d-inline p-2" v-on:click="back">Login</button>
+              <button id="sendRecovery" type="button" class="btn-login d-inline p-2" v-on:click="recoveryPassword">Trimite email</button>
             </div>
           </div>
         </div>
@@ -54,6 +54,7 @@ export default {
   methods: {
     recoveryPassword: function(){
       if(this.email !== null && this.email !== '' && this.reg.test(this.email)){
+        // eslint-disable-next-line no-undef
         axios.post(backend + '/api/recoveryPassword', {
           email: this.email,
         }).then(()=>{

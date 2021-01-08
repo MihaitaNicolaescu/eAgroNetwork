@@ -69,7 +69,7 @@ class UserController extends Controller
                         $code = $recovery->code;
 
                     }
-                    $link="http://192.168.1.6:8081/recoverypassword/". $request->email . "/".$code;
+                    $link="http://192.168.1.100:8080/recoverypassword/". $request->email . "/".$code;
                     $this->sendEmailRecovery($user->email, $user->firstName, $user->lastName, $link);
                 }
                 return response()->json([], 200);
@@ -299,7 +299,7 @@ class UserController extends Controller
             $email = $request->email;
             $user = User::where('email', $email)->first();
             $special_code = $user->code_verify;
-            $link="http://192.168.1.6:8081/verifica/". $request->email . "/".$special_code;
+            $link="http://192.168.1.100:8080/verifica/". $request->email . "/".$special_code;
             $this->sendEmail($user->email, $user->firstName, $user->lastName, $link);
             return response()->json([
                 'message' => 'success'
@@ -354,7 +354,7 @@ class UserController extends Controller
             $user->warnings = 0;
             $user->code_verify = $special_code;
             $user->save();
-            $link="http://192.168.1.6:8081/verifica/" . $request->email . "/".$special_code;
+            $link="http://192.168.1.100:8080/verifica/" . $request->email . "/".$special_code;
             $this->sendEmail($request->email, $request->firstName, $request->lastName, $link);
             return response()->json([
                 'message' => 'success'
