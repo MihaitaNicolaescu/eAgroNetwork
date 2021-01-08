@@ -1,18 +1,98 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Recovery;
 use App\Models\User;
 use App\Models\Notification;
 use http\Exception;
 use Illuminate\Http\Request;
-use Illuminate\Auth\Events\Registered;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    //Resetare parola
+    public function resetPassword(Request $request){
+        try{
+
+            $user = User::where('email', '=', $request->email)->first();
+            $user->password = Hash::make($request->newPassword);
+            $user->save();
+
+            Recovery::where('email', '=', $request->email)->delete();
+            return response()->json([
+                'message' => 'success'
+            ]);
+        }
+        catch(Exception $e){
+            $e->getMessage();
+            return response() -> json(['message' => $e->getMessage()]);
+        }
+    }
+
+        public function verifyRecovery(Request $request){
+            try{
+                $email = $request->email;
+                $code = $request->code;
+                $recovery = Recovery::where('email', '=', $email)->first();
+                error_log($recovery->code);
+                if($recovery->code === $code) {
+                    return response()->json([
+                        'message' => 'success'
+                    ]);
+
+                }else{
+                    return response()->json([
+                        'message' => 'INVALID'
+                    ]);
+                }
+            }
+            catch(Exception $e){
+                $e->getMessage();
+                return response() -> json(['message' => $e->getMessage()]);
+            }
+        }
+        public function recoveryPassword(Request $request){
+            try{
+                $email = $request->email;
+                $user = User::where('email', $email)->first();
+                if(!is_null($user)){
+                    $recovery = Recovery::where('email', '=', $email)->first();
+                    if(is_null($recovery)){
+                        var_dump($recovery);
+                        $code = $this->generateRandomString();
+                        $recovery = new Recovery();
+                        $recovery->code = $code;
+                        $recovery->email = $email;
+                        $recovery->save();
+                    }else{
+                        $code = $recovery->code;
+
+                    }
+                    $link="http://192.168.1.6:8081/recoverypassword/". $request->email . "/".$code;
+                    $this->sendEmailRecovery($user->email, $user->firstName, $user->lastName, $link);
+                }
+                return response()->json([], 200);
+            }
+            catch(Exception $e){
+                $e->getMessage();
+                return response() -> json(['message' => $e->getMessage()]);
+            }
+        }
+
+        public function sendEmailRecovery($email, $firstName, $lastName, $link){
+            $to_name = $lastName;
+            $to_email = $email;
+            $to_link = $link;
+            $data = array('name'=>"eAgro Network(sender_name)", "body" => "Recuperare parola", 'firstName' => $lastName, 'link'=>$link );
+
+            Mail::send('email.recoveryPassword', $data, function($message) use ($to_name, $to_email, $to_link) {
+                $message->to($to_email, $to_name, $to_link)
+                    ->subject("Resetarea parola pe eAgro Network");
+                $message->from("eagronetwork@gmail.com","eAgro Network");
+            });
+        }
+    //
     public function giveProducer(Request $request){
         try{
             $recived = auth()->userOrFail();

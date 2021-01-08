@@ -31,6 +31,9 @@ Route::get('/fetchFallowPosts', [PostController::class, 'fetchFallowPosts']);
 Route::get('/getFallow', [UserController::class, 'getFallow']);
 Route::post('/sendEmail', [UserController::class, 'resendEmail']);
 Route::post('/verifyAccount', [UserController::class, 'verifyAccount']);
+Route::post('/recoveryPassword', [UserController::class, 'recoveryPassword']);
+Route::post('/verifyRecovery', [UserController::class, 'verifyRecovery']);
+Route::post('/resetPassword', [UserController::class, 'resetPassword']);
 
 
 //Raportare

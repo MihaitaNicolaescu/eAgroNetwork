@@ -12,6 +12,16 @@ export default new Router({
             component: () => import('./components/Login.vue')
         },
         {
+            path:'/recovery',
+            name: 'recovery',
+            component: () => import('./components/Recovery.vue')
+        },
+        {
+            path:'/recoverypassword/:email/:code',
+            name: 'recoverypassword',
+            component: () => import('./components/RecoveryPassword.vue')
+        },
+        {
             path:'/',
             name: 'home',
             component: () => import('./components/Home.vue'),

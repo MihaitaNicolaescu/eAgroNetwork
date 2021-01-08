@@ -16,7 +16,8 @@
                         </div>
                         <div>
                             <button type="button" class="btn-login d-inline p-2" v-on:click="checkForms">Conectează-te</button>
-                            <p  class="d-inline p-2">Nu ai un cont? <router-link :to="{path: 'register'}">   Apasă aici</router-link></p>
+                            <p class="d-inline p-2">Nu ai un cont? <router-link :to="{path: 'register'}">   Apasă aici</router-link></p>
+                          <p class="p-2">Ai uitat parola? <router-link :to="{path: 'recovery'}">   Apasă aici</router-link></p>
                         </div>
                     </div>
                 </div>
