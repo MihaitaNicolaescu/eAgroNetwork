@@ -1,31 +1,36 @@
 <template>
-    <div class="container container-view">
-        <nav class="navbar navbar-light bg-light">
-           <button class="btn btn-outline-secondary" v-on:click="logout">Log out</button>
-              <form style="float: left" class="form-inline my-2 my-lg-0">
-                <input class="search-input form-control mr-sm-2 input-search" type="search" placeholder="Search" aria-label="Search" v-model="query">
-                <button class="btn btn-icons  icon-search" type="button"><i class="material-icons">search</i></button>
-              </form>
-            <div class="ml-auto">
-                <button v-if="isProducer === 0 && isProducer!==null " class="btn btn-success" v-on:click="aplica()">Devino producator</button>
-                <button v-if="admin" class="btn btn-icons" v-on:click="adminPanel"><span class="material-icons">admin_panel_settings</span></button>
-                <button class="btn btn-icons" v-on:click="profile"><span class="material-icons">account_circle</span></button>
-                <button v-if="this.hasNotifications === 1" v-on:click="showNotifications()" class="btn btn-icons"><span class="material-icons">mark_email_unread</span></button>
-                <button v-if="this.hasNotifications === 0" class="btn btn-icons" v-on:click="showNotifications()"><span class="material-icons">email</span></button>
-            </div>
+    <div style="min-width: 650px;" class="container-fluid container-view">
+      <div class="d-flex align-items-center flex-column">
+        <nav style="width: auto; z-index: 2; position: fixed;" class="navbar navbar-light bg-light">
+          <button class="btn btn-outline-secondary" v-on:click="logout">Log out</button>
+          <form style="float: left" class="form-inline my-2 my-lg-0">
+            <input class="search-input form-control mr-sm-2 input-search" type="search" placeholder="Search" aria-label="Search" v-model="query">
+            <button class="btn btn-icons  icon-search" type="button"><i class="material-icons">search</i></button>
+          </form>
+          <div class="ml-auto">
+            <button v-if="isProducer === 0 && isProducer!==null " class="btn btn-success" v-on:click="aplica()">Devino producator</button>
+            <button v-if="admin" class="btn btn-icons" v-on:click="adminPanel"><span class="material-icons">admin_panel_settings</span></button>
+            <button class="btn btn-icons" v-on:click="profile"><span class="material-icons">account_circle</span></button>
+            <button v-if="this.hasNotifications === 1" v-on:click="showNotifications()" class="btn btn-icons"><span class="material-icons">mark_email_unread</span></button>
+            <button v-if="this.hasNotifications === 0" class="btn btn-icons" v-on:click="showNotifications()"><span class="material-icons">email</span></button>
+          </div>
         </nav>
-        <ul class="list-group list-search" v-if="results.length > 0 && query">
-                <li class="list-group-item search-item" v-for="result in results.slice(0,10)" :key="result.id">
-                    <a class="link" :href="'/profile/' + result.searchable.id">
-                      <div class="link-profile" style="display: block ruby;">
-                          <img v-if="result.searchable.profile_image !== 'default.jpg'" class="search-image" :src="require('@/assets/profiles/profile_image_' + result.searchable.id + '.jpg')" alt="Prof. img" width="50" height="50">
-                          <img v-else class="search-image" :src="require('@/assets/profiles/default.jpg')" alt="Prof. img" width="50" height="50">
-                          <p style="color:black; display: inline-block;" v-text="result.searchable.lastName + ' ' + result.title"></p>
-                      </div>
-                    </a>
-                </li>
+      </div>
+      <div class="d-flex align-items-center flex-column">
+        <ul style="margin-top: 65px;" class="list-group list-search" v-if="results.length > 0 && query">
+          <li class="list-group-item search-item" v-for="result in results.slice(0,10)" :key="result.id">
+            <a class="link" :href="'/profile/' + result.searchable.id">
+              <div class="link-profile" style="display: block ruby;">
+                <img v-if="result.searchable.profile_image !== 'default.jpg'" class="search-image" :src="require('@/assets/profiles/profile_image_' + result.searchable.id + '.jpg')" alt="Prof. img" width="50" height="50">
+                <img v-else class="search-image" :src="require('@/assets/profiles/default.jpg')" alt="Prof. img" width="50" height="50">
+                <p style="color:black; display: inline-block;" v-text="result.searchable.lastName + ' ' + result.title"></p>
+              </div>
+            </a>
+          </li>
         </ul>
-        <div id="notifications-box">
+      </div>
+
+        <div class="align-items-center flex-column" id="notifications-box">
             <ul class="list-group list-search list-notifications">
               <div v-if="hasNotifications === 0">
                 <li class="list-group-item">
@@ -102,15 +107,15 @@
               </div>
             </ul>
         </div>
-        <div style="margin-top: 10px;" class="posts-container d-flex align-items-center flex-column">
+        <div style="margin-top: 65px;" class="posts-container d-flex align-items-center flex-column">
             <div id="posts">
                 <div v-for="(post, index) in fallowPosts" :key="post.id">
                     <div class="container-post sn p-3">
                         <div class="user-info">
                             <img alt="user profile photo" class="user-info-img" :src="require('@/assets/profiles/' + post.profile_image)">
-                            <a style="color: black; text-decoration: none;" :href="'/profile/' + post.user_id">{{post.firstName + " " + post.lastName}}</a>
+                            <a style="color: black; text-decoration: none; margin-left: 10px;" :href="'/profile/' + post.user_id">{{post.firstName + " " + post.lastName}}</a>
                         </div>
-                        <div class="post-description">
+                        <div style="margin-bottom: 10px; margin-top: 10px;" class="post-description">
                         {{post.description}} 
                         </div>
                         <div class="d-flex align-items-center flex-column image-post">
@@ -300,7 +305,7 @@
                 document.getElementById('notifications-box').style.display ="none";
             },
             showNotifications: function(){
-                document.getElementById('notifications-box').style.display ="block";
+                document.getElementById('notifications-box').style.display ="flex";
             },
             profile: function(){
                 this.$router.push('profile');
@@ -336,6 +341,17 @@
     @import '../style/screenSizes.css';
     ::-webkit-scrollbar {
       display: none;
+    }
+    .form-control:focus{
+      border-color: #9f5ac7;
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(255, 100, 255, 0.5);
+    }
+    input {
+      margin-left: 20px;
+      border-radius: 0;
+      border: none;
+      border-bottom: 2px solid #9f5ac7;
+      background: #f8f9fa!important
     }
 </style> 
 

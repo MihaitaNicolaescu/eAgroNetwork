@@ -580,13 +580,17 @@ import alertBox from "@/components/templates/invalidToken";
         width: 200px;
         height: 200px;
     }
-    .post-image{
-        max-width: 550px;
-        min-width: 550px;
-        max-height: 700px;
-        margin: auto;
-        object-fit: scale-down;
-    }
+  .post-image{
+    width: 100%;
+    max-height: 600px;
+    margin: auto;
+    object-fit: cover;
+  }
+  .image-post{
+    width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+  }
     .logo{
         z-index: 2;
         width: 500px;

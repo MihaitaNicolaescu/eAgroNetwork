@@ -1,11 +1,13 @@
 <template>
-    <div class="container">
-        <nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+      <div class="d-flex align-items-center flex-column">
+        <nav style="width: 1000px" class="navbar navbar-light bg-light">
            <button style="" class="btn btn-outline-secondary" v-on:click="home">Home</button>
-        </nav> 
+        </nav>
+      </div>
         <div class="container">
             <div class="d-flex align-items-left flex-column" style="height: 100px; margin-top: 50px;">
-                <div class="row">
+                <div class="  d-flex align-items-center">
                     <div class="col-3">
                         <div id="profile">
                             <img alt="profile image" class="profile-image" :src="require('@/assets/profiles/' + userPhoto)">  
@@ -35,7 +37,7 @@
                           </div>
                         </div>
                     </div>
-                    <div id="posts" class="col-7">
+                    <div id="posts" class="col-9">
                         <div v-for="(post, index) in userPosts" :key="post.id">
                             <div class="container-post sn p-3">
                                 <div class="user-info">
@@ -554,10 +556,14 @@ import axios from 'axios';
         height: 200px;
     }
     .post-image{
-        max-width: 550px;
-        min-width: 550px;
-        max-height: 700px;
-        margin: auto;
-        object-fit: scale-down;
+      width: 100%;
+      max-height: 600px;
+      margin: auto;
+      object-fit: cover;
+    }
+    .image-post{
+      width: 450px;
+      margin-left: auto;
+      margin-right: auto;
     }
 </style>

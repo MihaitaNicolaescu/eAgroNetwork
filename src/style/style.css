@@ -22,8 +22,6 @@
     }
     .list-search{
         position: fixed;
-        width: 400px;
-        margin-left: 98px;
         z-index: 2;
     }
     .search-item:hover{
@@ -40,15 +38,15 @@
         background: transparent;
     }
     #notifications-box{
-        position: fixed;
-        width: 400px;
-        margin-left: 342px;
-        z-index: 2;
         display: none;
+        margin-top: 65px;
     }
     .list-notifications{
+        position: fixed;
+        z-index: 2;
         background-color: #f8f9fa !important;
-        margin-left: 368px;
+        width: 600px;
+        padding: 10px;
     }
 
     .btn-react{
@@ -61,10 +59,10 @@
     }
     #posts{
         align-content: center;
-        height: 850px;
+        height: 90%;
     }
     .posts-container{
-        height:900px;
+        height:100%;
         overflow: hidden;
         overflow-y: scroll;
         -ms-overflow-style: none;  /* IE and Edge */
@@ -76,10 +74,11 @@
     }
     .container-post{
         background-color: #d9d9d9!important;
-        width: 600px;
+        width: 574px;
         height: auto;
-        box-shadow: 5px 10px #888888;
-        
+
+        margin-bottom: 15px;
+        border-radius: 20px;
     }
     .user-info-img{
         width: 50px;
@@ -139,11 +138,15 @@
         height: 200px;
     }
     .post-image{
-        width: 550px;
-        height: auto;
-        max-height: 700px;
+        width: 100%;
+        max-height: 600px;
         margin: auto;
-        object-fit: scale-down;
+        object-fit: cover;
+    }
+    .image-post{
+        width: 450px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     /*BUTTONS*/

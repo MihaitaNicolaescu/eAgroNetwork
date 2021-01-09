@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container-fluid">
     <nav v-if="post !== 'INVALID_POSTING'" class="navbar navbar-light bg-light">
       <button style="" class="btn btn-outline-secondary" v-on:click="home">Back</button>
     </nav>
@@ -14,10 +14,10 @@
           <div class="container-post sn p-3">
             <div class="user-info">
               <img class="user-info-img" :src="require('@/assets/profiles/' + post.profile_image)">
-              <a style="color: black; text-decoration: none;" :href="'/profile/' + post.user_id">{{post.firstName + " " + post.lastName}}</a>
+              <a style="color: black; text-decoration: none; margin-left: 10px;" :href="'/profile/' + post.user_id">{{post.firstName + " " + post.lastName}}</a>
               <button class="btn btn-secondary btn-sm" style="float: right; background: transparent; border: 0;"><span style="color:black" class="material-icons" data-toggle="modal" data-target="#modalPostare">more_horiz</span></button>
             </div>
-            <div class="post-description">
+            <div style="margin-bottom: 10px; margin-top: 10px;" class="post-description">
               {{post.description}}
             </div>
             <div class="d-flex align-items-center flex-column image-post">
@@ -344,15 +344,6 @@ export default{
   text-align: center;
   font-weight: bold;
 }
-
-.info-paragraph{
-  font-family: "NerkoOne";
-  font-size: 55px;
-  margin-top: -450px;
-  text-align: center;
-
-}
-
 /*Post*/
 .posts-container{
   height:900px;
@@ -361,9 +352,6 @@ export default{
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 
-}
-#post::-webkit-scrollbar {
-  display: none;
 }
 .container-post{
   background-color: #d9d9d9!important;
@@ -383,28 +371,17 @@ export default{
   border-radius: 50px;
   object-fit: cover;
 }
-.post-add{
-  margin-top: 100px;
-}
-.description-post{
-  margin-top: 10px;
-  resize: none;
-  width: 460px;
-}
-.btn-profile{
-  width: 225px;
-  font-size: 20px;
-  margin-top: 5px;
-}
-.info{
-  margin: 0px;
-}
+
 .post-image{
-  width: 550px;
-  height: auto;
-  max-height: 700px;
+  width: 100%;
+  max-height: 600px;
   margin: auto;
-  object-fit: scale-down;
+  object-fit: cover;
+}
+.image-post{
+  width: 450px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 ::-webkit-scrollbar {
@@ -414,4 +391,5 @@ export default{
 .btn-react{
   background: transparent;
 }
+
 </style>
