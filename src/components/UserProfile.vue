@@ -8,7 +8,7 @@
                 <div class="row">
                     <div class="col-3">
                         <div id="profile">
-                            <img style="margin-top: 20px;" alt="profile image" class="profile-image" :src="require('@/assets/profiles/' + userPhoto)">
+                            <img v-if="user !== null" style="margin-top: 20px;" alt="profile image" class="profile-image" :src="backend + user.link_profile">
                             <div id="profile-info">
                                 <p class="info">First name: {{ firstName }}</p>
                                 <p class="info">Last name: {{ lastName }}</p>
@@ -25,7 +25,7 @@
                                   <div class="row" style="margin-top: 5px">
                                     <div class="col-sm-1">
                                       <div class="user-info">
-                                        <img style="width: 50px; height: 50px;" class="profile-image" :src="require('../assets/profiles/'+ review.profile_image)">
+                                        <img v-if="review !== null" style="width: 50px; height: 50px;" class="profile-image" :src="backend + review.link_profile">
                                       </div>
                                     </div>
                                     <div class="col-9">
@@ -42,14 +42,14 @@
                         <div v-for="(post, index) in userPosts" :key="post.id">
                             <div class="container-post sn p-3">
                                 <div class="user-info">
-                                    <img class="user-info-img" :src="require('@/assets/profiles/' + userPhoto)">
+                                    <img class="user-info-img" :src="backend + user.link_profile">
                                     <p>{{firstName + " " + lastName}}</p>
                                 </div>
                                 <div class="post-description">
                                 {{post.description}} 
                                 </div>
                                 <div class="d-flex align-items-center flex-column image-post">
-                                    <img class="post-image" :src="require('../assets/posts/' + post.filename)">
+                                    <img class="post-image" :src="backend + post.link">
                                 </div>
                                 <button v-show="post.vote === 0 || post.vote == null || post.vote === -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
                                 <button v-show="post.vote === 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
@@ -172,15 +172,12 @@ import alertBox from "@/components/templates/invalidToken";
         data(){
             return{
                 id: -1,
+                user: null,
                 userPhoto: 'default.jpg',
                 firstName: '',
                 lastName: '',
                 email: '',
                 birthday: '',
-                tempFName: '',
-                tempLName: '',
-                tempEmail: '',
-                tempBirthday: '',
                 userPosts: {},
                 fallowed:null,
                 isProducer: null,
@@ -192,6 +189,7 @@ import alertBox from "@/components/templates/invalidToken";
                 review_text: "",
                 reviews: null,
                 myReview: null,
+                backend: backend,
             }
         },
         components: {
@@ -382,6 +380,7 @@ import alertBox from "@/components/templates/invalidToken";
                     if(response.data === "INVALID_USER"){
                         this.invalidUser = true;
                     }else{
+                        this.user = response.data;
                         this.invalidUser = false;
                         this.firstName = response.data['firstName'];
                         this.lastName = response.data['lastName'];
@@ -391,8 +390,6 @@ import alertBox from "@/components/templates/invalidToken";
                         this.userPhoto = response.data['profile_image'];
                         this.isProducer = response.data['producer'];
                         this.isBanned = response.data['banned'];
-                        if(this.userPhoto == null)
-                            this.userPhoto = 'default.jpg'
 
                     }
                 }).catch((error) =>{

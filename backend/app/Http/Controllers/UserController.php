@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 
+
 class UserController extends Controller
 {
     //Resetare parola
@@ -35,7 +36,6 @@ class UserController extends Controller
                 $email = $request->email;
                 $code = $request->code;
                 $recovery = Recovery::where('email', '=', $email)->first();
-                error_log($recovery->code);
                 if($recovery->code === $code) {
                     return response()->json([
                         'message' => 'success'
@@ -53,13 +53,13 @@ class UserController extends Controller
             }
         }
         public function recoveryPassword(Request $request){
+            $host_frontend = env('HOST_FRONTEND');
             try{
                 $email = $request->email;
                 $user = User::where('email', $email)->first();
                 if(!is_null($user)){
                     $recovery = Recovery::where('email', '=', $email)->first();
                     if(is_null($recovery)){
-                        var_dump($recovery);
                         $code = $this->generateRandomString();
                         $recovery = new Recovery();
                         $recovery->code = $code;
@@ -69,7 +69,7 @@ class UserController extends Controller
                         $code = $recovery->code;
 
                     }
-                    $link="http://192.168.1.100:8080/recoverypassword/". $request->email . "/".$code;
+                    $link= $host_frontend ."/recoverypassword/". $request->email . "/".$code;
                     $this->sendEmailRecovery($user->email, $user->firstName, $user->lastName, $link);
                 }
                 return response()->json([], 200);
@@ -93,6 +93,18 @@ class UserController extends Controller
             });
         }
     //
+    public function sendEmail($email, $firstName, $lastName, $link){
+        $to_name = $lastName;
+        $to_email = $email;
+        $to_link = $link;
+        $data = array('name'=>"eAgro Network(sender_name)", "body" => "Bine ai venit!", 'firstName' => $lastName, 'link'=>$link );
+
+        Mail::send('email.emailVerify', $data, function($message) use ($to_name, $to_email, $to_link) {
+            $message->to($to_email, $to_name, $to_link)
+                ->subject("Confirmare cont eAgro Network");
+            $message->from("eagronetwork@gmail.com","eAgro Network");
+        });
+    }
     public function giveProducer(Request $request){
         try{
             $recived = auth()->userOrFail();
@@ -210,9 +222,11 @@ class UserController extends Controller
         $imageName = $request->image->getClientOriginalName(). '.jpg';
         error_log($request->token);
         try{
-            $request->image->move(public_path('../../src/assets/profiles'), $imageName);
+            $link = "/storage/profiles/" . $imageName;
+            $request->image->move('../../backend/public/storage/profiles/', $imageName);
             $user = User::where('id', $recived['id'])->first();
             $user->profile_image = $imageName;
+            $user->link_profile = $link;
             $user->save();
             return response()->json(['message' => 'Image uploaded!'], 200);
         }catch(Exception $e){
@@ -248,7 +262,7 @@ class UserController extends Controller
             return response()->json(['error' => $e->getMessage()], 401);
         }
         $user = User::where('id', $recived['id'])->first();
-        return response()->json($user);
+        return response()->json($user, 200);
     }
 
     public function fetchFallowList(Request $request){
@@ -281,25 +295,14 @@ class UserController extends Controller
         return $randomString;
     }
 
-    public function sendEmail($email, $firstName, $lastName, $link){
-        $to_name = $lastName;
-        $to_email = $email;
-        $to_link = $link;
-        $data = array('name'=>"eAgro Network(sender_name)", "body" => "Bine ai venit!", 'firstName' => $lastName, 'link'=>$link );
-
-        Mail::send('email.emailVerify', $data, function($message) use ($to_name, $to_email, $to_link) {
-            $message->to($to_email, $to_name, $to_link)
-                ->subject("Confirmare cont eAgro Network");
-            $message->from("eagronetwork@gmail.com","eAgro Network");
-        });
-    }
 
     public function resendEmail(Request $request){
+        $host_frontend = env('HOST_FRONTEND');
         try{
             $email = $request->email;
             $user = User::where('email', $email)->first();
             $special_code = $user->code_verify;
-            $link="http://192.168.1.100:8080/verifica/". $request->email . "/".$special_code;
+            $link=$host_frontend . "/verifica/". $request->email . "/".$special_code;
             $this->sendEmail($user->email, $user->firstName, $user->lastName, $link);
             return response()->json([
                 'message' => 'success'
@@ -336,6 +339,7 @@ class UserController extends Controller
     }
 
     public function createUser(Request $request){
+        $host_frontend = env('HOST_FRONTEND');
         try{
             $special_code = $this->generateRandomString();
             $user = new User();
@@ -354,7 +358,7 @@ class UserController extends Controller
             $user->warnings = 0;
             $user->code_verify = $special_code;
             $user->save();
-            $link="http://192.168.1.100:8080/verifica/" . $request->email . "/".$special_code;
+            $link= $host_frontend ."/verifica/" . $request->email . "/".$special_code;
             $this->sendEmail($request->email, $request->firstName, $request->lastName, $link);
             return response()->json([
                 'message' => 'success'
@@ -411,6 +415,7 @@ class UserController extends Controller
         try{
             $user = User::where('id', $request->userID)->first();
             $user->banned = 1;
+            $user->warnings = 0;
             $user->reason = $request->reason;
             $user->save();
             return response() -> json(['message' => 'Succes'], 200);

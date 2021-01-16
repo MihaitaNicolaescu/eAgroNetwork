@@ -13,7 +13,7 @@
       <div v-if="invalidPost === false && invalidPost !== null" id="posts">
           <div class="container-post sn p-3">
             <div class="user-info">
-              <img class="user-info-img" :src="require('@/assets/profiles/' + post.profile_image)">
+              <img class="user-info-img" :src="backend + post.link_profile">
               <a style="color: black; text-decoration: none; margin-left: 10px;" :href="'/profile/' + post.user_id">{{post.firstName + " " + post.lastName}}</a>
               <button class="btn btn-secondary btn-sm" style="float: right; background: transparent; border: 0;"><span style="color:black" class="material-icons" data-toggle="modal" data-target="#modalPostare">more_horiz</span></button>
             </div>
@@ -21,10 +21,10 @@
               {{post.description}}
             </div>
             <div class="d-flex align-items-center flex-column image-post">
-              <img class="post-image" :src="require('../assets/posts/' + post.filename)">
+              <img class="post-image" :src="backend + post.link">
             </div>
-            <button v-show="post.vote == 0 || post.vote == null || post.vote == -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
-            <button v-show="post.vote == 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
+            <button v-show="post.vote === 0 || post.vote === null || post.vote === -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
+            <button v-show="post.vote === 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
             <span>{{post.votes}}</span>
             <div class="form-group">
               <textarea v-model="comment" style="resize: none; height: 60px;" class="form-control" id="exampleFormControlTextarea1" required></textarea>
@@ -36,7 +36,7 @@
               <div class="row" style="margin-top: 5px">
                 <div class="col-sm-1">
                   <div class="user-info">
-                    <img class="profile-image" :src="require('../assets/profiles/'+ comment.profile_image)">
+                    <img class="profile-image" :src="backend + comment.link_profile">
 
                   </div>
                 </div>
@@ -63,10 +63,31 @@
           </div>
           <div style="display: grid;" class="modal-body">
             <button class="btn btn-secondary" type="button" v-on:click="confirm_raport">Raportare</button>
+            <button style="margin-top: 5px;" v-if="isAdmin === 1" class="btn btn-danger" type="button" v-on:click="confirm_delete_post">Sterge postarea</button>
             <button style="margin-top: 5px;" v-if="id===post.user_id" class="btn btn-secondary" type="button" v-on:click="deletePost">Sterge postarea</button>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Inchide</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal delete -->
+    <div class="modal fade" id="deletePostModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteModal">Sterge postarea utilizatorului</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <input v-model="reportReason" type="text" class="input-group-text" style="width: 100%; font-weight: normal" placeholder="Motivul stergerii postarii." >
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuleaza</button>
+            <button type="button" class="btn btn-primary" v-on:click="deleteUserPost">Sterge postarea</button>
           </div>
         </div>
       </div>
@@ -146,6 +167,8 @@ export default{
       reportReason: null,
       post: null,
       comments: null,
+      isAdmin: null,
+      backend: backend,
     }
   },
   mounted() {
@@ -167,6 +190,28 @@ export default{
       }).catch((error)=>{
         console.log(error);
       })
+    },
+    deleteUserPost: function(){
+      axios.post(backend+'/api/deleteUserPost',{
+        token: localStorage.getItem('token'),
+        postID: this.post.id,
+        reason: this.reportReason,
+        userID: this.post.user_id,
+      }).then(()=>{
+        // eslint-disable-next-line no-undef
+        $('#deletePostModal').modal('hide');
+        // eslint-disable-next-line no-undef
+        this.$router.push('/');
+      }).catch((error)=>{
+        console.log(error);
+      })
+    },
+    confirm_delete_post: function(){
+      // eslint-disable-next-line no-undef
+      $('#modalPostare').modal('hide');
+      // eslint-disable-next-line no-undef
+      $('#deletePostModal').modal('show');
+      // eslint-disable-next-line no-undef
     },
     confirm_raport: function(){
       // eslint-disable-next-line no-undef
@@ -306,6 +351,9 @@ export default{
         params: {
           token: localStorage.getItem('token'),
         }
+      }).then((res)=>{
+         if(res.data['admin'] === 1) this.isAdmin = 1;
+         else this.isAdmin = 0;
       }).catch(() =>{
         document.getElementById('overlay-alert').style.display ="block";
       })

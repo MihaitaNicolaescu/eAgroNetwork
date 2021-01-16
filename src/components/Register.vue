@@ -37,7 +37,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text">Data nasterii</span>
                 </div>
-                <input v-model="birthday" type="date" class="form-control" value="01-01-2020" aria-label="birthdayField" aria-describedby="basic-addon1" name="birthdayField" id="birthdayField">
+                <input  v-model="birthday" type="date" class="form-control" value="01-01-2020" aria-label="birthdayField" aria-describedby="basic-addon1" name="birthdayField" id="birthdayField">
             </div>
             
         </form>
@@ -119,6 +119,7 @@ import {backend} from '../constants.js';
             }
         }
     }
+
 </script>
 
 <style scoped>

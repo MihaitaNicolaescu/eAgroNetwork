@@ -50,14 +50,12 @@
         }
       }).then((res) =>{
         localStorage.setItem('admin', res.data['isAdmin']);
+        if(res.data['isAdmin'] === 0) this.$router.push('/');
+        else this.getApplications();
       }).catch((error)=>{
         console.log(error);
         this.$router.push('/');
       })
-      //
-      if(localStorage.getItem('admin') === false) this.$router.push('/') // daca userul nu este administrator regasit in baza de date atunci va fi redirectonat
-
-      this.getApplications()
     },
     methods:{
       back: function(){

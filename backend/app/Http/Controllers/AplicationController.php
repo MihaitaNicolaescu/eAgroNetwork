@@ -169,8 +169,8 @@ class AplicationController extends Controller
         var_dump($certificat);
         error_log($request->token);
         try{
-            $request->copie_ci->move(public_path('../../src/assets/applications'), $copie_ci);
-            $request->copie_certificat->move(public_path('../../src/assets/applications'), $certificat);
+            $request->copie_ci->move(public_path('../../backend/public/storage/applications'), $copie_ci);
+            $request->copie_certificat->move(public_path('../../backend/public/storage/applications'), $certificat);
 
             return response()->json(['message' => 'Image uploaded!'], 200);
         }catch(Exception $e){
@@ -191,6 +191,7 @@ class AplicationController extends Controller
             }else{
                 $aplication = Aplication::where('user_id', '=', $recived['id'])->first();
             }
+            $link = "/storage/applications/";
             $aplication->user_firstName = $request->firstName;
             $aplication->user_lastName = $request->lastName;
             $aplication->user_email = $request->email;
@@ -204,8 +205,8 @@ class AplicationController extends Controller
             $aplication->nr_certificat = $request->nr_certificat;
             $aplication->primaria = $request->primaria;
             if($request->altele !== null) $aplication->alte_precizari = $request->altele;
-            $aplication->copie_ci = "copie_ci_" . $recived['id'] . ".jpg";
-            $aplication->copie_certificat = "copie_certificat_" . $recived['id'] . ".jpg";
+            $aplication->copie_ci =  $link . "copie_ci_" . $recived['id'] . ".jpg";
+            $aplication->copie_certificat = $link . "copie_certificat_" . $recived['id'] . ".jpg";
             $aplication->status = 0;
             $aplication->pending = 1;
             $aplication->save();

@@ -26,7 +26,7 @@
             <td v-if="report.report_type === 2">Postare</td>
             <td>{{report.reason}}</td>
             <td><a :href="report.link">{{report.link}}</a></td>
-            <td><a :href="'http://192.168.1.100:8080/profile/' + report.sender_id">{{report.sender_id}}</a></td>
+            <td><button class="btn btn-secondary"><a  style="color: white; text-decoration: none;" :href="frontend + '/profile/' + report.sender_id">Vizualizare profil</a></button></td>
             <td><button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#modalReport" v-on:click="actualReport(report.reported_id, report.id)">Raspunde</button></td>
           </tr>
         </tbody>
@@ -104,6 +104,7 @@
 
   import axios from "axios";
   import {backend} from "@/constants";
+  import {frontend} from "@/constants";
 
   export default{
     data(){
@@ -112,6 +113,7 @@
         actualUserId: null,
         reason: '',
         reportID: null,
+        frontend: frontend,
       }
     },
     mounted() {
@@ -122,12 +124,11 @@
         }
       }).then((res) => {
         localStorage.setItem('admin', res.data['isAdmin']);
+        if(res.data['isAdmin'] === 0) this.$router.push('/');
+        else this.getReports();
       }).catch((error) => {
         console.log(error);
       })
-      //
-      if (localStorage.getItem('admin') == false) this.$router.push('/'); // daca userul nu este administrator regasit in baza de date atunci va fi redirectonat
-      this.getReports();
     },
     methods:{
       warnUser: function(userID, reason, reportID){

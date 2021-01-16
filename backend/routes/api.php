@@ -64,6 +64,7 @@ Route::get('/vote', [PostController::class, 'postVote']);
 Route::get('/modifyVote',[PostVoteController::class, 'modifyVote']);
 Route::get('/getPost', [PostController::class, 'getPost']);
 Route::post('/deletePost', [PostController::class, 'deletePost']);
+Route::post('/deleteUserPost', [PostController::class, 'deleteUserPost']);
 Route::post('/modifyDescriptionPost', [PostController::class, 'modifyDescriptionPost']);
 
 

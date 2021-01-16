@@ -21,8 +21,7 @@
           <li class="list-group-item search-item" v-for="result in results.slice(0,10)" :key="result.id">
             <a class="link" :href="'/profile/' + result.searchable.id">
               <div class="link-profile" style="display: block ruby;">
-                <img v-if="result.searchable.profile_image !== 'default.jpg'" class="search-image" :src="require('@/assets/profiles/profile_image_' + result.searchable.id + '.jpg')" alt="Prof. img" width="50" height="50">
-                <img v-else class="search-image" :src="require('@/assets/profiles/default.jpg')" alt="Prof. img" width="50" height="50">
+                <img class="search-image" :src="backend + result.searchable.link_profile" alt="Prof. img" width="50" height="50">
                 <p style="color:black; display: inline-block;" v-text="result.searchable.lastName + ' ' + result.title"></p>
               </div>
             </a>
@@ -51,7 +50,7 @@
                       <div style="display: block;" class="user-info">
                         <div style="margin-bottom: 5px;" class="row">
                           <div class="col-2">
-                            <img alt="user profile photo" class="user-info-img" :src="require('@/assets/profiles/' + notification.profile_image)">
+                            <img alt="user profile photo" class="user-info-img" :src="backend + notification.link_profile">
                           </div>
                           <div class="col-10">
                             <p style="margin-bottom: 0;">{{notification.firstName}} {{notification.lastName}}</p>
@@ -89,6 +88,20 @@
                       </div>
                     </li>
                   </div>
+                  <div v-if="notification.type === -122">
+                    <li class="list-group-item">
+                      <div style="display: block;" class="user-info">
+                        <div style="margin-bottom: 5px;" class="row">
+                          <div class="col-2">
+                            <p style="font-size: 30px">⚠️</p>
+                          </div>
+                          <div class="col-10">
+                            <p  class="pre-formatted" style="display: block; font-weight: normal;" >{{notification.message}}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  </div>
                   <div v-if="notification.type === -125">
                     <li class="list-group-item">
                       <div style="display: block;" class="user-info">
@@ -112,14 +125,14 @@
                 <div v-for="(post, index) in fallowPosts" :key="post.id">
                     <div class="container-post sn p-3">
                         <div class="user-info">
-                            <img alt="user profile photo" class="user-info-img" :src="require('@/assets/profiles/' + post.profile_image)">
+                            <img alt="user profile photo" class="user-info-img" :src="backend + post.link_profile">
                             <a style="color: black; text-decoration: none; margin-left: 10px;" :href="'/profile/' + post.user_id">{{post.firstName + " " + post.lastName}}</a>
                         </div>
                         <div style="margin-bottom: 10px; margin-top: 10px;" class="post-description">
                         {{post.description}} 
                         </div>
                         <div class="d-flex align-items-center flex-column image-post">
-                            <img alt="user post photo" class="post-image" :src="require('../assets/posts/' + post.filename)">
+                            <img alt="user post photo" class="post-image" :src="backend + post.link">
                         </div>
                         <button v-show="post.vote === 0 || post.vote === null || post.vote === -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
                         <button v-show="post.vote === 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
@@ -149,6 +162,7 @@
                 fallowPosts: [],
                 isProducer: null,
                 notifications: [],
+                backend: backend,
             }
         },
         components: {

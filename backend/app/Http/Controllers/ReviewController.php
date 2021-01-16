@@ -19,7 +19,7 @@ class ReviewController extends Controller
 
 
                 $review = Review::where('user_id', '=', $request->userPageID)->where('reviewer_id', '=', $request->userID)->first();
-                return response()->json(['review' => $review],200);
+                return response()->json(['review' => $review],200, [], JSON_NUMERIC_CHECK);
 
             }catch(Exception $e){
                 return response()->json(['message' => $e]);
@@ -41,12 +41,12 @@ class ReviewController extends Controller
 
                 })
                     ->select('reviews.id', 'reviews.user_id', 'reviews.reviewer_id', 'reviews.rating',
-                        'reviews.message', 'users.lastName', 'users.firstName', 'users.profile_image')
+                        'reviews.message', 'users.lastName', 'users.firstName', 'users.link_profile')
                     ->where('reviews.user_id', '=', $request->userID)->get();
 
 
                 //$reviews = Review::where('user_id', '=', $request->userID)->orderBy('id', 'desc')->get();
-                return response()->json(['reviews' => $reviews],200);
+                return response()->json(['reviews' => $reviews],200, [], JSON_NUMERIC_CHECK);
 
             }catch(Exception $e){
                 return response()->json(['message' => $e]);

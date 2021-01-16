@@ -57,7 +57,7 @@ class CommentController extends Controller
 
             })
                 ->select('comments.id', 'comments.user_id', 'comments.post_id', 'comments.comment', 'users.firstName',
-                    'users.lastName', 'users.profile_image')
+                    'users.lastName', 'users.link_profile')
                 ->where('comments.post_id', '=', $request->postID)->orderBy('comments.id', 'desc')->get();
             return response()->json(['comments' => $result]);
         }catch(Exception $e){

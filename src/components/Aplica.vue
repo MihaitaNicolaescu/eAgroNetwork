@@ -4,7 +4,7 @@
            <button class="btn btn-home" v-on:click="home"><span class="material-icons">home</span></button>              
         </nav>
         <h3 style="text-align: center;">Aplicatie pentru gradul de producator</h3>
-        <div class="edit" v-if="checkIfHasAplication === false || (application.pending === 0 && application != null && application.status !== -1)">
+        <div class="edit" v-if="checkIfHasAplication === false || (application !== null && application.pending === 0 && application.status !== -1)">
             <form class="form-group">
                 <div class="d-flex align-items-center flex-column">
                     <div class="d-flex flex-row">

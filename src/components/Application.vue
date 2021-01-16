@@ -28,9 +28,9 @@
           </div>
           <div class="col">
             <p>Copie carte identitate</p>
-            <img alt="docs-image" class="doc-image" :src="require('../assets/applications/' + applicationDetails.copie_ci)">
+            <img alt="docs-image" class="doc-image" :src="backend + applicationDetails.copie_ci">
             <p>Copie certificat producator</p>
-            <img alt="docs-image" class="doc-image" :src="require('../assets/applications/' + applicationDetails.copie_certificat)">
+            <img alt="docs-image" class="doc-image" :src="backend + applicationDetails.copie_certificat">
           </div>
         </div>
       </div>
@@ -91,6 +91,7 @@
         applicationDetails: null,
         userId: this.$route.params.id,
         motiv: null,
+        backend: backend,
       }
     },
     mounted(){
@@ -100,13 +101,13 @@
         }
       }).then((res) =>{
         localStorage.setItem('admin', res.data['isAdmin']);
+        if(res.data['isAdmin'] === 0) this.$router.push('/');
+        else this.getApplicationInfo();
       }).catch((error)=>{
         console.log(error);
         this.$router.push('/');
       })
       //
-      if(localStorage.getItem('admin') === false) this.$router.push('/') // daca userul nu este administrator regasit in baza de date atunci va fi redirectonat
-      this.getApplicationInfo();
     },
     methods:{
       rejectApplication: function(){
