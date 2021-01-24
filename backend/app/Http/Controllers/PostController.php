@@ -114,7 +114,7 @@ class PostController extends Controller
                         $join->on('users.id', '=', 'posts.user_id');
                     })
                     ->select('posts.id', 'posts.user_id', 'posts.description', 'vote', 'posts.votes', 'posts.link',
-                        'posts.filename', 'users.lastName', 'users.firstName', 'users.link_profile')
+                        'posts.filename','posts.has_photo', 'users.lastName', 'users.firstName', 'users.link_profile')
                     ->where('posts.id', '=', $request->postID)->first();
                 if($result != NULL) return response()->json(['post' => $result,], 200, [], JSON_NUMERIC_CHECK);
                 else return response()->json(['post' => "INVALID_POSTING"], 200);
@@ -143,10 +143,20 @@ class PostController extends Controller
                 $idCount = $lastPost->id;
                 $idCount++;
                 error_log($idCount);
-                $imageName = $request->image->getClientOriginalName(). "_".$idCount . '.jpg';
+                if($request->image !== "null"){
+                    $imageName = $request->image->getClientOriginalName(). "_".$idCount . '.jpg';
+                }else{
+                    $imageName = "null";
+                }
             }
-            else $imageName = $request->image->getClientOriginalName(). "_0". '.jpg';
-            $request->image->move('../../backend/public/storage/posts', $imageName);
+            else {
+                if($request->image !== "null"){
+                    $imageName = $request->image->getClientOriginalName(). "_0". '.jpg';
+                }else {
+                    $imageName = "null";
+                }
+            }
+            if($request->image !== "null") $request->image->move('../../backend/public/storage/posts', $imageName);
             $link = "/storage/posts/" . $imageName;
             $post = new Post();
             $post->has_photo = true;
@@ -154,6 +164,7 @@ class PostController extends Controller
             $post->user_id = $request->user_id;
             $post->description = $request->description;
             $post->link = $link;
+            $post->has_photo = $request->hasPhoto;
             $post->save();
             return response()->json(['message'=> 'success']);
         }catch(Exception $e){
@@ -165,9 +176,6 @@ class PostController extends Controller
     }
 
 
-
-
-
     function fetchUserPosts(Request $request){
         try{
             $recived = auth()->userOrFail();
@@ -177,7 +185,7 @@ class PostController extends Controller
                     $recived = auth()->userOrFail();
                     $join->on('posts.id', '=', 'post_votes.post_id')->where('post_votes.user_id', '=', $recived['id']);
                 })
-                ->select('posts.id', 'posts.user_id', 'posts.description', 'vote', 'posts.votes', 'posts.link'
+                ->select('posts.id', 'posts.has_photo', 'posts.user_id', 'posts.description', 'vote', 'posts.votes', 'posts.link'
                     ,  'posts.filename')
                 ->where('posts.user_id', '=', $request->user_id)
                 ->orderBy('posts.id', 'desc')->get();
@@ -209,7 +217,7 @@ class PostController extends Controller
                     $join->on('users.id', '=', 'posts.user_id');
                 })
                 ->select('posts.id', 'posts.user_id', 'posts.description', 'vote', 'posts.votes', 'posts.link',
-                    'posts.filename', 'users.lastName', 'users.firstName', 'users.link_profile')
+                    'posts.filename', 'posts.has_photo', 'users.lastName', 'users.firstName', 'users.link_profile')
                 ->whereIn('posts.user_id', $arrayRecived)->orWhere('posts.user_id', $recived['id'])
                 ->orderBy('posts.created_at', 'desc')->get();
                 return response()->json(['posts' => $result], 200, [], JSON_NUMERIC_CHECK);

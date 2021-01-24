@@ -7,14 +7,15 @@
       </div>
         <div class="container">
             <div class="d-flex align-items-left flex-column" style="height: 100px; margin-top: 50px;">
-                <div class="  d-flex align-items-center">
+                <div class=" d-flex align-items-center">
                     <div class="col-3">
-                        <div id="profile">
+                        <div v-if="user !== null" id="profile">
                             <img alt="profile image" class="profile-image" :src="backend + user.link_profile">
                             <div id="profile-info">
                                 <p class="info">First name: {{ firstName }}</p>
                                 <p class="info">Last name: {{ lastName }}</p>
                                 <p class="info">Email: {{ email }}</p>
+                                <p class="info">Judet: {{ judet }}</p>
                                 <p class="info">Birthday: {{ birthday }}</p>
                             </div>
                         </div>
@@ -48,7 +49,7 @@
                                 {{post.description}} 
                                 </div>
                                 <div class="d-flex align-items-center flex-column image-post">
-                                    <img alt="user post photo" class="post-image" :src="backend + post.link">
+                                    <img v-if="post.has_photo === 1" alt="user post photo" class="post-image" :src="backend + post.link">
                                 </div>
                                 <button v-show="post.vote === 0 || post.vote === null || post.vote === -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
                                 <button v-show="post.vote === 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
@@ -128,9 +129,9 @@
                         </div>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">Email</span>
+                                <span class="input-group-text">Judet</span>
                             </div>
-                            <input type="text" class="form-control" v-model="tempEmail"  placeholder="Email" aria-label="email" aria-describedby="basic-addon1">
+                            <input type="text" class="form-control" v-model="tempJudet"  placeholder="Judet" aria-label="judet" aria-describedby="basic-addon1">
                         </div>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
@@ -187,10 +188,11 @@ import axios from 'axios';
                 firstName: '',
                 lastName: '',
                 email: '',
+                judet: '',
                 birthday: '',
                 tempFName: '',
                 tempLName: '',
-                tempEmail: '',
+                tempJudet: '',
                 tempBirthday: '',
                 description: '',
                 selectedFile: null,
@@ -353,7 +355,8 @@ import axios from 'axios';
                     this.id = response.data['id'];
                     this.userPhoto = response.data['profile_image'];
                     this.isProducer = response.data['producer'];
-                    this.link = response.data['link_profile']
+                    this.link = response.data['link_profile'];
+                    this.judet = response.data['judet'];
                     if(this.userPhoto == null)
                         this.userPhoto = 'default.jpg';
                     this.getReviews();
@@ -365,7 +368,15 @@ import axios from 'axios';
             },
             add_post: function(){
                 const fd = new FormData();
-                fd.append('image', this.selectedFile, 'post_image_'+this.id);
+                console.log(this.selectedFile);
+                if(this.selectedFile === null) {
+                  fd.append('image', "null");
+                  fd.append('hasPhoto', 0);
+                }
+                else {
+                  fd.append('image', this.selectedFile, 'post_image_'+this.id);
+                  fd.append('hasPhoto', 1);
+                }
                 fd.append('token', localStorage.getItem('token'));
                 fd.append('description', this.description);
                 fd.append('user_id', this.id);
@@ -387,7 +398,7 @@ import axios from 'axios';
             on: function(){
                 this.tempFName = this.firstName;
                 this.tempLName = this.lastName;
-                this.tempEmail = this.email;
+                this.tempJudet = this.judet;
                 this.tempBirthday = this.birthday;
                 document.getElementById('overlay').style.display ="block";
             },
@@ -408,12 +419,12 @@ import axios from 'axios';
             save: function(){
                 this.firstName = this.tempFName;
                 this.lastName = this.tempLName;
-                this.email = this.tempEmail;
+                this.judet = this.tempJudet;
                 this.birthday = this.tempBirthday;
                 axios.post(backend+'/api/updateUserData', {
                         firstName: this.firstName,
                         lastName: this.lastName,
-                        email: this.email,
+                        judet: this.judet,
                         birthday: this.birthday,
                         token: localStorage.getItem('token'),
                     }).catch(() =>{
@@ -441,7 +452,7 @@ import axios from 'axios';
             cancel: function(){
                 this.tempFName = this.firstName;
                 this.tempLName = this.lastName;
-                this.tempEmail = this.email;
+                this.tempJudet = this.judet;
                 this.tempBirthday = this.birthday;
                 this.off();
             }

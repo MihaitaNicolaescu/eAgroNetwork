@@ -96,10 +96,10 @@ class AplicationController extends Controller
                 $recived = auth()->userOrFail();
                 $join->on('aplications.user_id', '=', 'users.id');
             })->select('aplications.user_id', 'aplications.user_firstName', 'aplications.user_lastName',
-                'aplications.user_email', 'aplications.judet', 'aplications.adresa', 'aplications.serie_ci',
+                'aplications.user_email', 'aplications.judet', 'aplications.localitate', 'aplications.adresa', 'aplications.serie_ci',
                 'aplications.numar_serie_ci', 'aplications.cnp', 'aplications.nr_certificat', 'aplications.primaria',
                 'aplications.alte_precizari', 'aplications.copie_ci', 'aplications.copie_certificat', 'aplications.pending',
-                'aplications.status', 'aplications.motiv_respingere', 'aplications.created_at', 'aplications.updated_at', 'users.profile_image')
+                'aplications.status', 'aplications.motiv_respingere', 'aplications.created_at', 'aplications.updated_at', 'users.link_profile')
                 ->where('aplications.user_id', '=', $request->id)->first();
 
 

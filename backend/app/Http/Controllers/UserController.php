@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Notification;
 use http\Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 
@@ -245,10 +246,26 @@ class UserController extends Controller
             $user = User::where('id', $recived['id'])->first();
             $user->firstName = $request->firstName;
             $user->lastName = $request->lastName;
-            $user->email = $request->email;
+            $user->judet = $request->judet;
             $user->birthday = $request->birthday;
             $user->save();
             return response() -> json(['message' => 'Succes'], 200);
+        }catch(Exception $e){
+            return response()->json(['message' => 'Error on save data in database!'], 417);
+        }
+    }
+
+    public function localProducers(Request $request){
+        try{
+            $recived = auth()->userOrFail();
+        }catch(\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e){
+            error_log($e);
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+        try{
+            $user = User::where('producer', 1)->where('judet','like','%'.$recived['judet'].'%')->where('id', '!=', $recived['id'])
+                ->select('firstName', 'lastName', 'id', 'link_profile')->get();
+            return response() -> json(['producers' => $user], 200);
         }catch(Exception $e){
             return response()->json(['message' => 'Error on save data in database!'], 417);
         }
@@ -357,6 +374,7 @@ class UserController extends Controller
             $user->reason = '';
             $user->warnings = 0;
             $user->code_verify = $special_code;
+            $user->judet = $request->judet;
             $user->save();
             $link= $host_frontend ."/verifica/" . $request->email . "/".$special_code;
             $this->sendEmail($request->email, $request->firstName, $request->lastName, $link);

@@ -21,7 +21,7 @@
               {{post.description}}
             </div>
             <div class="d-flex align-items-center flex-column image-post">
-              <img class="post-image" :src="backend + post.link">
+              <img v-if="post.has_photo === 1" class="post-image" :src="backend + post.link">
             </div>
             <button v-show="post.vote === 0 || post.vote === null || post.vote === -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
             <button v-show="post.vote === 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>

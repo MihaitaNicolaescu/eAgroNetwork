@@ -9,9 +9,9 @@
                     <div class="col-3">
                         <div id="profile">
                             <img v-if="user !== null" style="margin-top: 20px;" alt="profile image" class="profile-image" :src="backend + user.link_profile">
-                            <div id="profile-info">
-                                <p class="info">First name: {{ firstName }}</p>
-                                <p class="info">Last name: {{ lastName }}</p>
+                            <div class="profile-info">
+                                <p class="info"> {{ firstName }} {{ lastName }}</p>
+                                <p class="info">Judet: {{judet}} </p>
                                 <p class="info">Email: {{ email }}</p>
                                 <p class="info">Birthday: {{ birthday }}</p>
                                 <p v-if="isProducer === 1" class="info">Producator atestat <img style="width:45px" src="../assets/Logo.png"></p>
@@ -49,7 +49,7 @@
                                 {{post.description}} 
                                 </div>
                                 <div class="d-flex align-items-center flex-column image-post">
-                                    <img class="post-image" :src="backend + post.link">
+                                    <img v-if="post.has_photo === 1" class="post-image" :src="backend + post.link">
                                 </div>
                                 <button v-show="post.vote === 0 || post.vote == null || post.vote === -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
                                 <button v-show="post.vote === 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
@@ -190,6 +190,7 @@ import alertBox from "@/components/templates/invalidToken";
                 reviews: null,
                 myReview: null,
                 backend: backend,
+                judet: '',
             }
         },
         components: {
@@ -390,6 +391,7 @@ import alertBox from "@/components/templates/invalidToken";
                         this.userPhoto = response.data['profile_image'];
                         this.isProducer = response.data['producer'];
                         this.isBanned = response.data['banned'];
+                        this.judet = response.data['judet'];
 
                     }
                 }).catch((error) =>{
@@ -429,7 +431,10 @@ import alertBox from "@/components/templates/invalidToken";
     border: none;
     float: left;
   }
-
+  .profile-info{
+    word-wrap: break-word;
+    margin: 0;
+  }
   .rating > input { display: none; }
   .rating > label:before {
     margin: 5px;
@@ -502,7 +507,7 @@ import alertBox from "@/components/templates/invalidToken";
         overflow: scroll;
         -ms-overflow-style: none;  /* IE and Edge */
         scrollbar-width: none;  /* Firefox */
-        height: 850px;
+        height: 950px;
     }
     #post::-webkit-scrollbar {
         display: none;
@@ -512,9 +517,9 @@ import alertBox from "@/components/templates/invalidToken";
         width: 600px;
         height: auto;
         padding: 10px;
-        box-shadow: 5px 10px #888888;
         margin-top:20px;
-        
+        border-radius: 20px;
+
     }
     .user-info-img{
         width: 50px;
@@ -522,46 +527,12 @@ import alertBox from "@/components/templates/invalidToken";
         border-radius: 50px;
         object-fit: cover;
     }
-    .post-add{
-        margin-top: 100px;
-    }
-    .description-post{
-        margin-top: 10px;
-        resize: none;
-        width: 460px;
-    }
-    .btn-profile{
-        width: 225px;
-        font-size: 20px;
-        margin-top: 5px;
-    }
+
     .info{
         margin: 0px;
     }
     #profile{
         font-size: 20px;
-    }
-    #overlay{
-        position: fixed;
-        display: none;
-        width: 500px;
-        height: 500px;
-        background-color: rgb(77,74,73);
-        z-index: 2;
-        cursor: pointer;
-        margin-left: 300px;
-        margin-top: -140px;
-    }
-    #post-overlay{
-        position: fixed;
-        display: none;
-        width: 500px;
-        height: 500px;
-        background-color: rgb(77,74,73);
-        z-index: 2;
-        cursor: pointer;
-        margin-left: 300px;
-        margin-top: -140px;
     }
     .form-control{
         font-size: 20px !important;

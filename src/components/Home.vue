@@ -1,7 +1,7 @@
 <template>
     <div style="min-width: 650px;" class="container-fluid container-view">
       <div class="d-flex align-items-center flex-column">
-        <nav style="width: auto; z-index: 2; position: fixed;" class="navbar navbar-light bg-light">
+        <nav style="width: 900px; z-index: 2; position: fixed;" class="navbar navbar-light bg-light">
           <button class="btn btn-outline-secondary" v-on:click="logout">Log out</button>
           <form style="float: left" class="form-inline my-2 my-lg-0">
             <input class="search-input form-control mr-sm-2 input-search" type="search" placeholder="Search" aria-label="Search" v-model="query">
@@ -120,26 +120,50 @@
               </div>
             </ul>
         </div>
-        <div style="margin-top: 65px;" class="posts-container d-flex align-items-center flex-column">
-            <div id="posts">
-                <div v-for="(post, index) in fallowPosts" :key="post.id">
+        <div style="margin-top: 65px;" class="d-flex align-items-center flex-column">
+            <div class="row">
+              <div class="col-8 posts-container">
+                <div id="posts">
+                  <div v-for="(post, index) in fallowPosts" :key="post.id">
                     <div class="container-post sn p-3">
-                        <div class="user-info">
-                            <img alt="user profile photo" class="user-info-img" :src="backend + post.link_profile">
-                            <a style="color: black; text-decoration: none; margin-left: 10px;" :href="'/profile/' + post.user_id">{{post.firstName + " " + post.lastName}}</a>
-                        </div>
-                        <div style="margin-bottom: 10px; margin-top: 10px;" class="post-description">
-                        {{post.description}} 
-                        </div>
-                        <div class="d-flex align-items-center flex-column image-post">
-                            <img alt="user post photo" class="post-image" :src="backend + post.link">
-                        </div>
-                        <button v-show="post.vote === 0 || post.vote === null || post.vote === -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
-                        <button v-show="post.vote === 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
-                        <span>{{post.votes}}</span>
-                        <button class="btn btn-react" type="button" v-on:click="gotToComments(post.id)"><span class="material-icons">insert_comment</span></button>
+                      <div class="user-info">
+                        <img alt="user profile photo" class="user-info-img" :src="backend + post.link_profile">
+                        <a style="color: black; text-decoration: none; margin-left: 10px;" :href="'/profile/' + post.user_id">{{post.firstName + " " + post.lastName}}</a>
+                      </div>
+                      <div style="margin-bottom: 10px; margin-top: 10px;" class="post-description">
+                        {{post.description}}
+                      </div>
+                      <div class="d-flex align-items-center flex-column image-post">
+                        <img v-if="post.has_photo === 1" alt="user post photo" class="post-image" :src="backend + post.link">
+                      </div>
+                      <button v-show="post.vote === 0 || post.vote === null || post.vote === -1" class="btn btn-react" type="button" v-on:click="voteUp(post.id, index, 1)"><span class="material-icons">thumb_up_alt</span></button>
+                      <button v-show="post.vote === 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
+                      <span>{{post.votes}}</span>
+                      <button class="btn btn-react" type="button" v-on:click="gotToComments(post.id)"><span class="material-icons">insert_comment</span></button>
                     </div>
+                  </div>
                 </div>
+              </div>
+              <div class="col-2">
+                <div class="recomandari">
+                  <ul v-if="producers !== null && producers.length != 0" class="list-group">
+                    <li v-for="producer in producers" :key="producer.id" class="list-group-item list-group-item-dark">
+                      <div class="row" style="margin-top: 5px">
+                        <div class="col-sm-2">
+                          <div class="user-info">
+                            <img data-v-8dc7cce2="" alt="user profile photo" :src="backend + producer.link_profile" class="user-info-img">
+                          </div>
+                        </div>
+                        <div style="margin-left: 20px" class="col-8">
+                          <p style="margin: 0; word-wrap: break-word; font-size: 15px; font-weight: bold;">{{producer.firstName}} {{producer.lastName}}</p>
+                          <buttom style="width: 100%" class="btn btn-sm btn-success"><a style="text-decoration: none; color: white" :href="'/profile/' + producer.id">Vizualizare profil</a></buttom>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                  <p style="text-align: center;" v-if="producers.length === 0">Momentan nu sunt inregistrati producatori in acest judet.</p>
+                </div>
+              </div>
             </div>
         </div>
         <alert-box></alert-box>
@@ -162,6 +186,7 @@
                 fallowPosts: [],
                 isProducer: null,
                 notifications: [],
+                producers: null,
                 backend: backend,
             }
         },
@@ -203,6 +228,7 @@
             })
             this.getNotifications();
             this.getUserFallowList();
+            this.getAllProducers();
         },
         watch: {
             query: function(){
@@ -215,6 +241,17 @@
             }
         },
         methods:{
+              getAllProducers: function(){
+                axios.get(backend+'/api/localProducers', {
+                  params:{
+                    token: localStorage.getItem('token'),
+                  }
+                }).then((res) =>{
+                  this.producers = res.data['producers'];
+                }).catch((error)=>{
+                  console.log(error);
+                })
+              },
               gotToComments: function(postID){
                 this.$router.push('/post/'+postID);
               },
@@ -336,7 +373,7 @@
             },
             searchMembers() {
                 axios.get(backend+'/api/user/search',  { params :{
-                    query: this.query 
+                    query: this.query
                 }})
                 .then(response => {
                     this.results = response.data
@@ -366,6 +403,18 @@
       border: none;
       border-bottom: 2px solid #9f5ac7;
       background: #f8f9fa!important
+    }
+    .recomandari{
+      background-color: #d9d9d9 !important;
+      width: 300px;
+      max-height: 900px;
+      border-radius: 15px;
+      overflow: scroll;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    .posts-container{
+      height: 900px;
     }
 </style> 
 

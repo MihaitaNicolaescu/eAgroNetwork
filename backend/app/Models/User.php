@@ -2,20 +2,19 @@
 
 namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable  implements Searchable, JWTSubject 
+class User extends Authenticatable  implements Searchable, JWTSubject
 {
     use HasFactory,Notifiable;
 
+
     public function getSearchResult(): SearchResult
-    {  
+    {
        return new SearchResult($this, $this->firstName);
     }
 
@@ -47,6 +46,7 @@ class User extends Authenticatable  implements Searchable, JWTSubject
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+
     ];
 
     /* Get the identifier that will be stored in the subject claim of the JWT.

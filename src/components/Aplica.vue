@@ -102,6 +102,7 @@
         <p>Puteti trimite o noua aplicatie corectand greselile specificate in motivul respingeri, daca trimiteti o aplicatie de mai multe ori
           puteti primi interdictie la acest grad.</p>
           <p>Motivul respingeri: {{application.motiv_respingere}}</p>
+        <p style="font-weight: bold;">Este necesara reincarcarea documentelor!</p>
         <button class="btn btn-danger" v-on:click="enableEditApplication">Editeaza aplicatia</button>
       </div>
       <!--Modal pentru confirmarea stergerii aplicatiei -->

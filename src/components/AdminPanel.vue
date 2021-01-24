@@ -203,8 +203,8 @@
                 localStorage.setItem('admin', res.data['isAdmin']);
                 if(res.data['isAdmin'] === 0) this.$router.push('/');
                 else this.getUsers();
-            }).catch((error)=>{
-                console.log(error);
+            }).catch(()=>{
+              this.$router.push('/');
             })
             //
         },

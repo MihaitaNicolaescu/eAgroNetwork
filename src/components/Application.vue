@@ -11,32 +11,64 @@
       <div style="margin-top: 20px;" class="container">
         <div class="row">
           <div class="col">
-            <img alt="profile image" class="profile-image" :src="require('@/assets/profiles/' +applicationDetails.profile_image)">
+            <img alt="profile image" class="profile-image" :src="backend + applicationDetails.link_profile">
+            <div style="margin-top: 20px;" class="text-center">
+              <button style="margin-right: 10px;" data-toggle="modal" data-target="#rejectModal" class="btn btn-danger" type="button">Respinge</button>
+              <button class="btn btn-success" data-toggle="modal" data-target="#acceptModal" type="button">Aproba</button>
+            </div>
           </div>
-          <div class="col">
-            <p>Numele: {{applicationDetails.user_firstName}}</p>
-            <p>Prenumele: {{applicationDetails.user_lastName}}</p>
-            <p>Email: {{applicationDetails.user_email}}</p>
-            <p>Judet: {{applicationDetails.judet}}</p>
-            <p>Localitate: {{applicationDetails.localitate}}</p>
-            <p>Adresa: {{applicationDetails.adresa}}</p>
-            <p>Serie carte identitate: {{applicationDetails.serie_ci}} {{applicationDetails.numar_serie_ci}}</p>
-            <p>CNP: {{applicationDetails.cnp}}</p>
-            <p>Numar certficat producator: {{applicationDetails.nr_certificat}}</p>
-            <p>Primaria: {{applicationDetails.primaria}}</p>
-            <p>Alte precizari: {{applicationDetails.alte_precizari}}</p>
-          </div>
-          <div class="col">
-            <p>Copie carte identitate</p>
-            <img alt="docs-image" class="doc-image" :src="backend + applicationDetails.copie_ci">
-            <p>Copie certificat producator</p>
-            <img alt="docs-image" class="doc-image" :src="backend + applicationDetails.copie_certificat">
+          <div class="col-6">
+            <ul class="list-group">
+              <li class="list-group-item">Numele: {{applicationDetails.user_firstName}}</li>
+              <li class="list-group-item">Prenumele: {{applicationDetails.user_lastName}}</li>
+              <li class="list-group-item">{{applicationDetails.user_email}}</li>
+              <li class="list-group-item">Judet: {{applicationDetails.judet}}</li>
+              <li class="list-group-item">Localitate: {{applicationDetails.localitate}}</li>
+              <li class="list-group-item">Adresa: {{applicationDetails.adresa}}</li>
+              <li class="list-group-item">Serie carte identitate: {{applicationDetails.serie_ci}} {{applicationDetails.numar_serie_ci}}</li>
+              <li class="list-group-item">CNP: {{applicationDetails.cnp}}</li>
+              <li class="list-group-item">Numar certficat producator: {{applicationDetails.nr_certificat}}</li>
+              <li class="list-group-item">Primaria: {{applicationDetails.primaria}}</li>
+              <li class="list-group-item">Alte precizari: {{applicationDetails.alte_precizari}}</li>
+            </ul>
+            <button style="width: 100%; margin-bottom: 5px; margin-top:5px;" type="button" class="btn btn-primary" data-toggle="modal" data-target="#CImodal">Copie carte identitate</button>
+            <button style="width: 100%" type="button" class="btn btn-primary" data-toggle="modal" data-target="#CCmodal">Copie certificat producator</button>
           </div>
         </div>
       </div>
-      <div class="col-md-12 text-center">
-        <button style="margin-right: 10px;" data-toggle="modal" data-target="#rejectModal" class="btn btn-danger" type="button">Respinge</button>
-        <button class="btn btn-success" data-toggle="modal" data-target="#acceptModal" type="button">Aproba</button>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="CCmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="CCTitle">Copie carte identitate</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <img style="width: 470px; height: 629px;" alt="docs-image" :src="backend + applicationDetails.copie_certificat">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="CImodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Copie carte identitate</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <img style="width: 470px; height: 629px;" alt="docs-image" :src="backend + applicationDetails.copie_ci">
+          </div>
+        </div>
       </div>
     </div>
     <!--Modal pentru confirmarea aplicatiei -->
@@ -173,16 +205,8 @@
     width: 250px;
     height: 250px;
   }
-  .doc-image{
-    width: 200px;
-    height: 200px;
-    margin-bottom: 10px;
-    object-fit: cover;
-  }
-  .doc-image:hover{
-    transform: scale(2,3);
-    object-fit: initial;
-    display: block;
-    margin:0;
-  }
+.col {
+  flex-grow: 0;
+
+}
 </style>

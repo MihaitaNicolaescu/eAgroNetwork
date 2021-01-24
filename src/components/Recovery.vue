@@ -9,6 +9,7 @@
             <div class="form-group">
               <input v-model="email" type="text" id="name" class="form-control" required>
               <label class="form-control-placeholder" for="name">Email</label>
+              <div style="margin-top: 10px;" class="g-recaptcha" data-sitekey="6LdQBjgaAAAAAEWxNTAJS2_l0AY2rqwbl_QO-dwy" ></div>
             </div>
             <div>
               <button type="button" class="btn-login d-inline p-2" v-on:click="back">Login</button>
@@ -22,11 +23,10 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Este necesara verificarea contului.</h5>
+              <h5 class="modal-title">{{ title }}</h5>
             </div>
             <div class="modal-body">
-              <div class="pre-formatted">Un email a fost trimis catre email, daca exista un cont<br>inregistrat cu acel email.<br>Email-ul contine toate datele necesare pentru resetarea parolei.
-                </div>
+              {{content}}
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Inchide</button>
@@ -49,20 +49,42 @@ export default {
       //eslint-disable-next-line
       reg: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/,
       info: '',
+      title: '',
+      content: '',
     }
+  },
+  mounted(){
+    let recaptchaScript = document.createElement('script')
+    recaptchaScript.setAttribute('src', 'https://www.google.com/recaptcha/api.js')
+    document.head.appendChild(recaptchaScript)
   },
   methods: {
     recoveryPassword: function(){
+      // eslint-disable-next-line no-undef
+      if(grecaptcha.getResponse().length === 0){
+        this.title = "Eroare";
+        this.content = "Va rugam sa completati campul captcha!";
+        // eslint-disable-next-line no-undef
+        $('#verifyModal').modal('show');
+      }
       if(this.email !== null && this.email !== '' && this.reg.test(this.email)){
         // eslint-disable-next-line no-undef
         axios.post(backend + '/api/recoveryPassword', {
           email: this.email,
         }).then(()=>{
+          this.title = "Resetare parola";
+          this.content = "Pe email-ul introdus de dumneavoastra a fost trimis un email care contine datele pentru resetarea aprolei." +
+              " Daca nu primiti email-ul verificati si in spam."
           // eslint-disable-next-line no-undef
           $('#verifyModal').modal('show');
         }).catch((error)=>{
           console.log(error);
         })
+      }else{
+        this.title = "Eroare";
+        this.content = "Introduceti un email valid.";
+        // eslint-disable-next-line no-undef
+        $('#verifyModal').modal('show');
       }
     },
     back: function(){
