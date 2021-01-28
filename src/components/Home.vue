@@ -127,8 +127,15 @@
                   <div v-for="(post, index) in fallowPosts" :key="post.id">
                     <div class="container-post sn p-3">
                       <div class="user-info">
-                        <img alt="user profile photo" class="user-info-img" :src="backend + post.link_profile">
-                        <a style="color: black; text-decoration: none; margin-left: 10px;" :href="'/profile/' + post.user_id">{{post.firstName + " " + post.lastName}}</a>
+                        <div class="row">
+                          <div class="col-3">
+                            <img alt="user profile photo" class="user-info-img" :src="backend + post.link_profile">
+                          </div>
+                          <div class="col">
+                            <a style="color: black; text-decoration: none;" :href="'/profile/' + post.user_id">{{post.firstName + " " + post.lastName}}</a>
+                            <p style="margin: 0; font-weight: normal; font-size: 13px">{{ formatDate(post.created_at) }}</p>
+                          </div>
+                        </div>
                       </div>
                       <div style="margin-bottom: 10px; margin-top: 10px;" class="post-description">
                         {{post.description}}
@@ -241,147 +248,151 @@
             }
         },
         methods:{
-              getAllProducers: function(){
-                axios.get(backend+'/api/localProducers', {
-                  params:{
-                    token: localStorage.getItem('token'),
-                  }
-                }).then((res) =>{
-                  this.producers = res.data['producers'];
-                }).catch((error)=>{
-                  console.log(error);
-                })
-              },
-              gotToComments: function(postID){
-                this.$router.push('/post/'+postID);
-              },
-             goToNotifications: function(){
-               this.$router.push('/notifications');
-             },
-             markReadNotifications: function(){
-               axios.post(backend +'/api/markReadNotifications', {
+          formatDate: function(date) {
+            let newDate = new Date(date);
+            let months = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'];
+            return newDate.getDate() + ' ' + months[newDate.getMonth()] + ' ' + newDate.getFullYear();
+          },
+          getAllProducers: function(){
+            axios.get(backend+'/api/localProducers', {
+              params:{
+                token: localStorage.getItem('token'),
+                }
+              }).then((res) =>{
+                this.producers = res.data['producers'];
+              }).catch((error)=>{
+                console.log(error);
+              })
+            },
+            gotToComments: function(postID){
+              this.$router.push('/post/'+postID);
+            },
+           goToNotifications: function(){
+             this.$router.push('/notifications');
+           },
+           markReadNotifications: function(){
+             axios.post(backend +'/api/markReadNotifications', {
+               token: localStorage.getItem('token'),
+             }).then(()=>{
+               this.notifications = [];
+               this.hasNotifications = 0;
+             }).catch((error)=>{
+               console.log(error);
+             })
+           },
+           getNotifications: function(){
+             axios.get(backend+'/api/getUnreadNotifications', {
+               params:{
                  token: localStorage.getItem('token'),
-               }).then(()=>{
-                 this.notifications = [];
-                 this.hasNotifications = 0;
-               }).catch((error)=>{
-                 console.log(error);
-               })
-             },
-             getNotifications: function(){
-               axios.get(backend+'/api/getUnreadNotifications', {
-                 params:{
-                   token: localStorage.getItem('token'),
-                 }
-               }).then((res) =>{
-                    this.notifications = res.data['notifications'];
-                    if(this.notifications.length > 0) this.hasNotifications = 1;
-                    else this.hasNotifications = 0;
-               }).catch((error)=>{
-                 console.log(error);
-               })
-             },
-             modifyVote: function(userId, postId, vote){ // functia modifica reactia userului de la o anumita postare cand reactioneaza cu up sau down
-                axios.get(backend+'/api/modifyVote',{
-                    params:{
-                        token: localStorage.getItem('token'),
-                        userId: userId,
-                        postId: postId,
-                        vote: vote,
-                    }
-                })
-            },
-            cancelVoteUp: function(postId, index, vote){
-                axios.get(backend+'/api/vote', {
-                    params:{
-                        token: localStorage.getItem('token'),
-                        postId: postId,
-                        vote: -1,
-                    }
-                }).then(
-                    this.fallowPosts[index].votes--,
-                    this.fallowPosts[index].vote = 0,
-                ).catch((error)=>{
-                    console.log(error);
-                })
-                this.modifyVote(this.id, postId, vote)
-            },
-            voteUp: function(postId, index, vote){
-                axios.get(backend+'/api/vote', {
-                    params:{
-                        token: localStorage.getItem('token'),
-                        postId: postId,
-                        vote: 1,
-                    }
-                }).then(
-                    this.fallowPosts[index].votes++,
-                    this.fallowPosts[index].vote = 1,
-                ).catch((error)=>{
-                    console.log(error);
-                })
-                this.modifyVote(this.id, postId, vote)
-            },
-            getFallowListPosts: function(){
-                let listConverted = JSON.stringify(this.fallowList);
+               }
+             }).then((res) =>{
+                  this.notifications = res.data['notifications'];
+                  if(this.notifications.length > 0) this.hasNotifications = 1;
+                  else this.hasNotifications = 0;
+             }).catch((error)=>{
+               console.log(error);
+             })
+           },
+           modifyVote: function(userId, postId, vote){ // functia modifica reactia userului de la o anumita postare cand reactioneaza cu up sau down
+              axios.get(backend+'/api/modifyVote',{
+                  params:{
+                      token: localStorage.getItem('token'),
+                      userId: userId,
+                      postId: postId,
+                      vote: vote,
+                  }
+              })
+          },
+          cancelVoteUp: function(postId, index, vote){
+              axios.get(backend+'/api/vote', {
+                  params:{
+                      token: localStorage.getItem('token'),
+                      postId: postId,
+                      vote: -1,
+                  }
+              }).then(
+                  this.fallowPosts[index].votes--,
+                  this.fallowPosts[index].vote = 0,
+              ).catch((error)=>{
+                  console.log(error);
+              })
+              this.modifyVote(this.id, postId, vote)
+          },
+          voteUp: function(postId, index, vote){
+              axios.get(backend+'/api/vote', {
+                  params:{
+                      token: localStorage.getItem('token'),
+                      postId: postId,
+                      vote: 1,
+                  }
+              }).then(
+                  this.fallowPosts[index].votes++,
+                  this.fallowPosts[index].vote = 1,
+              ).catch((error)=>{
+                  console.log(error);
+              })
+              this.modifyVote(this.id, postId, vote)
+          },
+          getFallowListPosts: function(){
+              let listConverted = JSON.stringify(this.fallowList);
+             const sendGetRequest = async() => {
+                  try{
+                      const resp = await axios.get(backend+'/api/fetchFallowPosts', {
+                  params:{
+                      fallowList: listConverted,
+                      token: localStorage.getItem('token'),
+                  }});
+                  this.fallowPosts = resp.data['posts'];
+                  }catch(error){
+                      console.log(error);
+                  }
+              }
+              sendGetRequest();
+          },
+          getUserFallowList: function(){
                const sendGetRequest = async() => {
-                    try{
-                        const resp = await axios.get(backend+'/api/fetchFallowPosts', {
-                    params:{
-                        fallowList: listConverted,
-                        token: localStorage.getItem('token'),
-                    }});
-                    this.fallowPosts = resp.data['posts'];
-                    }catch(error){
-                        console.log(error);
-                    }
-                }
-                sendGetRequest();
-
-            },
-            getUserFallowList: function(){
-                 const sendGetRequest = async() => {
-                    try{
-                        const response = await axios.get(backend+'/api/fetchFallowList', {
-                    params: {
-                        token: localStorage.getItem('token'),
-                    }});
-                    this.fallowList = response.data;
-                    }catch(error){
-                        console.log(error);
-                    }
-                }
-                sendGetRequest();
-            },
-            closeNotifications: function(){
-                document.getElementById('notifications-box').style.display ="none";
-            },
-            showNotifications: function(){
-                document.getElementById('notifications-box').style.display ="flex";
-            },
-            profile: function(){
-                this.$router.push('profile');
-            },
-            adminPanel: function(){
-                this.$router.push('admin');
-            },
-            aplica: function(){
-                this.$router.push('aplica');
-            },
-            logout: function(){
-                localStorage.clear();
-                this.$router.push('login');
-            },
-            searchMembers() {
-                axios.get(backend+'/api/user/search',  { params :{
-                    query: this.query
-                }})
-                .then(response => {
-                    this.results = response.data
-                })
-                .catch(error => {
-                    console.log(error)
-                });
-            }
+                  try{
+                      const response = await axios.get(backend+'/api/fetchFallowList', {
+                  params: {
+                      token: localStorage.getItem('token'),
+                  }});
+                  this.fallowList = response.data;
+                  }catch(error){
+                      console.log(error);
+                  }
+              }
+              sendGetRequest();
+          },
+          closeNotifications: function(){
+              document.getElementById('notifications-box').style.display ="none";
+          },
+          showNotifications: function(){
+              document.getElementById('notifications-box').style.display ="flex";
+          },
+          profile: function(){
+              this.$router.push('profile');
+          },
+          adminPanel: function(){
+              this.$router.push('admin');
+          },
+          aplica: function(){
+              this.$router.push('aplica');
+          },
+          logout: function(){
+              localStorage.clear();
+              this.$router.push('login');
+          },
+          searchMembers() {
+              axios.get(backend+'/api/user/search',  { params :{
+                  query: this.query
+              }})
+              .then(response => {
+                  this.results = response.data
+              })
+              .catch(error => {
+                  console.log(error)
+              });
+          }
         }
     }
 </script>

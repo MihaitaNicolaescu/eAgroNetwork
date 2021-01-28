@@ -186,7 +186,7 @@ class PostController extends Controller
                     $join->on('posts.id', '=', 'post_votes.post_id')->where('post_votes.user_id', '=', $recived['id']);
                 })
                 ->select('posts.id', 'posts.has_photo', 'posts.user_id', 'posts.description', 'vote', 'posts.votes', 'posts.link'
-                    ,  'posts.filename')
+                    ,  'posts.filename', 'posts.created_at')
                 ->where('posts.user_id', '=', $request->user_id)
                 ->orderBy('posts.id', 'desc')->get();
                 return response()->json(['posts' => $result], 200, [], JSON_NUMERIC_CHECK);
@@ -217,7 +217,7 @@ class PostController extends Controller
                     $join->on('users.id', '=', 'posts.user_id');
                 })
                 ->select('posts.id', 'posts.user_id', 'posts.description', 'vote', 'posts.votes', 'posts.link',
-                    'posts.filename', 'posts.has_photo', 'users.lastName', 'users.firstName', 'users.link_profile')
+                    'posts.filename', 'posts.has_photo', 'users.lastName', 'users.firstName', 'users.link_profile', 'posts.created_at')
                 ->whereIn('posts.user_id', $arrayRecived)->orWhere('posts.user_id', $recived['id'])
                 ->orderBy('posts.created_at', 'desc')->get();
                 return response()->json(['posts' => $result], 200, [], JSON_NUMERIC_CHECK);

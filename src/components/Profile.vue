@@ -12,15 +12,20 @@
                         <div v-if="user !== null" id="profile">
                             <img alt="profile image" class="profile-image" :src="backend + user.link_profile">
                             <div id="profile-info">
-                                <p class="info">First name: {{ firstName }}</p>
-                                <p class="info">Last name: {{ lastName }}</p>
-                                <p class="info">Email: {{ email }}</p>
-                                <p class="info">Judet: {{ judet }}</p>
-                                <p class="info">Birthday: {{ birthday }}</p>
+                                <p style="font-weight: bold; font-size: 14px; margin: 0;">Nume</p>
+                                <p class="info">{{ firstName }}</p>
+                              <p style="font-weight: bold; font-size: 14px; margin: 0;">Prenume</p>
+                                <p class="info">{{ lastName }}</p>
+                              <p style="font-weight: bold; font-size: 14px; margin: 0;">Email</p>
+                                <p class="info">{{ email }}</p>
+                              <p style="font-weight: bold; font-size: 14px; margin: 0;">Judet</p>
+                                <p class="info">{{ judet }}</p>
+                              <p style="font-weight: bold; font-size: 14px; margin: 0;">Data nasterii</p>
+                                <p class="info">{{ birthday }}</p>
                             </div>
                         </div>
-                        <button class="btn btn-secondary btn-sm btn-profile" v-on:click="on()">Edit profile</button>
-                        <button v-show="isProducer" class="btn btn-secondary btn-sm btn-profile" type="button" v-on:click="post_on()">Add a new post</button>
+                        <button style="width: 100%; margin-bottom: 5px;" class="btn btn-secondary btn-sm" v-on:click="on()">Editează profilul</button>
+                        <button style="width: 100%;" v-show="isProducer" class="btn btn-secondary btn-sm" type="button" v-on:click="post_on()">Adaugă o postare</button>
                         <div v-if="reviews!==null" class="review-form-users">
                           <div v-for="review in reviews" :key="review.id">
                             <div class="row" style="margin-top: 5px">
@@ -42,8 +47,16 @@
                         <div v-for="(post, index) in userPosts" :key="post.id">
                             <div class="container-post sn p-3">
                                 <div class="user-info">
-                                    <img  alt="user profile photo" class="user-info-img" :src="backend + link">
-                                    <p>{{firstName + " " + lastName}}</p>
+                                  <div class="row">
+                                    <div class="col-3">
+                                      <img  alt="user profile photo" class="user-info-img" :src="backend + link">
+                                    </div>
+                                    <div class="col">
+                                      <p style="margin: 0">{{firstName + " " + lastName}}</p>
+                                      <p style="margin: 0; font-weight: normal; font-size: 13px">{{ formatDate(post.created_at) }}</p>
+                                    </div>
+                                  </div>
+
                                 </div>
                                 <div class="post-description">
                                 {{post.description}} 
@@ -111,71 +124,55 @@
             </div>
           </div>
         </div>
-        <div id="overlay">
-            <div class="container">
-                <div class="d-flex align-items-center flex-column">
-                    <div class="input" style="margin-top: 60px;">
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">First name</span>
-                            </div>
-                            <input type="text" class="form-control" v-model="tempFName"  placeholder="First name" aria-label="firstName" aria-describedby="basic-addon1">
-                        </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Last name</span>
-                            </div>
-                            <input type="text" class="form-control" v-model="tempLName" placeholder="Last name" aria-label="lastName" aria-describedby="basic-addon1">
-                        </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Judet</span>
-                            </div>
-                            <input type="text" class="form-control" v-model="tempJudet"  placeholder="Judet" aria-label="judet" aria-describedby="basic-addon1">
-                        </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Birthday</span>
-                            </div>
-                            <input type="date" class="form-control" v-model="tempBirthday"  aria-label="birthday" aria-describedby="basic-addon1">
-                        </div>
-                        <div class="custom-file">
-                            <input @change="onFileSelected" type="file" class="custom-file-input" id="inputGroupFile01" accept="image/*">
-                            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-                        </div>
-                    </div>
-                    <button class="btn btn-success btn-profile" v-on:click="save()">Save data</button>
-                    <button class="btn btn-danger btn-profile" v-on:click="cancel()">Cancel</button>
-                </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="editProfile" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 v-if="modalType=== 2 && modalType !== null" class="modal-title" id="staticBackdropLabel">Informațiile profilului</h5>
+              <h5 v-if="modalType=== 1 && modalType !== null" class="modal-title" id="titluPostari">Adauga o postare</h5>
             </div>
-        </div>
-
-
-        <div id="post-overlay">
-            <div class="container">
-                <div class="d-flex align-items-center flex-column">
-                    <div class="form-group post-add">
-                        <div class="custom-file">
-                            <input @change="onFileSelected" type="file" class="custom-file-input" id="photo-post" accept="image/*">
-                            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-                        </div>
-                        <textarea v-model="description" class="form-control description-post" id="description-post" rows="3"></textarea>
-                    </div>
-                    <button class="btn btn-success btn-profile" type="button" v-on:click="add_post()">Continue</button>
-                    <button class="btn btn-danger btn-profile" type="button" v-on:click="off()">Cancel</button>
+            <div class="modal-body">
+              <div v-if="modalType === 1 && modalType !== null">
+                <div class="form-group">
+                  <input v-model="tempFName" id="tempFName"  type="text"  class="form-control" required>
+                  <label class="form-control-placeholder" for="tempFName">Nume</label>
                 </div>
+                <div class="form-group">
+                  <input v-model="tempLName" id="tempLName"  type="text"  class="form-control" required>
+                  <label class="form-control-placeholder" for="tempLName">Prenume</label>
+                </div>
+                <div class="form-group">
+                  <input v-model="tempJudet" id="tempJudet"  type="text"  class="form-control" required>
+                  <label class="form-control-placeholder" for="tempJudet">Județ</label>
+                </div>
+                <div class="form-group">
+                  <input v-model="tempBirthday" onfocusout="(this.type='text')" onfocus="(this.type='date')" id="tempBirthday" class="form-control" required>
+                  <label class="form-control-placeholder" for="tempBirthday">Zi de naștere</label>
+                </div>
+              </div>
+              <div v-if="modalType=== 2 && modalType !== null">
+                <p>Daca nu selectati o fotografie, postarea va contine doar descriere.</p>
+                <div class="custom-file">
+                  <input @change="onFileSelected" type="file" class="custom-file-input" id="photo-post" accept="image/*">
+                  <label class="custom-file-label" for="photo-post">Alege fotografia</label>
+                </div>
+                <textarea v-model="description" class="form-control description-post" id="description-post" rows="3"></textarea>
+              </div>
             </div>
-
+            <div class="modal-footer">
+              <button v-if="modalType=== 2 && modalType !== null" class="btn btn-success btn-profile" type="button" v-on:click="add_post()">Continue</button>
+              <button v-if="modalType === 1 && modalType !== null" class="btn btn-success btn-profile" type="button" v-on:click="save()">Salvează informațiile</button>
+              <button class="btn btn-danger btn-profile" type="button" v-on:click="off()">Anulează</button>
+            </div>
+          </div>
         </div>
-        <alert-box></alert-box>
-        <div class="container overlay" id="confirm">
-            
-        </div>
+      </div>
     </div>
 </template>
 
 <script>
-import alertBox from './templates/invalidToken';
 import {backend} from '@/constants.js';
 import axios from 'axios';
     export default{
@@ -203,12 +200,9 @@ import axios from 'axios';
                 reviews: null,
                 link: null,
                 backend: backend,
+                modalType: null,
             }
         },
-        components:{
-            'alert-box': alertBox,
-        },
-
         async created() {
             await this.getUserInformatios();
         },
@@ -221,6 +215,11 @@ import axios from 'axios';
             this.verifyToken();
         },
         methods: {
+            formatDate: function(date) {
+              let newDate = new Date(date);
+              let months = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'];
+              return newDate.getDate() + ' ' + months[newDate.getMonth()] + ' ' + newDate.getFullYear();
+            },
             getReviews: function(){
               axios.get(backend+'/api/getReviews',{
                 params:{
@@ -388,6 +387,7 @@ import axios from 'axios';
                 }).then(()=>{
                     this.description = "";
                     this.selectedFile = "";
+                    this.getUserPosts();
                 }).catch((error) =>{
                     console.log(error)
                 });
@@ -400,14 +400,19 @@ import axios from 'axios';
                 this.tempLName = this.lastName;
                 this.tempJudet = this.judet;
                 this.tempBirthday = this.birthday;
-                document.getElementById('overlay').style.display ="block";
+              // eslint-disable-next-line no-undef
+                $('#editProfile').modal('show');
+                this.modalType = 1;
             },
             post_on: function(){
-                document.getElementById('post-overlay').style.display = "block";
+              // eslint-disable-next-line no-undef
+              $('#editProfile').modal('show');
+              this.modalType = 2;
             },
             off: function(){
-                document.getElementById('overlay').style.display ="none";
-                document.getElementById('post-overlay').style.display ="none";
+              // eslint-disable-next-line no-undef
+              $('#editProfile').modal('hide');
+                this.modalType = null;
             },
             home: function(){
                 this.$router.push('/');
@@ -427,8 +432,8 @@ import axios from 'axios';
                         judet: this.judet,
                         birthday: this.birthday,
                         token: localStorage.getItem('token'),
-                    }).catch(() =>{
-                        document.getElementById('overlay-alert').style.display ="block";
+                    }).catch((error) =>{
+                        console.log(error);
                 });
                 this.off();
                 if(this.selectedFile != null){
@@ -460,6 +465,34 @@ import axios from 'axios';
     }
 </script>
 <style scoped>
+    input {
+      border-radius: 0;
+      border: none;
+      border-bottom: 2px solid #9f5ac7;
+    }
+    .form-control:focus{
+      border-color: #b5b1c4;
+      box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(255, 100, 255, 0.5);
+    }
+    .form-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-control-placeholder {
+      position: absolute;
+      top: 10px;
+      padding: 7px 0 0 13px;
+      transition: all 200ms;
+      opacity: 0.5;
+    }
+
+    .form-control:focus + .form-control-placeholder,
+    .form-control:valid + .form-control-placeholder {
+      font-size: 15px;
+      transform: translate3d(0, -100%, 0);
+      opacity: 1;
+    }
     /*Fonts from frontend server*/
     @font-face {
         font-family: "NerkoOne";
@@ -504,9 +537,6 @@ import axios from 'axios';
         border-radius: 50px;
         object-fit: cover;
     }
-    .post-add{
-        margin-top: 100px;
-    }
     .description-post{
         margin-top: 10px;
         resize: none;
@@ -528,38 +558,13 @@ import axios from 'axios';
     }
     .info{
         margin: 0;
+        font-size: 18px;
     }
     #profile{
         font-size: 20px;
     }
-    #overlay{
-        position: fixed;
-        display: none;
-        width: 500px;
-        height: 500px;
-        background-color: rgb(77,74,73);
-        z-index: 2;
-        cursor: pointer;
-        margin-left: 300px;
-        margin-top: -140px;
-    }
-    #post-overlay{
-        position: fixed;
-        display: none;
-        width: 500px;
-        height: 500px;
-        background-color: rgb(77,74,73);
-        z-index: 2;
-        cursor: pointer;
-        margin-left: 300px;
-        margin-top: -140px;
-    }
     .form-control{
         font-size: 20px !important;
-        font-weight: bold;
-    }
-    .input-group-text{
-        font-size: 1.2rem !important;
         font-weight: bold;
     }
     .profile-image{

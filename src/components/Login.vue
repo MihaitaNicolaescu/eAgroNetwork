@@ -176,10 +176,6 @@
         -webkit-transition: 0.38s ease-in;
         box-shadow: 0  17px 10px -10px rgba(0, 0, 0, 0.4)
     }
-    .form-control:focus{
-        border-color: #9f5ac7;
-        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(255, 100, 255, 0.5);
-    }
     .btn-login:hover {
         color: white;
         box-shadow: 0  37px 20px -20px rgba(0, 0, 0, 0.5);
@@ -203,22 +199,19 @@
     button.btn-login:active:after {
         height: 100%;
     }
-
-    .fill:hover:before {
-    top: 0;
-    }
-    .input-group-text{
-        width: 90px;
-    }
-    input {
-        border-radius: 0;
-        border: none;
-        border-bottom: 2px solid #9f5ac7;
-    }
     .logo{
         margin-bottom: 10px;
         width: 350px;
         height: 300px;
+    }
+    input {
+      border-radius: 0;
+      border: none;
+      border-bottom: 2px solid #9f5ac7;
+    }
+    .form-control:focus{
+      border-color: #9f5ac7;
+      box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(255, 100, 255, 0.5);
     }
     .form-group {
         position: relative;

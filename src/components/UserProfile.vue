@@ -6,16 +6,22 @@
         <div class="container">
             <div v-if="invalidUser === false && isBanned === 0" class="d-flex align-items-left flex-column" style="height: 100px;">
                 <div class="row">
-                    <div class="col-3">
+                    <div style="max-width: 30%!important;" class="col-3">
                         <div id="profile">
                             <img v-if="user !== null" style="margin-top: 20px;" alt="profile image" class="profile-image" :src="backend + user.link_profile">
-                            <div class="profile-info">
-                                <p class="info"> {{ firstName }} {{ lastName }}</p>
-                                <p class="info">Judet: {{judet}} </p>
-                                <p class="info">Email: {{ email }}</p>
-                                <p class="info">Birthday: {{ birthday }}</p>
-                                <p v-if="isProducer === 1" class="info">Producator atestat <img style="width:45px" src="../assets/Logo.png"></p>
-                            </div>
+                          <div id="profile-info">
+                            <p style="font-weight: bold; font-size: 14px; margin: 0;">Nume</p>
+                            <p class="info">{{ firstName }}</p>
+                            <p style="font-weight: bold; font-size: 14px; margin: 0;">Prenume</p>
+                            <p class="info">{{ lastName }}</p>
+                            <p style="font-weight: bold; font-size: 14px; margin: 0;">Email</p>
+                            <p class="info">{{ email }}</p>
+                            <p style="font-weight: bold; font-size: 14px; margin: 0;">Judet</p>
+                            <p class="info">{{ judet }}</p>
+                            <p style="font-weight: bold; font-size: 14px; margin: 0;">Data nasterii</p>
+                            <p class="info">{{ birthday }}</p>
+                            <p v-if="isProducer === 1" class="info">Producator atestat <img style="width:45px" src="../assets/Logo.png"></p>
+                          </div>
                             <button v-if="!fallowed && fallowed!=null && isProducer === 1 && visitorID !== id" style="width: 100%" class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste</button>
                             <button v-if="fallowed && fallowed!=null && isProducer === 1 && visitorID !== id" style="width: 100%" class="btn btn-danger btn-sm" type="button" v-on:click="cancelFallow()">Nu mai urmari</button>
                             <button v-if="visitorID !== id" class="btn btn-danger btn-sm" type="button"  style="margin-top: 5px; width: 100%;" data-toggle="modal" data-target="#reportModal">Raporteaza utilizatorul</button>
@@ -42,8 +48,15 @@
                         <div v-for="(post, index) in userPosts" :key="post.id">
                             <div class="container-post sn p-3">
                                 <div class="user-info">
-                                    <img class="user-info-img" :src="backend + user.link_profile">
-                                    <p>{{firstName + " " + lastName}}</p>
+                                  <div class="row">
+                                    <div class="col-3">
+                                      <img  alt="user profile photo" class="user-info-img" :src="backend + user.link_profile">
+                                    </div>
+                                    <div class="col">
+                                      <p style="margin: 0">{{firstName + " " + lastName}}</p>
+                                      <p style="margin: 0; font-weight: normal; font-size: 13px">{{ formatDate(post.created_at) }}</p>
+                                    </div>
+                                  </div>
                                 </div>
                                 <div class="post-description">
                                 {{post.description}} 
@@ -210,6 +223,11 @@ import alertBox from "@/components/templates/invalidToken";
             }
         },
         methods: {
+            formatDate: function(date) {
+              let newDate = new Date(date);
+              let months = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'];
+              return newDate.getDate() + ' ' + months[newDate.getMonth()] + ' ' + newDate.getFullYear();
+            },
             show_MyReview: function(){
               this.getMyReview()
               // eslint-disable-next-line no-undef
@@ -431,7 +449,7 @@ import alertBox from "@/components/templates/invalidToken";
     border: none;
     float: left;
   }
-  .profile-info{
+  #profile-info{
     word-wrap: break-word;
     margin: 0;
   }
@@ -529,7 +547,8 @@ import alertBox from "@/components/templates/invalidToken";
     }
 
     .info{
-        margin: 0px;
+        margin: 0;
+        font-size: 18px;
     }
     #profile{
         font-size: 20px;
