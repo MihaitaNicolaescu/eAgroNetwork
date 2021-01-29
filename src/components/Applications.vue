@@ -3,13 +3,13 @@
     <nav class="navbar navbar-light bg-light">
       <button class="btn btn-outline-secondary" v-on:click="back">Back</button>
     </nav>
-    <div v-if="!applications.length && applications != null">
+    <div v-if="applications != null && !applications.length">
       <h2>Momentan nu este nici o aplicatie in asteptare.</h2>
     </div>
-    <div v-if="applications.length !== 0 && applications != null">
+    <div v-if="applications != null && applications.length !== 0">
       <h2>Momentan sunt {{applications.length}} aplicatii in asteptare.</h2>
       <table class="table">
-        <thead class="thead-dark">
+        <thead class="thead-light">
         <tr>
           <th scope="col">#</th>
           <th scope="col">Numele de familie</th>
