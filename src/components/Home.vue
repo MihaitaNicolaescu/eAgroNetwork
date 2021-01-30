@@ -1,7 +1,7 @@
 <template>
   <div style="min-width: 650px;" class="container-fluid container-view">
     <div class="d-flex align-items-center flex-column">
-      <nav style="width: 950px; z-index: 2; position: fixed;" class="navbar navbar-light bg-light">
+      <nav style="width: 942px; z-index: 2; position: fixed;" class="navbar navbar-light bg-light">
         <button class="btn btn-outline-secondary" v-on:click="logout">Log out</button>
         <form style="float: left" class="form-inline my-2 my-lg-0">
           <input class="search-input form-control mr-sm-2 input-search" type="search" placeholder="Search"
@@ -23,7 +23,7 @@
       </nav>
     </div>
     <div class="d-flex align-items-center flex-column">
-      <ul style="margin-top: 65px;" class="list-group list-search" v-if="results.length > 0 && query">
+      <ul style="margin-top: 60px;" class="list-group list-search" v-if="results.length > 0 && query">
         <li class="list-group-item search-item" v-for="result in results.slice(0,10)" :key="result.id">
           <a class="link" :href="'/profile/' + result.searchable.id">
             <div class="link-profile" style="display: block ruby;">
@@ -138,7 +138,7 @@
         </div>
       </ul>
     </div>
-    <div style="margin-top: 65px;" class="d-flex align-items-center flex-column">
+    <div style="margin-top: 60px;" class="d-flex align-items-center flex-column">
       <div class="row">
         <div class="col-8 posts-container">
           <div id="posts">
@@ -177,8 +177,9 @@
         </div>
         <div class="col-2">
           <div class="recomandari">
-            <ul v-if="producers !== null && producers.length !== 0" class="list-group">
-              <li v-for="producer in producers" :key="producer.id" class="list-group-item list-group-item-dark">
+            <p v-if="producers !== null && producers.length !== 0" style="text-align: center; font-weight: bold;">Topul producatorilor in functie de urmaritori</p>
+            <ul v-if="producers !== null && producers.length !== 0" class="list-group list-group list-group-flush">
+              <li v-for="producer in producers" :key="producer.id" class="list-group-item list-group-item-dark list-group-flush">
                 <div class="row" style="margin-top: 5px">
                   <div class="col-sm-2">
                     <div class="user-info">
@@ -398,7 +399,7 @@ export default {
       document.getElementById('notifications-box').style.display = "none";
     },
     showNotifications: function () {
-      document.getElementById('notifications-box').style.display = "flex";
+      document.getElementById('notifications-box').style.display = "block";
     },
     profile: function () {
       this.$router.push('profile');
@@ -453,19 +454,24 @@ input {
 }
 
 .recomandari {
-  background-color: #d9d9d9 !important;
+  background-color: #f8f9fa !important;
   width: 300px;
   max-height: 900px;
-  border-radius: 15px;
   overflow: scroll;
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
 .list-group-item-dark{
-  background-color: #d9d9d9 !important;
+  background-color: #f8f9fa !important;
 }
 .posts-container {
   height: 900px;
+}
+
+.container-fluid{
+  background-image: url('../assets/background.png');
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 </style> 
 

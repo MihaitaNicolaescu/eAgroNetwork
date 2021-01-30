@@ -1,8 +1,10 @@
 <template>
   <div class="container-fluid">
-    <nav v-if="post !== 'INVALID_POSTING'" class="navbar navbar-light bg-light">
-      <button style="" class="btn btn-outline-secondary" v-on:click="home">Back</button>
-    </nav>
+    <div class="d-flex align-items-center flex-column">
+      <nav style="width: 600px" v-if="post !== 'INVALID_POSTING'" class="navbar navbar-light bg-light">
+        <button style="" class="btn btn-outline-secondary" v-on:click="home">Back</button>
+      </nav>
+    </div>
     <div class="container">
       <div v-if="invalidPost === true && invalidPost !== null" class="container">
         <p class="not-found">Postarea nu este gasita.</p>
@@ -27,27 +29,28 @@
             <button v-show="post.vote === 1" class="btn btn-react" type="button" v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons" style="color: blue;">thumb_up_alt</span></button>
             <span>{{post.votes}}</span>
             <div class="form-group">
-              <textarea v-model="comment" style="resize: none; height: 60px;" class="form-control" id="exampleFormControlTextarea1" required></textarea>
+              <textarea v-model="comment" maxlength="255" style="resize: none; height: 60px;" class="form-control" id="exampleFormControlTextarea1"></textarea>
 
               <button style="margin-top: 5px;" class="btn btn-success btn-sm" type="button" v-on:click="addComment">Adauga comentariu</button>
             </div>
 
-            <div v-for="comment in comments" :key="comment.id" style="margin-bottom: 2px" class="comments-from-users">
-              <div class="row" style="margin-top: 5px">
-                <div class="col-sm-1">
-                  <div class="user-info">
-                    <img class="profile-image" :src="backend + comment.link_profile">
-
+            <ul class="list-group">
+              <li v-for="comment in comments" :key="comment.id" class="list-group-item list-group-flush">
+                <div class="row">
+                  <div class="col-sm-1">
+                    <div class="user-info">
+                      <img class="profile-image" :src="backend + comment.link_profile">
+                    </div>
+                  </div>
+                  <div class="col-10">
+                    <p style="margin-left: 20px; word-wrap: break-word;"><a  style="color: black; text-decoration: none; font-weight: bold" :href="'/profile/' + comment.user_id">{{ comment.firstName }} {{ comment.lastName }}</a><br>{{ comment.comment }}</p>
+                  </div>
+                  <div class="col-1">
+                    <button v-if="id === comment.user_id " style="border: 0; background: transparent;" class="btn btn-outline-danger" v-on:click="deleteComment(comment.id)"><span class="material-icons">delete</span></button>
                   </div>
                 </div>
-                <div class="col-9">
-                  <p style="margin-left: 20px; word-wrap: break-word;"><a  style="color: black; text-decoration: none; font-weight: bold" :href="'/profile/' + comment.user_id">{{ comment.firstName }} {{ comment.lastName }}</a><br>{{ comment.comment }}</p>
-                </div>
-                <div class="col">
-                  <button v-if="id === comment.user_id " style="border: 0; background: transparent;" class="btn btn-outline-danger" v-on:click="deleteComment(comment.id)"><span class="material-icons">delete</span></button>
-                </div>
-              </div>
-            </div>
+              </li>
+            </ul>
           </div>
       </div>
     </div>
@@ -402,10 +405,10 @@ export default{
 
 }
 .container-post{
-  background-color: #d9d9d9!important;
+  background-color: #f8f9fa !important;
   width: 600px;
   height: auto;
-  box-shadow: 5px 10px #888888;
+  padding: 10px;
 
 }
 .user-info{
@@ -427,7 +430,7 @@ export default{
   object-fit: cover;
 }
 .image-post{
-  width: 450px;
+  width: 555px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -439,5 +442,12 @@ export default{
 .btn-react{
   background: transparent;
 }
-
+.row{
+  margin-right: 0;
+}
+.container-fluid{
+  background-image: url('../assets/background.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 </style>

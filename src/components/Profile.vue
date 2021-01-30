@@ -1,14 +1,14 @@
 <template>
   <div class="container-fluid">
     <div class="d-flex align-items-center flex-column">
-      <nav style="width: 1000px" class="navbar navbar-light bg-light">
+      <nav style="width: 896px" class="navbar navbar-light bg-light">
         <button style="" class="btn btn-outline-secondary" v-on:click="home">Home</button>
       </nav>
     </div>
     <div class="container">
       <div class="d-flex align-items-left flex-column">
         <div class="d-flex align-items-center">
-          <div class="col-3">
+          <div class="col-3 left-info">
             <div v-if="user !== null" id="profile">
               <img alt="profile image" class="profile-image" :src="backend + user.link_profile">
               <div id="profile-info">
@@ -504,6 +504,10 @@ export default {
 }
 </script>
 <style scoped>
+.left-info{
+  background-color: #f8f9fa !important;
+  left: 9.6%;
+}
 input {
   border-radius: 0;
   border: none;
@@ -568,15 +572,15 @@ input {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
   height: 900px;
+  left: 9.99%;
 }
 
 .container-post {
-  background-color: #d9d9d9 !important;
+  background-color: #f8f9fa !important;
   width: 600px;
   height: auto;
   padding: 10px;
-  border-radius: 20px;
-  margin-top: 20px;
+  margin-bottom: 20px;
 
 }
 
@@ -617,6 +621,7 @@ input {
 
 #profile {
   font-size: 20px;
+  margin-bottom: 12px;
 }
 
 .form-control {
@@ -642,5 +647,11 @@ input {
   width: 555px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.container-fluid{
+  background-image: url('../assets/background.png');
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 </style>

@@ -663,4 +663,10 @@ h1 {
   z-index: 2;
   width: 500px;
 }
+
+.container{
+  background-image: url('../assets/background.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 </style>

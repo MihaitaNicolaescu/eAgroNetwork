@@ -410,15 +410,7 @@ export default {
 
 .search-btn {
   background-color: transparent;
-  margin-left: 0px;
   width: 50px;
-}
-
-#confirm-text {
-  color: white;
-  font-size: 2rem;
-  text-align: center;
-  padding-top: 110px;
 }
 
 #confirm-box {

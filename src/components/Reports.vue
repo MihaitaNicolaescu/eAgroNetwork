@@ -3,10 +3,10 @@
     <nav class="navbar navbar-light bg-light">
       <button class="btn btn-outline-secondary" v-on:click="back">Back</button>
     </nav>
-    <div v-if="reports.length === 0 && reports != null">
+    <div v-if="reports !== null && reports.length === 0">
       <h2>Momentan nu sunt raportari.</h2>
     </div>
-    <div v-if="reports.length && reports != null">
+    <div v-if="reports != null && reports.length">
       <h2>Momentan sunt {{reports.length}} sesizari in asteptare.</h2>
       <table style="margin-top: 20px;" class="table table-bordered">
         <thead class="thead-light">
@@ -109,7 +109,7 @@
   export default{
     data(){
       return{
-        reports: [],
+        reports: null,
         actualUserId: null,
         reason: '',
         reportID: null,
