@@ -6,11 +6,10 @@
       </nav>
     </div>
     <div class="container">
-      <div class="d-flex align-items-left flex-column">
-        <div class="d-flex align-items-center">
+      <div class="d-flex align-items-left">
           <div class="col-3 left-info">
             <div v-if="user !== null" id="profile">
-              <img alt="profile image" class="profile-image" :src="backend + user.link_profile">
+              <img style="margin-left: 10%;" alt="profile image" class="profile-image" :src="backend + user.link_profile">
               <div id="profile-info">
                 <p style="font-weight: bold; font-size: 14px; margin: 0;">Nume</p>
                 <p class="info">{{ firstName }}</p>
@@ -34,7 +33,7 @@
             </button>
             <div v-if="reviews!==null" class="review-form-users">
               <div v-for="review in reviews" :key="review.id">
-                <div class="row" style="margin-top: 5px">
+                <div class="row">
                   <div class="col-sm-1">
                     <div class="user-info">
                       <img alt="user profile photo" style="width: 50px; height: 50px;" class="profile-image"
@@ -87,16 +86,17 @@
                 </button>
               </div>
             </div>
-            <div v-if="isProducer === 0 && isProducer!==null">
-              <img alt="logo_cos" class="logo d-flex align-items-center flex-column" src="../assets/Logo_cos.png">
+            <div v-if="isProducer === 0 && isProducer!=null"  class="container-info">
+              <div v-if="isProducer === 0 && isProducer!==null">
+                <img alt="logo_cos" class="logo d-flex align-items-center flex-column" src="../assets/Logo_cos.png">
+              </div>
+              <p v-if="isProducer === 0 && isProducer!=null" class="info-paragraph">Daca esti un producator local poti sa
+                trimiti un formular pentru a primi gradul de producator pe aplicatie. Detinatorii acestui grad au
+                posibilitatea sa posteze fotografii
+                cu produsele agricole si sa poata primi recenzi de la alti utilizatori.
+              </p>
             </div>
-            <p v-if="isProducer === 0 && isProducer!=null" class="info-paragraph">Daca esti un producator local poti sa
-              trimiti un formular pentru a primi gradul de producator pe aplicatie. Detinatorii acestui grad au
-              posibilitatea sa posteze fotografii
-              cu produsele agricole si sa poata primi recenzi de la alti utilizatori.
-            </p>
           </div>
-        </div>
       </div>
       <!-- Modal setari postare -->
       <div class="modal fade bd-example-modal-sm" id="modalPostare" tabindex="-1" role="dialog"
@@ -507,6 +507,7 @@ export default {
 .left-info{
   background-color: #f8f9fa !important;
   left: 9.6%;
+  margin-top: 10px;
 }
 input {
   border-radius: 0;
@@ -551,7 +552,6 @@ input {
 }
 
 .info-paragraph {
-  font-family: "NerkoOne", serif;
   font-size: 30px;
   text-align: center;
 
@@ -580,8 +580,15 @@ input {
   width: 600px;
   height: auto;
   padding: 10px;
-  margin-bottom: 20px;
+  margin-top: 10px;
 
+}
+.container-info {
+  background-color: #f8f9fa !important;
+  width: 600px;
+  height: auto;
+  padding: 10px;
+  margin-top: 10px;
 }
 
 .user-info-img {
@@ -621,7 +628,7 @@ input {
 
 #profile {
   font-size: 20px;
-  margin-bottom: 12px;
+  padding-top: 2px;
 }
 
 .form-control {
@@ -653,5 +660,6 @@ input {
   background-image: url('../assets/background.png');
   background-repeat: no-repeat;
   background-size: cover;
+  height: 100vh;
 }
 </style>

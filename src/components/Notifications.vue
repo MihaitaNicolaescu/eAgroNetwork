@@ -1,29 +1,29 @@
 <template>
-  <div class="container container-view">
-    <nav class="navbar navbar-light bg-light">
-      <button class="btn btn-outline-secondary" v-on:click="back">Back</button>
-    </nav>
-    <div class="d-flex justify-content-center">
-      <ul style="width: 100%" class="list-group">
-        <li v-for="notification in notifications" :key="notification.id" class="list-group-item">
-          <div class="row">
-            <div class="col-sm-1">
-              <img  v-if="notification.type === 1" :src="backend + notification.link_profile" width="50" height="50" style="object-fit: cover">
-              <p v-if="notification.type === -123" style="font-size: 30px">🎇</p>
-              <p v-if="notification.type === -124" style="font-size: 30px">⚠️</p>
-              <p v-if="notification.type === -122" style="font-size: 30px">⚠️</p>
-              <p v-if="notification.type === -125" style="font-size: 30px">❌️</p>
+  <div class="container-fluid container-view">
+    <div class="d-flex align-items-center flex-column">
+      <nav style="width: 900px; margin-bottom: 10px;" class="navbar navbar-light bg-light">
+        <button class="btn btn-outline-secondary" v-on:click="back">Back</button>
+      </nav>
+    </div>
+    <div class="d-flex align-items-center flex-column notifications">
+      <div style="width: 900px;" class="d-flex justify-content-center">
+        <ul style="width: 100%" class="list-group">
+          <li v-for="notification in notifications" :key="notification.id" class="list-group-item">
+            <div class="row">
+              <div class="col-sm-1">
+                <img  v-if="notification.type === 1" :src="backend + notification.link_profile" width="50" height="50" style="object-fit: cover">
+                <p v-if="notification.type === -123" style="font-size: 30px">🎇</p>
+                <p v-if="notification.type === -124" style="font-size: 30px">⚠️</p>
+                <p v-if="notification.type === -122" style="font-size: 30px">⚠️</p>
+                <p v-if="notification.type === -125" style="font-size: 30px">❌️</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="notification-message"><a class="link" :href="'/profile/' + notification.from">{{ notification.firstName }} {{ notification.lastName }}</a> {{ notification.message }}.</p>
+              </div>
             </div>
-            <div class="col-sm-9">
-
-              <p class="notification-message"><a class="link" :href="'/profile/' + notification.from">{{ notification.firstName }} {{ notification.lastName }}</a> {{ notification.message }}.</p>
-            </div>
-          </div>
-        </li>
-
-      </ul>
-
-
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -84,6 +84,18 @@
     font-size: 20px;
     padding-top: 5px;
 
+  }
+.notifications{
+  overflow: scroll;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  height: 900px;
+}
+  .container-fluid {
+    background-image: url('../assets/background.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
   }
 
 </style>

@@ -42,7 +42,7 @@ class AplicationController extends Controller
             $notification->id_user = $request->user_id;
             $notification->from = $recived['id'];
             $notification->message = "Un administrator ti-a respins aplicatia la gradul de producator.
-            Motivul respingeri este:" . $request->motiv. ".";
+            Motivul respingeri este: " . $request->motiv. ".";
             $notification->read = 0;
             $notification->type = -125;
             $notification->firstName = '';

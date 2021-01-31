@@ -1,7 +1,7 @@
 <template>
   <div style="min-width: 650px;" class="container-fluid container-view">
     <div class="d-flex align-items-center flex-column">
-      <nav style="width: 942px; z-index: 2; position: fixed;" class="navbar navbar-light bg-light">
+      <nav style="width: 888px; z-index: 2; position: fixed;" class="navbar navbar-light bg-light">
         <button class="btn btn-outline-secondary" v-on:click="logout">Log out</button>
         <form style="float: left" class="form-inline my-2 my-lg-0">
           <input class="search-input form-control mr-sm-2 input-search" type="search" placeholder="Search"
@@ -175,7 +175,7 @@
             </div>
           </div>
         </div>
-        <div class="col-2">
+        <div style="left: -3%;" class="col-2">
           <div class="recomandari">
             <p v-if="producers !== null && producers.length !== 0" style="text-align: center; font-weight: bold;">Topul producatorilor in functie de urmaritori</p>
             <ul v-if="producers !== null && producers.length !== 0" class="list-group list-group list-group-flush">
@@ -299,6 +299,7 @@ export default {
     },
     goToNotifications: function () {
       this.$router.push('/notifications');
+      this.markReadNotifications();
     },
     markReadNotifications: function () {
       axios.post(backend + '/api/markReadNotifications', {
@@ -460,18 +461,21 @@ input {
   overflow: scroll;
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+  margin-top: 10px;
 }
 .list-group-item-dark{
   background-color: #f8f9fa !important;
 }
 .posts-container {
   height: 900px;
+  left: 0.9%;
 }
 
 .container-fluid{
   background-image: url('../assets/background.png');
   background-repeat: no-repeat;
   background-size: cover;
+  height: 100vh;
 }
 </style> 
 

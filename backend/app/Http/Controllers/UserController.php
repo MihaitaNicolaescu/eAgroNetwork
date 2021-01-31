@@ -123,6 +123,15 @@ class UserController extends Controller
             $user = User::where('id', '=', $request->producer_id)->first();
             $user->producer = 1;
             $user->save();
+            $notification = new Notification();
+            $notification->id_user = $request->producer_id;
+            $notification->from = $recived['id'];
+            $notification->message = "Un administrator ti-a oferit gradul de producator.";
+            $notification->read = 0;
+            $notification->type = -123;
+            $notification->firstName = '';
+            $notification->lastName = '';
+            $notification->save();
             return response()->json(['message' => 'SUCCESS']);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error on accesing database!'], 417);

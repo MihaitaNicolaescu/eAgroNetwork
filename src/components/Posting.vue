@@ -34,7 +34,7 @@
               <button style="margin-top: 5px;" class="btn btn-success btn-sm" type="button" v-on:click="addComment">Adauga comentariu</button>
             </div>
 
-            <ul class="list-group">
+            <ul class="list-group list-group-flush">
               <li v-for="comment in comments" :key="comment.id" class="list-group-item list-group-flush">
                 <div class="row">
                   <div class="col-sm-1">
@@ -409,6 +409,7 @@ export default{
   width: 600px;
   height: auto;
   padding: 10px;
+  margin-top: 10px;
 
 }
 .user-info{
@@ -449,5 +450,6 @@ export default{
   background-image: url('../assets/background.png');
   background-repeat: no-repeat;
   background-size: cover;
+  height: 100vh;
 }
 </style>
