@@ -181,6 +181,10 @@
                        id="tempBirthday" class="form-control" required>
                 <label class="form-control-placeholder" for="tempBirthday">Zi de naștere</label>
               </div>
+              <div class="custom-file">
+                <input @change="onFileSelected" type="file" class="custom-file-input" id="photo-profile" accept="image/*">
+                <label class="custom-file-label" for="photo-post">Alege fotografia</label>
+              </div>
             </div>
             <div v-if="modalType=== 2 && modalType !== null">
               <p>Daca nu selectati o fotografie, postarea va contine doar descriere.</p>
@@ -489,7 +493,6 @@ export default {
           'Content-Type': 'multipart/form-data'
         }
       }).then(() => {
-        alert('Imaginea a fost actualizata cu succes!');
         this.userPhoto = 'profile_image_' + this.id + '.jpg';
       })
     },
@@ -512,12 +515,12 @@ export default {
 input {
   border-radius: 0;
   border: none;
-  border-bottom: 2px solid #9f5ac7;
+  border-bottom: 2px solid #1b941d;
 }
 
 .form-control:focus {
   border-color: #b5b1c4;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(255, 100, 255, 0.5);
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(35, 196, 38, 0.5);
 }
 
 .form-group {

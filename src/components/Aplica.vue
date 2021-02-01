@@ -345,11 +345,11 @@ export default {
 input {
   border-radius: 0;
   border: none;
-  border-bottom: 2px solid #9f5ac7;
+  border-bottom: 2px solid #1b941d;
 }
 .form-control:focus{
-  border-color: #9f5ac7;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(255, 100, 255, 0.5);
+  border-color: #1b941d;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(35, 196, 38, 0.5);
 }
 .form-group {
   position: relative;

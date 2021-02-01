@@ -2,15 +2,15 @@
   <div style="min-width: 650px;" class="container-fluid container-view">
     <div class="d-flex align-items-center flex-column">
       <nav style="width: 888px; z-index: 2; position: fixed;" class="navbar navbar-light bg-light">
-        <button class="btn btn-outline-secondary" v-on:click="logout">Log out</button>
+        <button class="btn btn-outline-secondary" v-on:click="logout">Deconectare</button>
         <form style="float: left" class="form-inline my-2 my-lg-0">
-          <input class="search-input form-control mr-sm-2 input-search" type="search" placeholder="Search"
+          <input class="search-input form-control mr-sm-2 input-search" type="search" placeholder="Căutare utilizator"
                  aria-label="Search" v-model="query">
           <button class="btn btn-icons  icon-search" type="button"><i class="material-icons">search</i></button>
         </form>
         <div class="ml-auto">
-          <button v-if="isProducer === 0 && isProducer!==null " class="btn btn-success" v-on:click="aplica()">Devino
-            producator
+          <button v-if="isProducer === 0 && isProducer!==null " class="btn btn-success btn-sm" v-on:click="aplica()">Devino
+            producător
           </button>
           <button v-if="admin" class="btn btn-icons" v-on:click="adminPanel"><span class="material-icons">admin_panel_settings</span>
           </button>
@@ -23,7 +23,7 @@
       </nav>
     </div>
     <div class="d-flex align-items-center flex-column">
-      <ul style="margin-top: 60px;" class="list-group list-search" v-if="results.length > 0 && query">
+      <ul style="margin-top: 60px; box-shadow: 0 8px 8px rgba(79,79,79, 0.5);" class="list-group list-search" v-if="results.length > 0 && query">
         <li class="list-group-item search-item" v-for="result in results.slice(0,10)" :key="result.id">
           <a class="link" :href="'/profile/' + result.searchable.id">
             <div class="link-profile" style="display: block ruby;">
@@ -38,7 +38,7 @@
     </div>
 
     <div class="align-items-center flex-column" id="notifications-box">
-      <ul class="list-group list-search list-notifications">
+      <ul style="box-shadow: 0 8px 8px rgba(79,79,79, 0.5);" class="list-group list-search list-notifications">
         <div v-if="hasNotifications === 0">
           <li class="list-group-item">
             <p>Nu ai notificari necitite</p>
@@ -177,7 +177,7 @@
         </div>
         <div style="left: -3%;" class="col-2">
           <div class="recomandari">
-            <p v-if="producers !== null && producers.length !== 0" style="text-align: center; font-weight: bold;">Topul producatorilor in functie de urmaritori</p>
+            <p v-if="producers !== null && producers.length !== 0" style="text-align: center; font-weight: bold;">Topul producătorilor în funcție de urmăritori</p>
             <ul v-if="producers !== null && producers.length !== 0" class="list-group list-group list-group-flush">
               <li v-for="producer in producers" :key="producer.id" class="list-group-item list-group-item-dark list-group-flush">
                 <div class="row" style="margin-top: 5px">
@@ -442,15 +442,15 @@ export default {
 }
 
 .form-control:focus {
-  border-color: #9f5ac7;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(255, 100, 255, 0.5);
+  border-color: #1b941d;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(35, 196, 38, 0.5);
 }
 
 input {
   margin-left: 20px;
   border-radius: 0;
   border: none;
-  border-bottom: 2px solid #9f5ac7;
+  border-bottom: 2px solid #1b941d;
   background: #f8f9fa !important
 }
 
