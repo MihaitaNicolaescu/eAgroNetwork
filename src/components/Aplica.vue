@@ -5,7 +5,7 @@
         <button class="btn btn-home" v-on:click="home"><span class="material-icons">home</span></button>
       </nav>
     </div>
-    <div class="container aplication">
+    <div class="container shadow-sm aplication">
       <h3 style="text-align: center; margin-bottom: 35px;">Aplicatie pentru gradul de producator</h3>
       <div class="edit"
            v-if="checkIfHasAplication === false || (application !== null && application.pending === 0 && application.status !== -1)">
@@ -153,6 +153,7 @@
 import {backend} from '@/constants.js';
 import axios from 'axios';
 import alertBox from './templates/invalidToken';
+
 
 export default {
   data() {
@@ -373,8 +374,9 @@ input {
 .aplication{
   background-color: #f8f9fa !important;
   width: 700px;
-  height: 670px;
+  height: 700px;
   margin-top: 10px;
+  box-shadow: 0 1rem 3rem rgba(0,0,0,.3) !important;
 }
 .form-control {
   flex: none;

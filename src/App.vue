@@ -5,7 +5,8 @@
 </template>
 
 <script>
-
+import 'bootstrap';
+import '@popperjs/core';
 export default {
   data(){
     return{
