@@ -73,7 +73,7 @@ export default {
           email: this.email,
         }).then(()=>{
           this.title = "Resetare parola";
-          this.content = "Pe email-ul introdus de dumneavoastra a fost trimis un email care contine datele pentru resetarea aprolei." +
+          this.content = "Pe email-ul introdus de dumneavoastra a fost trimis un email care contine datele pentru resetarea parolei." +
               " Daca nu primiti email-ul verificati si in spam."
           // eslint-disable-next-line no-undef
           $('#verifyModal').modal('show');

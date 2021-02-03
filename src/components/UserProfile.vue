@@ -11,7 +11,7 @@
         <div class="d-flex align-items-left">
             <div style="left: 9.65%" class="col-3 left-info">
               <div id="profile">
-                <img v-if="user !== null" style="margin-top: 10px;" alt="profile image" class="profile-image"
+                <img v-if="user !== null" style="margin-top: 10px; margin-left: 10%" alt="profile image" class="profile-image"
                      :src="backend + user.link_profile">
                 <div id="profile-info">
                   <p style="font-weight: bold; font-size: 14px; margin: 0;">Nume</p>

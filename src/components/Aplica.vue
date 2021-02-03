@@ -381,6 +381,7 @@ input {
 .form-control {
   flex: none;
   display: flex;
+  font-weight: normal;
 }
 
 .input-group {

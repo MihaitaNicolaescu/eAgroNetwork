@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="d-flex align-items-center flex-column">
       <nav style="width: 896px" class="navbar navbar-light bg-light">
-        <button style="" class="btn btn-outline-secondary" v-on:click="home">Home</button>
+        <button style="" class="btn btn-outline-secondary" v-on:click="home">Acasă</button>
       </nav>
     </div>
     <div class="container">
@@ -19,10 +19,10 @@
                 <p class="info">{{ email }}</p>
                 <p style="font-weight: bold; font-size: 14px; margin: 0;">Judet</p>
                 <p class="info">{{ judet }}</p>
-                <p style="font-weight: bold; font-size: 14px; margin: 0;">Data nasterii</p>
+                <p style="font-weight: bold; font-size: 14px; margin: 0;">Data nașterii</p>
                 <p class="info">{{ formatDate(birthday) }}</p>
-                <p style="font-weight: bold; font-size: 14px; margin: 0;">Numar urmaritori</p>
-                <p class="info">{{ fallowers }}</p>
+                <p v-if="isProducer !== 0" style="font-weight: bold; font-size: 14px; margin: 0;">Numar urmaritori</p>
+                <p v-if="isProducer !== 0" class="info">{{ fallowers }}</p>
               </div>
             </div>
             <button style="width: 100%; margin-bottom: 5px;" class="btn btn-secondary btn-sm" v-on:click="on()">Editează
@@ -90,10 +90,10 @@
               <div v-if="isProducer === 0 && isProducer!==null">
                 <img alt="logo_cos" class="logo d-flex align-items-center flex-column" src="../assets/Logo_cos.png">
               </div>
-              <p v-if="isProducer === 0 && isProducer!=null" class="info-paragraph">Daca esti un producator local poti sa
-                trimiti un formular pentru a primi gradul de producator pe aplicatie. Detinatorii acestui grad au
-                posibilitatea sa posteze fotografii
-                cu produsele agricole si sa poata primi recenzi de la alti utilizatori.
+              <p v-if="isProducer === 0 && isProducer!=null" class="info-paragraph">Dacă ești un producător local poți să
+                trimiți un formular pentru a primi gradul de producător pe aplicație. Deținătorii acestui grad au
+                posibilitatea să posteze fotografii
+                cu produsele agricole și să poată primi recenzi de la alți utilizatori.
               </p>
             </div>
           </div>
@@ -173,8 +173,13 @@
                 <label class="form-control-placeholder" for="tempLName">Prenume</label>
               </div>
               <div class="form-group">
-                <input v-model="tempJudet" id="tempJudet" type="text" class="form-control" required>
-                <label class="form-control-placeholder" for="tempJudet">Județ</label>
+                <div class="input-group mb-3">
+                  <select style="margin-top: 10px;" v-model="tempJudet" class="custom-select" id="tempJudet">
+                    <option selected>Judet</option>
+                    <option v-for="(judet, index) in judete" :key="index" v-bind:value="judet.nume">{{judet.nume}}</option>
+                  </select>
+                </div>
+                <label style="font-size: 15px;transform: translate3d(0, -100%, 0);opacity: 1;" class="form-control-placeholder" for="tempJudet">Județ</label>
               </div>
               <div class="form-group">
                 <input v-model="tempBirthday" onfocusout="(this.type='text')" onfocus="(this.type='date')"
@@ -214,6 +219,7 @@
 <script>
 import {backend} from '@/constants.js';
 import axios from 'axios';
+import judete from '../judete.json';
 
 export default {
   data() {
@@ -224,6 +230,7 @@ export default {
       userPhoto: 'default.jpg',
       firstName: '',
       lastName: '',
+      judete: judete,
       email: '',
       judet: '',
       birthday: '',
@@ -545,8 +552,8 @@ input {
 
 /*Fonts from frontend server*/
 @font-face {
-  font-family: "NerkoOne";
-  src: url("../fonts/NerkoOne-Regular.ttf");
+  font-family: "NotoSerif-Italic";
+  src: url("../fonts/NotoSerif-Italic.ttf");
 }
 
 .logo {
@@ -557,6 +564,7 @@ input {
 .info-paragraph {
   font-size: 30px;
   text-align: center;
+  font-family: NotoSerif-Italic,sans-serif;
 
 }
 
@@ -636,7 +644,7 @@ input {
 
 .form-control {
   font-size: 20px !important;
-  font-weight: bold;
+  font-weight: normal;
 }
 
 .profile-image {
@@ -664,5 +672,16 @@ input {
   background-repeat: no-repeat;
   background-size: cover;
   height: 100vh;
+}
+select:focus{
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(35, 196, 38, 0.5) !important;
+}
+
+select{
+  border: 0;
+  border-bottom: 2px #1b941d solid !important;
+  border-radius: 0;
+  margin-bottom: 20px;
+  margin-top: -10px;
 }
 </style>
