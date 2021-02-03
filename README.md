@@ -1,4 +1,8 @@
-# proiect-licenta
+# Aplicatie dinamica utilizand Vue.js (Promovare producatori locali)
+
+##Youtube
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/GMQlSrAOvsk/0.jpg)](https://www.youtube.com/watch?v=GMQlSrAOvsk)
 
 ## Project setup
 ```
