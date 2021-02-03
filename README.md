@@ -1,6 +1,6 @@
 # Aplicatie dinamica utilizand Vue.js (Promovare producatori locali)
 
-## Youtube
+## Youtube video with project
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/GMQlSrAOvsk/0.jpg)](https://www.youtube.com/watch?v=GMQlSrAOvsk)
 
