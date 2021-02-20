@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="d-flex align-items-center flex-column">
       <nav style="width: 896px" v-if="invalidUser === false" class="navbar navbar-light bg-light">
-        <button style="" class="btn btn-outline-secondary" v-on:click="home">Home</button>
+        <a href="/"><img src="@/assets/Logo.png" alt="Logo" width="50px"></a>
       </nav>
     </div>
     <div class="container">

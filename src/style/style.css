@@ -14,8 +14,9 @@
         object-fit: cover;
     }
     .icon-search{
-        margin-left: -50px;
         background: transparent;
+        box-shadow: none;
+        outline: none!important;
     }
     .input-search{
         width: 400px;

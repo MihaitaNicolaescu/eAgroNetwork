@@ -1,5 +1,5 @@
 <template>
-  <div class="container-flex">
+  <div class="container">
     <nav class="navbar navbar-light bg-light">
       <button class="btn btn-outline-secondary" v-on:click="back">Back</button>
     </nav>

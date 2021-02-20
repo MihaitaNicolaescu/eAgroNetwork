@@ -2,7 +2,8 @@
   <div class="container-fluid container-view">
     <div class="d-flex align-items-center flex-column">
       <nav style="width: 900px; margin-bottom: 10px;" class="navbar navbar-light bg-light">
-        <button class="btn btn-outline-secondary" v-on:click="back">Back</button>
+        <a href="/"><img src="@/assets/Logo.png" alt="Logo" width="50px"></a>
+        <h2>Notificări</h2>
       </nav>
     </div>
     <div class="d-flex align-items-center flex-column notifications">

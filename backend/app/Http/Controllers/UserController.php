@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Recovery;
+use App\Models\Review;
 use App\Models\User;
 use App\Models\Notification;
 use http\Exception;
@@ -294,9 +295,20 @@ class UserController extends Controller
             return response()->json(['error' => $e->getMessage()], 401);
         }
         try {
-            $user = User::where('producer', 1)->where('judet', 'like', '%' . $recived['judet'] . '%')->where('id', '!=', $recived['id'])
+            $producers = User::where('producer', 1)->where('judet', 'like', '%' . $recived['judet'] . '%')->where('id', '!=', $recived['id'])
                 ->select('firstName', 'lastName', 'id', 'link_profile')->where('banned', '=', 0)->orderBy('fallowers', 'desc')->get();
-            return response()->json(['producers' => $user], 200);
+            //calculare punctaj revew pentru fiecare producator;
+            $reviewDetails = [];
+            foreach($producers as $producer){
+                $sum = Review::where('user_id', $producer->id)->avg('rating');
+                $allReviews = Review::where('user_id', $producer->id)->get();
+                $allReviews = $allReviews->count();
+                $sum = number_format($sum,2);
+                $user = [];
+                array_push($user, $allReviews, $sum);
+                array_push($reviewDetails, $user);
+            }
+            return response()->json(['producers' => $producers, 'score' => $reviewDetails], 200);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error on save data in database!'], 417);
         }

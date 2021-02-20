@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="/">Home</a>
+      <a href="/"><img src="@/assets/Logo.png" alt="Logo" width="50px"></a>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
@@ -15,7 +15,7 @@
           <form class="search-user d-flex justify-content-center">
             <input v-model="searchedUser" class="form-control mr-sm-2 input-search" type="search"
                    placeholder="Cautati un utilizator" aria-label="Search">
-            <button style="border: 0; background: transparent; color:black;" v-if="!active || active != 1"
+            <button style="border: 0; background: transparent; color:black;" v-if="!active || active !== 1"
                     class="btn search-btn" type="button" v-on:click="searchUser()"><i
                 class="material-icons icon-search">search</i></button>
           </form>
@@ -48,9 +48,24 @@
           <td v-if="user.producer == true"><span class="material-icons">done_outline</span></td>
           <td v-else><span class="material-icons">clear</span></td>
           <td>
-            <button data-toggle="modal" data-target="#modal-user" class="btn btn-secondary"
-                    v-on:click="actualUser(user.id, index)">Administrare
+            <button class="btn btn-danger btn-modal" type="button" v-on:click="deleteUser(user.id, index)">Sterge
+              utilizator
             </button>
+              <button v-if="user.producer === 1" class="btn btn-danger btn-modal" type="button"
+                      v-on:click="cancelProducer(user.id)">Sterge grad de producator
+              </button>
+              <button v-if="user.producer === 0" class="btn btn-danger btn-modal" type="button"
+                      v-on:click="giveProducer(user.id)">Adauga grad de producator
+              </button>
+              <button v-if="user.banned === 0" class="btn btn-danger btn-modal"
+                      v-on:click="confirm_ban(user.id)">Ban
+              </button>
+              <button v-if="user.banned === 1" class="btn btn-danger btn-modal"
+                      v-on:click="unbanUser(user.id)">Unban
+              </button>
+              <button v-if="user.banned === 0" class="btn btn-warning btn-modal"
+                      v-on:click="confirm_warn(user.id)">Avertizare
+              </button>
           </td>
         </tr>
         </tbody>
@@ -154,45 +169,6 @@
           </div>
         </div>
       </div>
-      <!-- Modal pentru administrarea unui user -->
-      <div class="modal fade bd-example-modal-sm" id="modal-user" tabindex="-1" role="dialog"
-           aria-labelledby="modal-user" aria-hidden="true">
-        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="modal-user-title">Administrare utilizator</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div style="display: grid;" class="modal-body">
-              <button class="btn btn-danger btn-modal" type="button" v-on:click="deleteUser(actualUserId)">Sterge
-                utilizator
-              </button>
-              <div v-if="this.actualUserIndex !== null && this.actualUserId !== null">
-                <button v-if="users[this.actualUserIndex].producer === 1" class="btn btn-danger btn-modal" type="button"
-                        v-on:click="cancelProducer(actualUserId)">Sterge grad de producator
-                </button>
-                <button v-if="users[this.actualUserIndex].producer === 0" class="btn btn-danger btn-modal" type="button"
-                        v-on:click="giveProducer(actualUserId)">Adauga grad de producator
-                </button>
-                <button v-if="users[this.actualUserIndex].banned === 0" class="btn btn-danger btn-modal"
-                        v-on:click="confirm_ban()">Ban
-                </button>
-                <button v-if="users[this.actualUserIndex].banned === 1" class="btn btn-danger btn-modal"
-                        v-on:click="unbanUser(actualUserId)">Unban
-                </button>
-                <button v-if="users[this.actualUserIndex].banned === 0" class="btn btn-warning btn-modal"
-                        v-on:click="confirm_warn">Avertizare
-                </button>
-              </div>
-            </div>
-            <div class="modal-footer d-flex align-items-center flex-column">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Inchide</button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
     <alert-box></alert-box>
     <div id="confirm-box">
@@ -243,9 +219,8 @@ export default {
     'alert-box': alertBox,
   },
   methods: {
-    confirm_warn: function () {
-      // eslint-disable-next-line no-undef
-      $('#modal-user').modal('hide');
+    confirm_warn: function (userID) {
+      this.actualUserId = userID;
       // eslint-disable-next-line no-undef
       $('#modal-confirm-warn').modal('show');
     },
@@ -268,9 +243,8 @@ export default {
         console.log(error)
       })
     },
-    confirm_ban: function () {
-      // eslint-disable-next-line no-undef
-      $('#modal-user').modal('hide');
+    confirm_ban: function (userID) {
+      this.actualUserId = userID;
       // eslint-disable-next-line no-undef
       $('#modal-confirm-ban').modal('show');
     },
@@ -309,8 +283,6 @@ export default {
         reason: reason,
       }).then(() => {
         // eslint-disable-next-line no-undef
-        $('#modal-user').modal('hide');
-        // eslint-disable-next-line no-undef
         $('#modal-confirm-ban').modal('hide');
         // eslint-disable-next-line no-undef
         $('#modal-ban-user').modal('show');
@@ -327,8 +299,6 @@ export default {
         token: localStorage.getItem('token'),
         userID: userID,
       }).then(() => {
-        // eslint-disable-next-line no-undef
-        $('#modal-user').modal('hide');
         this.getUsers();
       }).catch((error) => {
         console.log(error)
@@ -340,18 +310,14 @@ export default {
     reports: function () {
       this.$router.push('/admin/reports');
     },
-    deleteUser: function (id) {
-      if (this.users[this.actualUserIndex].banned === 1) {
+    deleteUser: function (id, index) {
+      if (this.users[index].banned === 1) {
         axios.post(backend + '/api/admin/delete', {
           id: id,
         }).then(() => {
-          // eslint-disable-next-line no-undef
-          $('#modal-user').modal('hide');
           this.getUsers();
         })
       } else {
-        // eslint-disable-next-line no-undef
-        $('#modal-user').modal('hide');
         // eslint-disable-next-line no-undef
         $('#modal-info-delete-user').modal('show');
       }
@@ -428,4 +394,5 @@ export default {
 .cancel-search {
   width: 50px;
 }
+
 </style>

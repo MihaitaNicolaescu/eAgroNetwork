@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="d-flex align-items-center flex-column">
       <nav style="width: 700px" class="navbar navbar-light bg-light">
-        <button class="btn btn-home" v-on:click="home"><span class="material-icons">home</span></button>
+        <a href="/"><img src="@/assets/Logo.png" alt="Logo" width="50px"></a>
       </nav>
     </div>
     <div class="container shadow-sm aplication">

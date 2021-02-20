@@ -2,23 +2,28 @@
   <div style="min-width: 650px;" class="container-fluid container-view">
     <div class="d-flex align-items-center flex-column">
       <nav style="width: 888px; z-index: 2; position: fixed;" class="navbar navbar-light bg-light">
-        <button class="btn btn-outline-secondary" v-on:click="logout">Deconectare</button>
+        <a href="/"><img src="@/assets/Logo.png" alt="Logo" width="50px"></a>
         <form style="float: left" class="form-inline my-2 my-lg-0">
           <input class="search-input form-control mr-sm-2 input-search" type="search" placeholder="Căutare utilizator"
                  aria-label="Search" v-model="query">
-          <button class="btn btn-icons  icon-search" type="button"><i class="material-icons">search</i></button>
         </form>
         <div class="ml-auto">
           <button v-if="isProducer === 0 && isProducer!==null " class="btn btn-success btn-sm" v-on:click="aplica()">Devino
             producător
           </button>
-          <button v-if="admin" class="btn btn-icons" v-on:click="adminPanel"><span class="material-icons">admin_panel_settings</span>
-          </button>
-          <button class="btn btn-icons" v-on:click="profile"><span class="material-icons">account_circle</span></button>
-          <button v-if="this.hasNotifications === 1" v-on:click="showNotifications()" class="btn btn-icons"><span
+          <button id="adminPanel" v-show="admin" type="button" class="btn btn-icons" data-trigger="hover" data-toggle="tooltip" data-placement="bottom" title="Administrare aplicațe" v-on:click="adminPanel"><span class="material-icons">admin_panel_settings</span></button>
+          <button type="button" data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Notificări" v-show="this.hasNotifications === 1" v-on:click="showNotifications()" class="btn btn-icons"><span
               class="material-icons">mark_email_unread</span></button>
-          <button v-if="this.hasNotifications === 0" class="btn btn-icons" v-on:click="showNotifications()"><span
-              class="material-icons">email</span></button>
+          <button type="button" data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Notificări" v-show="this.hasNotifications === 0" class="btn btn-icons" v-on:click="showNotifications()"><span class="material-icons">email</span></button>
+          <div class="dropdown d-inline">
+            <button data-tooltip="tooltip" title="Profil" data-trigger="hover" data-placement="bottom" class="btn btn-icons" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="material-icons">account_circle</span>
+            </button>
+            <div style="left: -127px;" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="/profile">Accesare profil</a>
+              <a style="cursor:pointer;" class="dropdown-item" v-on:click="logout">Deconectare</a>
+            </div>
+          </div>
         </div>
       </nav>
     </div>
@@ -179,8 +184,9 @@
           <div class="recomandari">
             <p v-if="producers !== null && producers.length !== 0" style="text-align: center; font-weight: bold;">Topul producătorilor în funcție de urmăritori</p>
             <ul v-if="producers !== null && producers.length !== 0" class="list-group list-group list-group-flush">
-              <li v-for="producer in producers" :key="producer.id" class="list-group-item list-group-item-dark list-group-flush">
-                <div class="row" style="margin-top: 5px">
+              <li v-for="(producer, index) in producers" :key="producer.id" class="list-group-item list-group-item-dark list-group-flush">
+                <a class="producers-li" style="text-decoration: none; color: black" :href="'/profile/' + producer.id">
+                  <div class="row" style="margin-top: 5px">
                   <div class="col-sm-2">
                     <div class="user-info">
                       <img data-v-8dc7cce2="" alt="user profile photo" :src="backend + producer.link_profile"
@@ -190,11 +196,20 @@
                   <div style="margin-left: 20px" class="col-8">
                     <p style="margin: 0; word-wrap: break-word; font-size: 15px; font-weight: bold;">
                       {{ producer.firstName }} {{ producer.lastName }}</p>
-                    <button style="width: 100%" class="btn btn-sm btn-success"><a
-                        style="text-decoration: none; color: white" :href="'/profile/' + producer.id">Vizualizare
-                      profil</a></button>
+                    <div v-if="producersScore[index][0] !== 0" class="d-inline">
+                      <div class="d-inline" v-for="i in 5" :key="i">
+                        <span v-if="i <=producersScore[index][1]" style="color: #f9bf3b;; font-size: 20px" class="material-icons">grade</span>
+                        <span v-else style="font-size: 20px; color: #b0acac;" class="material-icons">grade</span>
+                      </div>
+                    </div>
+                    <span v-if="producersScore[index][0] >= 1" style="font-size: 13px;">{{ producersScore[index][1] }}</span>
+                    <div v-if="producersScore[index][0] >= 1">
+                      <p v-if="producersScore[index][0] === 1" style="margin-top: -8px; margin-bottom: 0; font-size: 13px;">Un review</p>
+                      <p v-else style="margin-top: -8px; margin-bottom: 0; font-size: 13px;">{{producersScore[index][0]}} review-uri</p>
+                    </div>
                   </div>
                 </div>
+                </a>
               </li>
             </ul>
             <p style="text-align: center;" v-if="producers !== null && producers.length === 0">Momentan nu sunt
@@ -211,6 +226,14 @@
 import alertBox from './templates/invalidToken';
 import axios from 'axios';
 import {backend} from '@/constants.js';
+// eslint-disable-next-line no-undef
+$(function () {
+  // eslint-disable-next-line no-undef
+  $('[data-toggle="tooltip"]').tooltip();
+  // eslint-disable-next-line no-undef
+  $('[data-tooltip="tooltip"]').tooltip();
+
+})
 
 export default {
   data() {
@@ -225,6 +248,7 @@ export default {
       notifications: [],
       producers: null,
       backend: backend,
+      producersScore: null,
     }
   },
   components: {
@@ -290,6 +314,7 @@ export default {
         }
       }).then((res) => {
         this.producers = res.data['producers'];
+        this.producersScore = res.data['score'];
       }).catch((error) => {
         console.log(error);
       })
@@ -406,6 +431,8 @@ export default {
       this.$router.push('profile');
     },
     adminPanel: function () {
+      // eslint-disable-next-line no-undef
+      $('#adminPanel').tooltip('hide')
       this.$router.push('admin');
     },
     aplica: function () {
@@ -436,7 +463,10 @@ export default {
 
 @import '../style/style.css';
 @import '../style/screenSizes.css';
-
+@font-face {
+  font-family: "NotoSerif-Italic";
+  src: url("../fonts/NotoSerif-Italic.ttf");
+}
 ::-webkit-scrollbar {
   display: none;
 }
@@ -466,6 +496,10 @@ input {
 .list-group-item-dark{
   background-color: #f8f9fa !important;
 }
+
+.list-group-item-dark:hover{
+  background-color: #e8e8e8 !important;
+}
 .posts-container {
   height: 900px;
   left: 0.9%;
@@ -476,6 +510,10 @@ input {
   background-repeat: no-repeat;
   background-size: cover;
   height: 100vh;
+}
+.btn-icons:focus, .btn-icons:active{
+  outline: none!important;
+  box-shadow: none;
 }
 </style> 
 
