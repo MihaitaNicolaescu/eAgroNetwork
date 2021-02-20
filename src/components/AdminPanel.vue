@@ -1,14 +1,17 @@
 <template>
   <div class="container">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a href="/"><img src="@/assets/Logo.png" alt="Logo" width="50px"></a>
+      <a href="/"><img src="@/assets/Logo.png" alt="Logo" style="width: 50px;"></a>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a disabled style="font-weight: bold;" class="nav-link">Utilizatori</a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="/admin/reports">Raportari</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link disabled" href="/admin/applications">Aplicatii</a>
+            <a class="nav-link" href="/admin/applications">Aplicatii</a>
           </li>
         </ul>
         <form class="form-inline my-2 my-lg-0">
@@ -45,39 +48,23 @@
           <td>{{ user.firstName }}</td>
           <td>{{ user.lastName }}</td>
           <td>{{ user.email }}</td>
-          <td v-if="user.producer == true"><span class="material-icons">done_outline</span></td>
+          <td v-if="user.producer === true"><span class="material-icons">done_outline</span></td>
           <td v-else><span class="material-icons">clear</span></td>
           <td>
-            <button class="btn btn-danger btn-modal" type="button" v-on:click="deleteUser(user.id, index)">Sterge
-              utilizator
-            </button>
-              <button v-if="user.producer === 1" class="btn btn-danger btn-modal" type="button"
-                      v-on:click="cancelProducer(user.id)">Sterge grad de producator
-              </button>
-              <button v-if="user.producer === 0" class="btn btn-danger btn-modal" type="button"
-                      v-on:click="giveProducer(user.id)">Adauga grad de producator
-              </button>
-              <button v-if="user.banned === 0" class="btn btn-danger btn-modal"
-                      v-on:click="confirm_ban(user.id)">Ban
-              </button>
-              <button v-if="user.banned === 1" class="btn btn-danger btn-modal"
-                      v-on:click="unbanUser(user.id)">Unban
-              </button>
-              <button v-if="user.banned === 0" class="btn btn-warning btn-modal"
-                      v-on:click="confirm_warn(user.id)">Avertizare
-              </button>
+            <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Sterge utilizator" class="btn btn-danger btn-modal" type="button" v-on:click="deleteUser(user.id, index)"><span class="material-icons">delete_forever</span></button>
+            <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Scoate gradul de producator" v-if="user.producer === 1" class="btn btn-danger btn-modal" type="button" v-on:click="cancelProducer(user.id)"><span class="material-icons">do_disturb</span></button>
+            <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Adauga gradul de producator" v-if="user.producer === 0" class="btn btn-danger btn-modal" type="button" v-on:click="giveProducer(user.id)"><span class="material-icons">control_point</span></button>
+            <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Baneaza utilizatorul" v-if="user.banned === 0" class="btn btn-danger btn-modal" v-on:click="confirm_ban(user.id)"><span class="material-icons">do_disturb_on</span></button>
+            <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Debaneaza utilizatorul"  v-if="user.banned === 1" class="btn btn-danger btn-modal" v-on:click="unbanUser(user.id)"><span class="material-icons">do_disturb_off</span></button>
+            <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Acorda avertisment" v-if="user.banned === 0" class="btn btn-warning btn-modal" v-on:click="confirm_warn(user.id)"><span class="material-icons">warning_amber</span></button>
           </td>
         </tr>
         </tbody>
       </table>
       <div class="pagination d-flex justify-content-center">
-        <button class="btn btn-outline-secondary" v-on:click="fetchPaginateUsers(pagination.prev_page)"
-                :disabled="!pagination.prev_page">Previos
-        </button>
+        <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Pagina anterioara" class="btn btn-outline-secondary pagination-button" v-on:click="fetchPaginateUsers(pagination.prev_page)" :disabled="!pagination.prev_page"><span class="material-icons">undo</span></button>
         <span>Page {{ pagination.current_page }} of {{ pagination.last_page }}</span>
-        <button class="btn btn-outline-secondary" v-on:click="fetchPaginateUsers(pagination.next_page)"
-                :disabled="!pagination.next_page">Next
-        </button>
+        <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Pagina urmatoare" class="btn btn-outline-secondary pagination-button" v-on:click="fetchPaginateUsers(pagination.next_page)" :disabled="!pagination.next_page"><span class="material-icons">redo</span></button>
       </div>
       <!-- Modal ban user -->
       <div class="modal fade" id="modal-info-user" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
@@ -185,7 +172,13 @@ import alertBox from './templates/invalidToken';
 import axios from 'axios';
 import {backend} from '@/constants.js';
 
-export default {
+// eslint-disable-next-line no-undef
+$(function(){
+  // eslint-disable-next-line no-undef
+  $('body').tooltip({ selector: '[data-toggle="tooltip"]' });
+});
+
+  export default {
   data() {
     return {
       url: backend + '/api/admin/users',
@@ -201,6 +194,13 @@ export default {
   },
 
   mounted() {
+    // eslint-disable-next-line no-undef
+    $(document).ready(function(){
+      // eslint-disable-next-line no-undef
+      $('[data-toggle="tooltip"]').tooltip();
+      // eslint-disable-next-line no-undef
+      $('[data-tooltip="tooltip"]').tooltip();
+    });
     //verificarea userului pentru a se determina daca este un administrator valid
     axios.get(backend + '/api/verifyData', {
       params: {
@@ -213,7 +213,8 @@ export default {
     }).catch(() => {
       this.$router.push('/');
     })
-    //
+    // eslint-disable-next-line no-undef
+    $("[data-toggle=tooltip]").tooltip();
   },
   components: {
     'alert-box': alertBox,
@@ -323,7 +324,7 @@ export default {
       }
     },
     searchUser: function () { // functie pentru a cauta un anumit utilizator
-      if (this.searchedUser != '') {
+      if (this.searchedUser !== '') {
         this.getUsers();
         this.active = 1;
       }
@@ -341,7 +342,7 @@ export default {
       axios.get(this.url, {params: {searchedUser: this.searchedUser}}).then(response => {
         this.users = response.data.data
         $this.makePagination(response.data)
-        if (this.users.length == 0) {
+        if (this.users.length === 0) {
           //alert("Utilizatorul cautat nu exista in baza de date");
           this.usersButton();
         }
@@ -366,8 +367,15 @@ export default {
 
 <style scoped>
 .btn-modal {
-  margin-bottom: 5px;
-  width: 100%;
+  margin-left: 10px;
+  background-color: transparent;
+  color: black;
+  border: none;
+}
+
+.btn-modal:active, .btn-modal:focus{
+  outline: none!important;
+  box-shadow: none;
 }
 
 .input-search {
@@ -394,5 +402,14 @@ export default {
 .cancel-search {
   width: 50px;
 }
-
+.pagination-button{
+  background-color: transparent;
+  color: black;
+  font-size: 20px;
+  border: none;
+}
+.pagination-button:active, .pagination-button:focus{
+  outline: none!important;
+  box-shadow: none;
+}
 </style>

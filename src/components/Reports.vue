@@ -1,7 +1,20 @@
 <template>
   <div class="container">
-    <nav class="navbar navbar-light bg-light">
-      <button class="btn btn-outline-secondary" v-on:click="back">Back</button>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a href="/"><img src="@/assets/Logo.png" alt="Logo" style="width: 50px;"></a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/admin">Utilizatori</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" style="font-weight: bold">Raportari</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/applications">Aplicatii</a>
+          </li>
+        </ul>
+      </div>
     </nav>
     <div v-if="reports !== null && reports.length === 0">
       <h2>Momentan nu sunt raportari.</h2>

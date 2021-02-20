@@ -227,13 +227,12 @@ import alertBox from './templates/invalidToken';
 import axios from 'axios';
 import {backend} from '@/constants.js';
 // eslint-disable-next-line no-undef
-$(function () {
+$(document).ready(function(){
   // eslint-disable-next-line no-undef
   $('[data-toggle="tooltip"]').tooltip();
   // eslint-disable-next-line no-undef
   $('[data-tooltip="tooltip"]').tooltip();
-
-})
+});
 
 export default {
   data() {
