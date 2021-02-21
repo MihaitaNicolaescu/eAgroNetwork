@@ -60,6 +60,26 @@ export default new Router({
                 
         },
         {
+            path: '/report/post/:id',
+            name: 'reportpost',
+            component: () => import('./components/ReportPost.vue'),
+            beforeEnter: (to, from, next) => {
+                if(!localStorage.getItem('token')) next('/login')
+                else next();
+            }
+
+        },
+        {
+            path: '/report/profile/:id',
+            name: 'reportprofile',
+            component: () => import('./components/ReportProfile.vue'),
+            beforeEnter: (to, from, next) => {
+                if(!localStorage.getItem('token')) next('/login')
+                else next();
+            }
+
+        },
+        {
             path: '/admin/reports',
             name: 'reports',
             component: () => import('./components/Reports.vue'),

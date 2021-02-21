@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Review;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Product;
@@ -52,6 +53,7 @@ class DetailsController extends Controller
     public function deleteUser(Request $request)
     {
         try {
+            Review::where('reviewer_id', '=', $request->id)->delete();
             $user = User::where('id', $request->id)->first();
             error_log($request->id);
             $user->delete();

@@ -9,105 +9,105 @@
       <div v-if="invalidUser === false && isBanned === 0" class="d-flex align-items-left flex-column"
            style="height: 100px;">
         <div class="d-flex align-items-left">
-            <div style="left: 9.65%" class="col-3 left-info">
-              <div id="profile">
-                <img v-if="user !== null" style="margin-top: 10px; margin-left: 10%" alt="profile image" class="profile-image"
-                     :src="backend + user.link_profile">
-                <div id="profile-info">
-                  <p style="font-weight: bold; font-size: 14px; margin: 0;">Nume</p>
-                  <p class="info">{{ firstName }}</p>
-                  <p style="font-weight: bold; font-size: 14px; margin: 0;">Prenume</p>
-                  <p class="info">{{ lastName }}</p>
-                  <p style="font-weight: bold; font-size: 14px; margin: 0;">Email</p>
-                  <p class="info">{{ email }}</p>
-                  <p style="font-weight: bold; font-size: 14px; margin: 0;">Judet</p>
-                  <p class="info">{{ judet }}</p>
-                  <p style="font-weight: bold; font-size: 14px; margin: 0;">Data nasterii</p>
-                  <p class="info">{{ formatDate(birthday) }}</p>
-                  <p v-if="isProducer === 1" class="info">Producator atestat <img style="width:45px"
-                                                                                  src="../assets/Logo.png"></p>
-                  <p v-if="isProducer === 1 && fallowers > 0" class="info">Urmaritori <strong>{{ fallowers }}</strong>
-                  </p>
-                </div>
-                <button v-if="!fallowed && fallowed!=null && isProducer === 1 && visitorID !== id" style="width: 100%"
-                        class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste
-                </button>
-                <button v-if="fallowed && fallowed!=null && isProducer === 1 && visitorID !== id" style="width: 100%"
-                        class="btn btn-danger btn-sm" type="button" v-on:click="cancelFallow()">Nu mai urmari
-                </button>
-                <button v-if="visitorID !== id" class="btn btn-danger btn-sm" type="button"
-                        style="margin-top: 5px; width: 100%;" data-toggle="modal" data-target="#reportModal">Raporteaza
-                  utilizatorul
-                </button>
-                <button v-if="isProducer === 1 && this.id !== this.visitorID"
-                        style="margin-bottom: 10px; margin-top: 5px; width: 100%;" type="button"
-                        class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalReview"
-                        v-on:click="show_MyReview">Scrie o recenzie producatorului
-                </button>
-                <div v-if="reviews!==null" class="review-form-users">
-                  <div v-for="review in reviews" :key="review.id">
-                    <div class="row" style="margin-top: 5px">
-                      <div class="col-sm-1">
-                        <div class="user-info">
-                          <img v-if="review !== null" style="width: 50px; height: 50px;" class="profile-image"
-                               :src="backend + review.link_profile">
-                        </div>
-                      </div>
-                      <div class="col-9">
-                        <p style="margin-left: 25px; word-wrap: break-word; font-size: 12px;"><a style="color: black;
-                                   text-decoration: none; font-weight: bold" :href="'/profile/'+review.reviewer_id">{{
-                            review.firstName
-                          }}
-                          {{ review.lastName }}</a><br>{{ review.message }}
-                          <br><span v-for="n in review.rating" :key="n" style="font-size: 15px;" class="material-icons"
-                                    :id="'starRev'+ n">star_rate</span></p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div id="posts" class="col-7">
-              <div v-for="(post, index) in userPosts" :key="post.id">
-                <div class="container-post sn p-3">
-                  <div class="user-info">
-                    <div class="row">
-                      <div class="col-3">
-                        <img alt="user profile photo" class="user-info-img" :src="backend + user.link_profile">
-                      </div>
-                      <div class="col">
-                        <p style="margin: 0">{{ firstName + " " + lastName }}</p>
-                        <p style="margin: 0; font-weight: normal; font-size: 13px">{{ formatDate(post.created_at) }}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="post-description">
-                    {{ post.description }}
-                  </div>
-                  <div class="d-flex align-items-center flex-column image-post">
-                    <img v-if="post.has_photo === 1" class="post-image" :src="backend + post.link">
-                  </div>
-                  <button v-show="post.vote === 0 || post.vote == null || post.vote === -1" class="btn btn-react"
-                          type="button" v-on:click="voteUp(post.id, index, 1)"><span
-                      class="material-icons">thumb_up_alt</span></button>
-                  <button v-show="post.vote === 1" class="btn btn-react" type="button"
-                          v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons"
-                                                                             style="color: blue;">thumb_up_alt</span>
-                  </button>
-                  <span>{{ post.votes }}</span>
-                  <button class="btn btn-react" type="button" v-on:click="gotToComments(post.id)"><span
-                      class="material-icons">insert_comment</span></button>
-                </div>
-              </div>
-              <div v-if="isProducer === 0 && isProducer!=null"  class="container-info sn p-3">
-                <img alt="logo_cos" class="logo d-flex align-items-center flex-column" src="../assets/Logo_cos.png">
-                <p v-if="isProducer === 0 && isProducer!=null" class="info-paragraph">Daca esti un producator local poti sa
-                  trimiti un formular pentru a primi gradul de producator pe aplicatie. Detinatorii acestui grad au
-                  posibilitatea sa posteze fotografii
-                  cu produsele agricole si sa poata primi recenzi de la alti utilizatori.
+          <div style="left: 9.65%" class="col-3 left-info">
+            <div id="profile">
+              <img v-if="user !== null" style="margin-top: 10px; margin-left: 10%" alt="profile image" class="profile-image"
+                   :src="backend + user.link_profile">
+              <div id="profile-info">
+                <p style="font-weight: bold; font-size: 14px; margin: 0;">Nume</p>
+                <p class="info">{{ firstName }}</p>
+                <p style="font-weight: bold; font-size: 14px; margin: 0;">Prenume</p>
+                <p class="info">{{ lastName }}</p>
+                <p style="font-weight: bold; font-size: 14px; margin: 0;">Email</p>
+                <p class="info">{{ email }}</p>
+                <p style="font-weight: bold; font-size: 14px; margin: 0;">Judet</p>
+                <p class="info">{{ judet }}</p>
+                <p style="font-weight: bold; font-size: 14px; margin: 0;">Data nasterii</p>
+                <p class="info">{{ formatDate(birthday) }}</p>
+                <p v-if="isProducer === 1" class="info">Producator atestat <img style="width:45px"
+                                                                                src="../assets/Logo.png"></p>
+                <p v-if="isProducer === 1 && fallowers > 0" class="info">Urmaritori <strong>{{ fallowers }}</strong>
                 </p>
               </div>
+              <button v-if="!fallowed && fallowed!=null && isProducer === 1 && visitorID !== id" style="width: 100%"
+                      class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste
+              </button>
+              <button v-if="fallowed && fallowed!=null && isProducer === 1 && visitorID !== id" style="width: 100%"
+                      class="btn btn-danger btn-sm" type="button" v-on:click="cancelFallow()">Nu mai urmari
+              </button>
+              <button v-if="visitorID !== id" class="btn btn-danger btn-sm" type="button"
+                      style="margin-top: 5px; width: 100%;" data-toggle="modal" data-target="#reportModal">Raporteaza
+                utilizatorul
+              </button>
+              <button v-if="isProducer === 1 && this.id !== this.visitorID"
+                      style="margin-bottom: 10px; margin-top: 5px; width: 100%;" type="button"
+                      class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalReview"
+                      v-on:click="show_MyReview">Scrie o recenzie producatorului
+              </button>
+              <div v-if="reviews!==null" class="review-form-users">
+                <div v-for="review in reviews" :key="review.id">
+                  <div class="row" style="margin-top: 5px">
+                    <div class="col-sm-1">
+                      <div class="user-info">
+                        <img v-if="review !== null" style="width: 50px; height: 50px;" class="profile-image"
+                             :src="backend + review.link_profile">
+                      </div>
+                    </div>
+                    <div class="col-9">
+                      <p style="margin-left: 25px; word-wrap: break-word; font-size: 12px;"><a style="color: black;
+                                   text-decoration: none; font-weight: bold" :href="'/profile/'+review.reviewer_id">{{
+                          review.firstName
+                        }}
+                        {{ review.lastName }}</a><br>{{ review.message }}
+                        <br><span v-for="n in review.rating" :key="n" style="font-size: 15px;" class="material-icons"
+                                  :id="'starRev'+ n">star_rate</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
+          <div id="posts" class="col-7">
+            <div v-for="(post, index) in userPosts" :key="post.id">
+              <div class="container-post sn p-3">
+                <div class="user-info">
+                  <div class="row">
+                    <div class="col-3">
+                      <img alt="user profile photo" class="user-info-img" :src="backend + user.link_profile">
+                    </div>
+                    <div class="col">
+                      <p style="margin: 0">{{ firstName + " " + lastName }}</p>
+                      <p style="margin: 0; font-weight: normal; font-size: 13px">{{ formatDate(post.created_at) }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="post-description">
+                  {{ post.description }}
+                </div>
+                <div class="d-flex align-items-center flex-column image-post">
+                  <img v-if="post.has_photo === 1" class="post-image" :src="backend + post.link">
+                </div>
+                <button v-show="post.vote === 0 || post.vote == null || post.vote === -1" class="btn btn-react"
+                        type="button" v-on:click="voteUp(post.id, index, 1)"><span
+                    class="material-icons">thumb_up_alt</span></button>
+                <button v-show="post.vote === 1" class="btn btn-react" type="button"
+                        v-on:click="cancelVoteUp(post.id, index, 0)"><span class="material-icons"
+                                                                           style="color: blue;">thumb_up_alt</span>
+                </button>
+                <span>{{ post.votes }}</span>
+                <button class="btn btn-react" type="button" v-on:click="gotToComments(post.id)"><span
+                    class="material-icons">insert_comment</span></button>
+              </div>
+            </div>
+            <div v-if="isProducer === 0 && isProducer!=null"  class="container-info sn p-3">
+              <img alt="logo_cos" class="logo d-flex align-items-center flex-column" src="../assets/Logo_cos.png">
+              <p v-if="isProducer === 0 && isProducer!=null" class="info-paragraph">Daca esti un producator local poti sa
+                trimiti un formular pentru a primi gradul de producator pe aplicatie. Detinatorii acestui grad au
+                posibilitatea sa posteze fotografii
+                cu produsele agricole si sa poata primi recenzi de la alti utilizatori.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
       <div v-if="invalidUser === true || isBanned === 1" class="container">

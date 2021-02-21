@@ -27,6 +27,7 @@
             <th scope="col">#</th>
             <th scope="col">Tipul</th>
             <th scope="col">Motivul</th>
+            <th scope="col">Data trimiterii</th>
             <th scope="col">Link</th>
             <th scope="col">Trimis de</th>
             <th scope="col">Actiune</th>
@@ -37,10 +38,16 @@
             <td>{{index}}</td>
             <td v-if="report.report_type === 1">Profil</td>
             <td v-if="report.report_type === 2">Postare</td>
-            <td>{{report.reason}}</td>
-            <td><a :href="report.link">{{report.link}}</a></td>
-            <td><button class="btn btn-secondary"><a  style="color: white; text-decoration: none;" :href="frontend + '/profile/' + report.sender_id">Vizualizare profil</a></button></td>
-            <td><button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#modalReport" v-on:click="actualReport(report.reported_id, report.id)">Raspunde</button></td>
+            <td style="width: 260px;"><p class="motiv" style="margin-bottom: -10px!important;">{{report.reason}}</p></td>
+            <td>{{formatDate(report.updated_at)}}</td>
+            <td v-if="report.report_type === 1"><a style="color: black; font-weight: bold;" :href="frontend+'/report/profile/'+report.link">{{report.reportedFName}} {{ report.reportedLName}}</a></td>
+            <td v-if="report.report_type === 2"><a style="color: black; font-weight: bold;" :href="frontend+'/report/post/'+report.link">{{report.reportedFName}} {{ report.reportedLName}}</a></td>
+            <td><a  style="color: black; text-decoration: none; font-weight: bold;" :href="frontend + '/profile/' + report.sender_id">{{report.senderFName}} {{report.senderLName}}</a></td>
+            <td>
+              <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Baneaza utilizatorul" style="margin-bottom: 10px;" type="button" class="btn btn-secondary btn-modal" v-on:click="confirm_ban(report.reported_id, report.id)"><span class="material-icons">do_disturb_on</span></button>
+              <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Acorda avertisment" style="margin-bottom: 10px;" type="button" class="btn btn-secondary btn-modal" v-on:click="confirm_warn(report.reported_id, report.id)"><span class="material-icons">warning_amber</span></button>
+              <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Inchide reclamatia fara a lua vreo masura" style="margin-bottom: 10px;" type="button" class="btn btn-secondary btn-modal" v-on:click="closeReport(report.id)"><span class="material-icons">beenhere</span></button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -89,27 +96,6 @@
         </div>
       </div>
     </div>
-    <!-- Modal -->
-    <div class="modal fade bd-example-modal-sm" id="modalReport" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalReportTitle"></h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div style="display: grid;" class="modal-body">
-            <button style="margin-bottom: 10px;" type="button" class="btn btn-secondary" v-on:click="confirm_ban">Interdictie</button>
-            <button style="margin-bottom: 10px;" type="button" class="btn btn-secondary" v-on:click="confirm_warn">Atentionare</button>
-            <button style="margin-bottom: 10px;" type="button" class="btn btn-secondary" v-on:click="closeReport(reportID)">Nimic gresit</button>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -118,6 +104,12 @@
   import axios from "axios";
   import {backend} from "@/constants";
   import {frontend} from "@/constants";
+
+  // eslint-disable-next-line no-undef
+  $(function(){
+    // eslint-disable-next-line no-undef
+    $('body').tooltip({ selector: '[data-toggle="tooltip"]' });
+  });
 
   export default{
     data(){
@@ -144,6 +136,11 @@
       })
     },
     methods:{
+      formatDate: function (date) {
+        let newDate = new Date(date);
+        let months = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'];
+        return newDate.getDate() + ' ' + months[newDate.getMonth()] + ' ' + newDate.getFullYear();
+      },
       warnUser: function(userID, reason, reportID){
         axios.post(backend +'/api/warnUser', {
           token: localStorage.getItem('token'),
@@ -165,8 +162,6 @@
       },
       closeReport: function(reportID){
         this.markSolved(reportID);
-        // eslint-disable-next-line no-undef
-        $('#modalReport').modal('hide');
         this.getReports();
       },
       markSolved: function(reportID){
@@ -210,22 +205,42 @@
       back: function(){
         this.$router.push('/admin');
       },
-      confirm_ban: function(){
-        // eslint-disable-next-line no-undef
-        $('#modalReport').modal('hide');
+      confirm_ban: function(reportedID, reportID){
+        this.actualUserId = reportedID;
+        this.reportID = reportID;
         // eslint-disable-next-line no-undef
         $('#modal-confirm-ban').modal('show');
       },
-      confirm_warn: function(){
-        // eslint-disable-next-line no-undef
-        $('#modalReport').modal('hide');
+      confirm_warn: function(reportedID, reportID){
+        this.actualUserId = reportedID;
+        this.reportID = reportID;
         // eslint-disable-next-line no-undef
         $('#modal-confirm-warn').modal('show');
-      },
-      actualReport: function(id, reportID){
-        this.actualUserId = id;
-        this.reportID = reportID;
       },
     },
   }
 </script>
+<style>
+.btn-modal {
+  margin-right: 10px;
+  background-color: transparent;
+  color: black;
+  border: none;
+  height: 30px;
+}
+
+.btn-modal:active, .btn-modal:focus{
+  outline: none!important;
+  box-shadow: none;
+}
+.btn-modal:hover{
+  background-color: transparent;
+  color: black;
+}
+.motiv {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+}
+</style>

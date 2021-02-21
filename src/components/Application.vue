@@ -38,6 +38,7 @@
               <li class="list-group-item">Numar certficat producator: {{ applicationDetails.nr_certificat }}</li>
               <li class="list-group-item">Primaria: {{ applicationDetails.primaria }}</li>
               <li class="list-group-item">Alte precizari: {{ applicationDetails.alte_precizari }}</li>
+              <li class="list-group-item">Data trimiterii: {{ formatDate(applicationDetails.updated_at) }}</li>
             </ul>
             <button style="width: 100%; margin-bottom: 5px; margin-top:5px;" type="button" class="btn btn-primary"
                     data-toggle="modal" data-target="#CImodal">Copie carte identitate
@@ -163,6 +164,11 @@ export default {
     //
   },
   methods: {
+    formatDate: function (date) {
+      let newDate = new Date(date);
+      let months = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'];
+      return newDate.getDate() + ' ' + months[newDate.getMonth()] + ' ' + newDate.getFullYear();
+    },
     rejectApplication: function () {
       if (this.motiv !== null && this.motiv !== '') {
         axios.post(backend + '/api/rejectApplication', {
@@ -228,9 +234,10 @@ export default {
   width: 250px;
   height: 250px;
 }
-
+.list-group li{
+  border: grey solid 1px;
+}
 .col {
   flex-grow: 0;
-
 }
 </style>

@@ -301,6 +301,8 @@ $(function(){
         userID: userID,
       }).then(() => {
         this.getUsers();
+        // eslint-disable-next-line no-undef
+        $('#adminPanel').tooltip('hide')
       }).catch((error) => {
         console.log(error)
       })

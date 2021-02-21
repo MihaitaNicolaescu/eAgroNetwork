@@ -40,6 +40,7 @@ Route::get('/localProducers', [UserController::class, 'localProducers']);
 //Raportare
 Route::post('/sendReport', [ReportController::class, 'sendReport']);
 Route::get('/getReports', [ReportController::class, 'getReports']);
+Route::get('/getReportsResponse', [ReportController::class, 'getReportsResponse']);//returneaza toate raportarile facute unei anumite postari / profil
 Route::post('/markSolved', [ReportController::class, 'markSolved']);
 
 //Notificari

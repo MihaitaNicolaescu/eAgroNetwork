@@ -183,7 +183,7 @@
         <div style="left: -3%;" class="col-2">
           <div class="recomandari">
             <p v-if="producers !== null && producers.length !== 0" style="text-align: center; font-weight: bold;">Topul producătorilor în funcție de urmăritori</p>
-            <ul v-if="producers !== null && producers.length !== 0" class="list-group list-group list-group-flush">
+            <ul v-if="producers !== null && producers.length !== 0" class="list-group list-group-flush">
               <li v-for="(producer, index) in producers" :key="producer.id" class="list-group-item list-group-item-dark list-group-flush">
                 <a class="producers-li" style="text-decoration: none; color: black" :href="'/profile/' + producer.id">
                   <div class="row" style="margin-top: 5px">
@@ -494,6 +494,7 @@ input {
 }
 .list-group-item-dark{
   background-color: #f8f9fa !important;
+  border-top: grey solid 1px;
 }
 
 .list-group-item-dark:hover{
