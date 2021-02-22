@@ -1,24 +1,27 @@
 <template>
   <div class="container-fluid">
     <div class="d-flex align-items-center flex-column">
-      <nav style="width: 1070px" v-if="post !== 'INVALID_POSTING'" class="navbar navbar-light bg-light">
+      <nav style="width: 1070px" class="navbar navbar-light bg-light">
         <a href="/"><img src="@/assets/Logo.png" alt="Logo" width="50px"></a>
       </nav>
     </div>
     <div class="container">
-      <div v-if="invalidPost === true && invalidPost !== null" class="container">
-        <p class="not-found">Postarea nu este gasita.</p>
-        <p class="go-home">Apasa <router-link :to="{path: '/'}">aici</router-link> pentru a te intoarce la pagina principala.</p>
+      <div style="background-color: #f8f9fa !important; height: 500px; margin-top: 50px; width: 1070px" v-if="invalidPost === true && invalidPost !== null && invalidReport === true" class="container">
+        <p class="not-found">Reclamatie invalida.</p>
+        <p class="go-home">Apasa
+          <router-link :to="{path: '/admin/reports'}">aici</router-link>
+          pentru a te intoarce la pagina cu reclamatii.
+        </p>
       </div>
     </div>
-    <div class="d-flex align-items-center flex-column">
+    <div v-if="invalidPost === false && invalidPost !== null && invalidReport === false && invalidReport !== null" class="d-flex align-items-center flex-column">
       <div class="row">
         <div class="col-5">
           <div class="container-reports">
             <div class="buttons-report d-inline" style="margin-left: 30%;">
-              <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Baneaza utilizatorul"  type="button" class="btn btn-secondary btn-modal" v-on:click="confirm_ban(reports[0].reported_id, reports[0].id)"><span class="material-icons">do_disturb_on</span></button>
-              <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Acorda avertisment"  type="button" class="btn btn-secondary btn-modal" v-on:click="confirm_warn(reports[0].reported_id, reports[0].id)"><span class="material-icons">warning_amber</span></button>
-              <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Inchide reclamatia fara a lua vreo masura" type="button" class="btn btn-secondary btn-modal" v-on:click="markSolved(reports[0].id)"><span class="material-icons">beenhere</span></button>
+              <button v-if="reports !== null" data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Baneaza utilizatorul"  type="button" class="btn btn-secondary btn-modal adminPanel" v-on:click="confirm_ban(reports[0].reported_id, reports[0].id)"><span class="material-icons">do_disturb_on</span></button>
+              <button v-if="reports !== null" data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Acorda avertisment"  type="button" class="btn btn-secondary btn-modal adminPanel" v-on:click="confirm_warn(reports[0].reported_id, reports[0].id)"><span class="material-icons">warning_amber</span></button>
+              <button v-if="reports !== null" data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Inchide reclamatia fara a lua vreo masura" type="button" class="btn btn-secondary btn-modal adminPanel" v-on:click="markSolved(reports[0].id)"><span class="material-icons">beenhere</span></button>
             </div>
             <div class="reports-msg">
               <ul class="list-group">
@@ -253,18 +256,39 @@ export default{
       post: null,
       comments: null,
       isAdmin: null,
-      backend: backend,
+      backend: backend, // adresa catre backend luata din fisierul cu constante
       reports: null,
       actualUserId: null,
       reason: '',
+      invalidReport: null,
+    }
+  },
+  watch:{
+    reports: function (){
+      if(this.reports.length === 0){
+        this.invalidPost = true;
+      }
     }
   },
   mounted() {
-    this.verifyToken();
-    this.getPost();
-    this.getComments();
-    this.getID();
-    this.getReports();
+    //verificarea userului pentru a se determina daca este un administrator valid
+    axios.get(backend + '/api/verifyData', {
+      params: {
+        token: localStorage.getItem('token'),
+      }
+    }).then((res) => {
+      localStorage.setItem('admin', res.data['isAdmin']);
+      if (res.data['isAdmin'] === 0) this.$router.push('/');
+      else{
+        this.verifyToken();
+        this.getPost();
+        this.getComments();
+        this.getID();
+        this.getReports();
+      }
+    }).catch(() => {
+      this.$router.push('/');
+    })
   },
   methods: {
     banUser: function(userID, reason, reportID){
@@ -273,11 +297,12 @@ export default{
         userID: userID,
         reason: reason,
       }).then(()=>{
-
         // eslint-disable-next-line no-undef
         $('#modal-confirm-ban').modal('hide');
         // eslint-disable-next-line no-undef
         $('#modal-ban-user').modal('show');
+        // eslint-disable-next-line no-undef
+        $('.adminPanel').tooltip('hide')
         this.markSolved(reportID)
         this.actualUserId = null;
         this.actualUserIndex = null;
@@ -301,6 +326,7 @@ export default{
         // eslint-disable-next-line no-undef
         $('#modal-confirm-warn').modal('hide');
         // eslint-disable-next-line no-undef
+        $('.adminPanel').tooltip('hide')
         this.markSolved(reportID)
         this.actualUserId = null;
         this.actualUserIndex = null;
@@ -321,6 +347,8 @@ export default{
         reportID: reportID,
       }).then(()=>{
         this.$router.push('/admin/reports');
+        // eslint-disable-next-line no-undef
+        $('.adminPanel').tooltip('hide')
       }).catch((error)=>{
         console.log(error);
       })
@@ -339,6 +367,8 @@ export default{
         }
       }).then((res)=>{
         this.reports = res.data['reports'];
+        if(this.reports.length === 0) this.invalidReport = true;
+        else this.invalidReport = false;
       }).catch((error)=>{
         console.log(error);
       })
@@ -446,6 +476,7 @@ export default{
         this.post = res.data['post'];
         if(this.post === "INVALID_POSTING") this.invalidPost = true;
         else this.invalidPost = false;
+
       }).catch((error)=>{
         console.log(error);
       })

@@ -107,6 +107,11 @@
                   cu produsele agricole si sa poata primi recenzi de la alti utilizatori.
                 </p>
               </div>
+              <div v-if="userPosts.length === 0 && userPosts!=null"  class="container-info sn p-3">
+                <img alt="logo_cos" class="logo d-flex align-items-center flex-column" src="../assets/Logo_cos.png">
+                <p v-if="userPosts.length === 0 && userPosts!=null" class="info-paragraph">Acest producator nu are momentan postari.
+                </p>
+              </div>
             </div>
         </div>
       </div>
@@ -563,8 +568,8 @@ h1 {
 
 /*Fonts from frontend server*/
 @font-face {
-  font-family: "NerkoOne";
-  src: url("../fonts/NerkoOne-Regular.ttf");
+  font-family: "SourceSansPro";
+  src: url("../fonts/SourceSansPro-Regular.ttf");
 }
 
 /*For invalid user*/
@@ -653,7 +658,7 @@ input {
 }
 
 .info-paragraph {
-  font-family: "NerkoOne", serif;
+  font-family: "SourceSansPro", serif;
   font-size: 30px;
   text-align: center;
 

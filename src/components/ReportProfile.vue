@@ -1,15 +1,51 @@
 <template>
-  <div class="container-fluid">
+  <div class="container-fluid background-fundal">
     <div class="d-flex align-items-center flex-column">
-      <nav style="width: 896px" v-if="invalidUser === false" class="navbar navbar-light bg-light">
+      <nav style="width: 1450px" v-if="invalidUser === false" class="navbar navbar-light bg-light">
         <a href="/"><img src="@/assets/Logo.png" alt="Logo" width="50px"></a>
       </nav>
     </div>
-    <div class="container">
+    <div style="background-color: #f8f9fa !important; height: 500px; margin-top: 100px;" v-if="invalidUser === true || isBanned === 1" class="container">
+      <p class="not-found">Reclamatie invalida.</p>
+      <p class="go-home">Apasa
+        <router-link :to="{path: '/admin/reports'}">aici</router-link>
+        pentru a te intoarce la pagina cu reclamatii.
+      </p>
+    </div>
+    <div style="margin-left: 10%; width: 100%" class="container">
       <div v-if="invalidUser === false && isBanned === 0" class="d-flex align-items-left flex-column"
            style="height: 100px;">
-        <div class="d-flex align-items-left">
-          <div style="left: 9.65%" class="col-3 left-info">
+        <div class="d-flex">
+          <div class="col-5">
+            <div class="container-reports">
+              <div class="buttons-report d-inline" style="margin-left: 30%;">
+                <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Baneaza utilizatorul"  type="button" class="btn btn-secondary btn-modal" v-on:click="confirm_ban(reports[0].reported_id, reports[0].id)"><span class="material-icons">do_disturb_on</span></button>
+                <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Acorda avertisment"  type="button" class="btn btn-secondary btn-modal" v-on:click="confirm_warn(reports[0].reported_id, reports[0].id)"><span class="material-icons">warning_amber</span></button>
+                <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Inchide reclamatia fara a lua vreo masura" type="button" class="btn btn-secondary btn-modal" v-on:click="markSolved(reports[0].id)"><span class="material-icons">beenhere</span></button>
+              </div>
+              <div class="reports-msg">
+                <ul class="list-group">
+                  <li v-for="(report, index) in reports" :key="index" class="list-group-item">
+                    <div style="margin: 0" class="row">
+                      <div class="col-1">
+                        <div style="margin-left: -25px;" class="user-info">
+                          <img style="width: 50px; height: 50px;" class="profile-image" :src="backend + report.senderProfile">
+                        </div>
+                      </div>
+                      <div style="margin-left: -10px;" class="col-7">
+                        <p style="margin-left: 20px; word-wrap: break-word;"><a  style="color: black; text-decoration: none; font-weight: bold" :href="'/profile/' + report.sender_id">{{ report.senderFName }} {{ report.senderLName }}</a></p>
+                        <p style="margin-left: 20px; margin-top: -15px; word-wrap: break-word; width: 160%;">{{ report.reason }}</p>
+                      </div>
+                      <div style="width: 105px;" class="col-4">
+                        <p style="font-size: 13px; width: 115%;">{{formatDate(report.updated_at)}}</p>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-3 left-info">
             <div id="profile">
               <img v-if="user !== null" style="margin-top: 10px; margin-left: 10%" alt="profile image" class="profile-image"
                    :src="backend + user.link_profile">
@@ -29,21 +65,6 @@
                 <p v-if="isProducer === 1 && fallowers > 0" class="info">Urmaritori <strong>{{ fallowers }}</strong>
                 </p>
               </div>
-              <button v-if="!fallowed && fallowed!=null && isProducer === 1 && visitorID !== id" style="width: 100%"
-                      class="btn btn-success btn-sm" type="button" v-on:click="fallow()">Urmareste
-              </button>
-              <button v-if="fallowed && fallowed!=null && isProducer === 1 && visitorID !== id" style="width: 100%"
-                      class="btn btn-danger btn-sm" type="button" v-on:click="cancelFallow()">Nu mai urmari
-              </button>
-              <button v-if="visitorID !== id" class="btn btn-danger btn-sm" type="button"
-                      style="margin-top: 5px; width: 100%;" data-toggle="modal" data-target="#reportModal">Raporteaza
-                utilizatorul
-              </button>
-              <button v-if="isProducer === 1 && this.id !== this.visitorID"
-                      style="margin-bottom: 10px; margin-top: 5px; width: 100%;" type="button"
-                      class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalReview"
-                      v-on:click="show_MyReview">Scrie o recenzie producatorului
-              </button>
               <div v-if="reviews!==null" class="review-form-users">
                 <div v-for="review in reviews" :key="review.id">
                   <div class="row" style="margin-top: 5px">
@@ -107,111 +128,11 @@
                 cu produsele agricole si sa poata primi recenzi de la alti utilizatori.
               </p>
             </div>
-          </div>
-        </div>
-      </div>
-      <div v-if="invalidUser === true || isBanned === 1" class="container">
-        <p class="not-found">Utilizator invalid.</p>
-        <p class="go-home">Apasa
-          <router-link :to="{path: '/'}">aici</router-link>
-          pentru a te intoarce la pagina principala.
-        </p>
-      </div>
-    </div>
-    <!-- Modal raportare -->
-    <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-         aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="reportModalTitle">Raportare utilizator</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <input v-model="reportReason" type="text" class="input-group-text" style="width: 100%; font-weight: normal"
-                   placeholder="Motivul raportari. Ex: Postari cu continut inadecvat." required>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuleaza</button>
-            <button type="button" class="btn btn-primary" v-on:click="sendReport">Trimite</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Modal pentru review -->
-    <div v-if="isProducer === 1" class="modal fade" id="modalReview" tabindex="-1" role="dialog"
-         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">Scrie un review</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="review">
-              <fieldset class="rating">
-                <input type="radio" v-model="stars" id="star5" name="rating" value="5"/><label class="full"
-                                                                                               for="star5"></label>
-                <input type="radio" v-model="stars" id="star4" name="rating" value="4"/><label class="full"
-                                                                                               for="star4"></label>
-                <input type="radio" v-model="stars" id="star3" name="rating" value="3"/><label class="full"
-                                                                                               for="star3"></label>
-                <input type="radio" v-model="stars" id="star2" name="rating" value="2"/><label class="full"
-                                                                                               for="star2"></label>
-                <input type="radio" v-model="stars" id="star1" name="rating" value="1"/><label class="full"
-                                                                                               for="star1"></label>
-              </fieldset>
-              <input v-model="review_text" type="text" class="form-control">
+            <div v-if="userPosts.length === 0 && userPosts!=null"  class="container-info sn p-3">
+              <img alt="logo_cos" class="logo d-flex align-items-center flex-column" src="../assets/Logo_cos.png">
+              <p v-if="userPosts.length === 0 && userPosts!=null" class="info-paragraph">Acest producator nu are momentan postari.
+              </p>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
-            <button class="btn btn-success btn-sm" v-on:click="sendReview">Trimite parerea</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Modal succes send raportare -->
-    <div class="modal fade" id="succesReportSend" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-         aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="reportSendModalTitle">Success</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Raportul a fost trimis cu succes, in scurt timp un administrator se va ocupa de acest lucru.</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Inchide</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal failed send raportare -->
-    <div class="modal fade" id="failedReportSend" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-         aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="reportFailedSendModalTitle">Success</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Am intampinat o problema la trimiterea sesizari tale, te rugam sa incerci mai tarziu, iti multumim!</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Inchide</button>
           </div>
         </div>
       </div>
@@ -226,6 +147,12 @@
 import axios from 'axios';
 import {backend} from '../constants.js';
 import alertBox from "@/components/templates/invalidToken";
+
+// eslint-disable-next-line no-undef
+$(function(){
+  // eslint-disable-next-line no-undef
+  $('body').tooltip({ selector: '[data-toggle="tooltip"]' });
+});
 
 export default {
   data() {
@@ -251,6 +178,9 @@ export default {
       backend: backend,
       fallowers: null,
       judet: '',
+      reports: null,
+      actualUserId: null,
+      reason: ''
     }
   },
   components: {
@@ -260,6 +190,7 @@ export default {
     await this.getUserInformations();
   },
   mounted() {
+
     this.verifyToken();
   },
   watch: {
@@ -267,33 +198,84 @@ export default {
       this.getUserPosts();
       this.getFallowed();
       this.getReviews();
+      this.getReports();
     }
   },
   methods: {
+    banUser: function(userID, reason, reportID){
+      axios.post(backend +'/api/banUser', {
+        token: localStorage.getItem('token'),
+        userID: userID,
+        reason: reason,
+      }).then(()=>{
+        // eslint-disable-next-line no-undef
+        $('#modal-confirm-ban').modal('hide');
+        // eslint-disable-next-line no-undef
+        $('#modal-ban-user').modal('show');
+        this.markSolved(reportID)
+        this.actualUserId = null;
+        this.actualUserIndex = null;
+        this.reason = '';
+      }).catch((error) => {
+        console.log(error)
+      })
+    },
+    confirm_ban: function(reportedID, reportID){
+      this.actualUserId = reportedID;
+      this.reportID = reportID;
+      // eslint-disable-next-line no-undef
+      $('#modal-confirm-ban').modal('show');
+    },
+    warnUser: function(userID, reason, reportID){
+      axios.post(backend +'/api/warnUser', {
+        token: localStorage.getItem('token'),
+        userID: userID,
+        reason: reason,
+      }).then(()=>{
+        // eslint-disable-next-line no-undef
+        $('#modal-confirm-warn').modal('hide');
+        // eslint-disable-next-line no-undef
+        this.markSolved(reportID)
+        this.actualUserId = null;
+        this.actualUserIndex = null;
+        this.reason = '';
+      }).catch((error) => {
+        console.log(error)
+      })
+    },
+    confirm_warn: function(reportedID, reportID){
+      this.actualUserId = reportedID;
+      this.reportID = reportID;
+      // eslint-disable-next-line no-undef
+      $('#modal-confirm-warn').modal('show');
+    },
+    markSolved: function(reportID){
+      axios.post(backend + '/api/markSolved',{
+        token: localStorage.getItem('token'),
+        reportID: reportID,
+      }).then(()=>{
+        this.$router.push('/admin/reports');
+      }).catch((error)=>{
+        console.log(error);
+      })
+    },
+    getReports: function(){
+      axios.get(backend+'/api/getReportsResponse',{
+        params:{
+          token: localStorage.getItem('token'),
+          forID: this.$route.params.id,
+          type: "PROFILE",
+        }
+      }).then((res)=>{
+        this.reports = res.data['reports'];
+      }).catch((error)=>{
+        console.log(error);
+      })
+    },
     formatDate: function (date) {
       let newDate = new Date(date);
       let months = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'];
       return newDate.getDate() + ' ' + months[newDate.getMonth()] + ' ' + newDate.getFullYear();
-    },
-    show_MyReview: function () {
-      this.getMyReview()
-      // eslint-disable-next-line no-undef
-      $('#modalReview').modal('show');
-    },
-    getMyReview: function () {
-      axios.get(backend + '/api/getMyReview', {
-        params: {
-          token: localStorage.getItem('token'),
-          userID: this.visitorID,
-          userPageID: this.id,
-        }
-      }).then((res) => {
-        this.myReview = res.data['review'];
-        this.stars = this.myReview.rating;
-        this.review_text = this.myReview.message;
-      }).catch((error) => {
-        console.log(error);
-      })
     },
     getReviews: function () {
       axios.get(backend + '/api/getReviews', {
@@ -306,24 +288,6 @@ export default {
       }).catch((error) => {
         console.log(error);
       })
-    },
-    sendReview: function () {
-      if (this.stars !== null) {
-        axios.post(backend + '/api/sendReview', {
-          token: localStorage.getItem('token'),
-          scor: this.stars,
-          message: this.review_text,
-          for: this.id,
-        }).then(() => {
-          //this.getReviews(this.id);
-          this.review_text = '';
-          // eslint-disable-next-line no-undef
-          $('#modalReview').modal('hide');
-          this.getReviews();
-        }).catch((error) => {
-          console.log(error);
-        })
-      }
     },
     gotToComments: function (postID) {
       this.$router.push('/post/' + postID);
@@ -517,11 +481,6 @@ h1 {
 
 /****** Style Star Rating Widget *****/
 
-.rating {
-  border: none;
-  float: left;
-}
-
 #profile-info {
   word-wrap: break-word;
   margin: 0;
@@ -563,8 +522,8 @@ h1 {
 
 /*Fonts from frontend server*/
 @font-face {
-  font-family: "NerkoOne";
-  src: url("../fonts/NerkoOne-Regular.ttf");
+  font-family: "SourceSansPro";
+  src: url("../fonts/SourceSansPro-Regular.ttf");
 }
 
 /*For invalid user*/
@@ -601,7 +560,7 @@ h1 {
   overflow: scroll;
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
-  height: 228px;
+  height: 328px;
 }
 
 ::-webkit-scrollbar {
@@ -618,7 +577,7 @@ h1 {
 
 .left-info {
   background-color: #f8f9fa !important;
-  left: 9.6%;
+  left: 5%;
   margin-top: 10px;
 }
 
@@ -627,12 +586,6 @@ input {
   border: none;
   border-bottom: 2px solid #1b941d;
 }
-
-.form-control:focus {
-  border-color: #b5b1c4;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(35, 196, 38, 0.5);
-}
-
 
 .form-control:focus + .form-control-placeholder,
 .form-control:valid + .form-control-placeholder {
@@ -653,7 +606,7 @@ input {
 }
 
 .info-paragraph {
-  font-family: "NerkoOne", serif;
+  font-family: "SourceSansPro", serif;
   font-size: 30px;
   text-align: center;
 
@@ -683,7 +636,6 @@ input {
   height: auto;
   padding: 10px;
   margin-top: 10px;
-
 }
 
 .user-info-img {
@@ -697,12 +649,6 @@ input {
   display: none;
 }
 
-.btn-profile {
-  width: 100%;
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
 .info {
   margin: 0;
   font-size: 18px;
@@ -711,11 +657,6 @@ input {
 #profile {
   font-size: 20px;
   padding-top: 2px;
-}
-
-.form-control {
-  font-size: 20px !important;
-  font-weight: bold;
 }
 
 .profile-image {
@@ -738,10 +679,50 @@ input {
   margin-right: auto;
 }
 
-.container-fluid {
+.background-fundal {
   background-image: url('../assets/background.png');
   background-repeat: no-repeat;
   background-size: cover;
   height: 100vh;
+}
+
+.container-reports{
+  background-color: #f8f9fa !important;
+  width: 450px;
+  height: 100%;
+  padding-left: 15px;
+  margin-top: 10px;
+}
+.btn-modal {
+  margin-right: 10px;
+  background-color: transparent;
+  color: black;
+  border: none;
+  margin-top: 10px;
+}
+
+.btn-modal:active, .btn-modal:focus{
+  outline: none!important;
+  box-shadow: none;
+}
+.btn-modal:hover{
+  background-color: transparent;
+  color: black;
+}
+
+.list-group li{
+  border: gray solid 1px;
+}
+.list-group{
+  margin-top: 20px;
+  width: 96%;
+}
+
+.reports-msg{
+  height:90%;
+  overflow: hidden;
+  overflow-y: scroll;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 </style>
