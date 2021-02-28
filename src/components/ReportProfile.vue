@@ -190,8 +190,21 @@ export default {
     await this.getUserInformations();
   },
   mounted() {
-
-    this.verifyToken();
+    //verificarea userului pentru a se determina daca este un administrator valid
+    axios.get(backend + '/api/verifyData', {
+      params: {
+        token: localStorage.getItem('token'),
+      }
+    }).then((res) => {
+      localStorage.setItem('admin', res.data['isAdmin']);
+      if (res.data['isAdmin'] === 0) this.$router.push('/*');
+      else{
+        this.verifyToken();
+        this.getID();
+      }
+    }).catch(() => {
+      this.$router.push('/*');
+    })
   },
   watch: {
     id: function () {

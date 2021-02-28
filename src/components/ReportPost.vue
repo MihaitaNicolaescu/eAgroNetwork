@@ -278,7 +278,7 @@ export default{
       }
     }).then((res) => {
       localStorage.setItem('admin', res.data['isAdmin']);
-      if (res.data['isAdmin'] === 0) this.$router.push('/');
+      if (res.data['isAdmin'] === 0) this.$router.push('/*');
       else{
         this.verifyToken();
         this.getPost();
@@ -287,7 +287,7 @@ export default{
         this.getReports();
       }
     }).catch(() => {
-      this.$router.push('/');
+      this.$router.push('/*');
     })
   },
   methods: {

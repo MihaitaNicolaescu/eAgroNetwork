@@ -11,7 +11,7 @@
       </p>
     </div>
     <div v-if="applicationDetails!=null">
-      <div style="margin-top: 20px;" class="container">
+      <div style="margin-top: 20px; background-color: #f8f9fa; height: 80%;" class="container">
         <div class="row">
           <div class="col">
             <img alt="profile image" class="profile-image" :src="backend + applicationDetails.link_profile">
