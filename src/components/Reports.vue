@@ -19,8 +19,8 @@
     <div v-if="reports !== null && reports.length === 0">
       <h2>Momentan nu sunt raportari.</h2>
     </div>
-    <div v-if="reports != null && reports.length">
-      <h2>Momentan sunt {{reports.length}} sesizari in asteptare.</h2>
+    <div v-if="numberOfReports != null && numberOfReports">
+      <h2>Momentan sunt {{numberOfReports}} sesizari in asteptare.</h2>
       <table style="margin-top: 20px;" class="table table-bordered">
         <thead class="thead-light">
           <tr>
@@ -51,6 +51,11 @@
           </tr>
         </tbody>
       </table>
+    </div>
+    <div class="pagination d-flex justify-content-center">
+      <button id="btn-prev" data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Pagina anterioara" class="btn btn-outline-secondary pagination-button" v-on:click="fetchPaginateUsers(pagination.prev_page)" :disabled="!pagination.prev_page"><span class="material-icons">undo</span></button>
+      <span>Page {{ pagination.current_page }} of {{ pagination.last_page }}</span>
+      <button id="btn-next" data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Pagina urmatoare" class="btn btn-outline-secondary pagination-button" v-on:click="fetchPaginateUsers(pagination.next_page)" :disabled="!pagination.next_page"><span class="material-icons">redo</span></button>
     </div>
     <!-- Modal confirm ban user -->
     <div class="modal fade" id="modal-confirm-ban" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -114,11 +119,14 @@
   export default{
     data(){
       return{
+        url: backend + '/api/admin/reports',
         reports: null,
         actualUserId: null,
         reason: '',
         reportID: null,
         frontend: frontend,
+        pagination: [],
+        numberOfReports: null,
       }
     },
     mounted() {
@@ -175,12 +183,34 @@
         })
       },
       getReports: function(){
-        axios.get(backend +'/api/getReports',{
+        axios.get(this.url,{
+          params:{
+            token: localStorage.getItem('token'),
+          }
         }).then((res)=>{
-          this.reports = res.data['reports'];
+          this.reports = res.data.data;
+          this.makePagination(res.data);
         }).catch((error)=>{
           console.log(error);
         })
+      },
+      makePagination(data) { // realizarea link-urilor pentru paginare
+        let pagination = {
+          current_page: data.current_page,
+          last_page: data.last_page,
+          next_page: data.next_page_url,
+          prev_page: data.prev_page_url
+        };
+        this.numberOfReports = data.total;
+        this.pagination = pagination;
+      },
+      fetchPaginateUsers(url) { // generarea urmatoarelor pagini pentru "next" sau "prev" si incarcarea userilor de pe o anumita pagina
+        this.url = url;
+        // eslint-disable-next-line no-undef
+        $('#btn-next').tooltip('hide')
+        // eslint-disable-next-line no-undef
+        $('#btn-prev').tooltip('hide')
+        this.getReports();
       },
       banUser: function(userID, reason, reportID){
         axios.post(backend +'/api/banUser', {
@@ -242,5 +272,19 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 250px;
+}
+.pagination-button{
+  background-color: transparent;
+  color: black;
+  font-size: 20px;
+  border: none;
+}
+.pagination-button:active, .pagination-button:focus{
+  outline: none!important;
+  box-shadow: none;
+}
+.pagination-button:hover{
+  background-color: transparent;
+  color: black;
 }
 </style>

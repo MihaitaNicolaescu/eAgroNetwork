@@ -16,7 +16,7 @@
       <div v-if="invalidUser === false && isBanned === 0" class="d-flex align-items-left flex-column"
            style="height: 100px;">
         <div class="d-flex">
-          <div class="col-5">
+          <div style="height: 900px;" class="col-5">
             <div class="container-reports">
               <div class="buttons-report d-inline" style="margin-left: 30%;">
                 <button data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Baneaza utilizatorul"  type="button" class="btn btn-secondary btn-modal" v-on:click="confirm_ban(reports[0].reported_id, reports[0].id)"><span class="material-icons">do_disturb_on</span></button>

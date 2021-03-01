@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Aplication;
+use App\Models\Report;
 use App\Models\Review;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Product;
+use Illuminate\Support\Facades\DB;
 use Spatie\Searchable\Search;
 
 class DetailsController extends Controller
@@ -27,6 +30,34 @@ class DetailsController extends Controller
                 $users = User::where('firstName', 'like', '%' . $request->searchedUser . '%')->orWhere('lastName', 'like', '%' . $request->searchedUser . '%')->orWhere('email', 'like', '%' . $request->searchedUser . '%')->paginate(10);
                 return response()->json($users, 200);
             }
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function paginationReports(Request $request)
+    {//functie pentru paginare
+        try {
+            $reports = DB::table('reports')->leftJoin('users as reported', function($join){
+                $join->on('reports.reported_id', '=', 'reported.id');
+            })->leftJoin('users as sender', function($join2){
+                $join2->on('reports.sender_id', '=', 'sender.id');
+            })->select('reports.updated_at', 'reports.reported_id', 'reports.sender_id', 'reports.reason', 'reports.report_type'
+                ,'reports.link', 'sender.firstName as senderFName', 'sender.lastName as senderLName', 'reported.firstName as reportedFName',
+                'reported.lastName as reportedLName', 'reports.id')->where('reports.solved', '=', 0)->paginate(10);
+            return response()->json($reports, 200);
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    public function paginationApplications(Request $request)
+    {//functie pentru paginare
+        try {
+            $usersList = Aplication::select('user_id')->where('pending', '=', 1)->get();
+            $usersList = $usersList->pluck('user_id')->toArray();
+            $result = User::whereIn('id',  $usersList)->paginate(10);
+
+            return response()->json($result, 200);
         } catch (Exception $e) {
             return $e->getMessage();
         }

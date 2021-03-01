@@ -53,6 +53,8 @@ Route::get('/user/search', [DetailsController::class, 'search']);
 
 //Admins
 Route::get('/admin/users', [DetailsController::class, 'pagination']);
+Route::get('/admin/reports', [DetailsController::class, 'paginationReports']);
+Route::get('/admin/applications', [DetailsController::class, 'paginationApplications']);
 Route::post('/admin/delete', [DetailsController::class, 'deleteUser']);
 
 //Check data

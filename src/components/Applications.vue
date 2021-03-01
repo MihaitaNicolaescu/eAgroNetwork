@@ -38,10 +38,15 @@
           <td>{{ aplicant.firstName }}</td>
           <td>{{ aplicant.lastName }}</td>
           <td>{{ aplicant.email }}</td>
-          <td><button class="btn btn-secondary" type="button" v-on:click="viewApplicaiton(aplicant.id)">Vizualizare aplicatie</button></td>
+          <td><button class="btn btn-secondary btn-sm" type="button" v-on:click="viewApplicaiton(aplicant.id)">Vizualizare aplicatie</button></td>
         </tr>
         </tbody>
       </table>
+      <div class="pagination d-flex justify-content-center">
+        <button id="btn-prev" data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Pagina anterioara" class="btn btn-outline-secondary pagination-button" v-on:click="fetchPaginateUsers(pagination.prev_page)" :disabled="!pagination.prev_page"><span class="material-icons">undo</span></button>
+        <span>Page {{ pagination.current_page }} of {{ pagination.last_page }}</span>
+        <button id="btn-next" data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="Pagina urmatoare" class="btn btn-outline-secondary pagination-button" v-on:click="fetchPaginateUsers(pagination.next_page)" :disabled="!pagination.next_page"><span class="material-icons">redo</span></button>
+      </div>
     </div>
   </div>
 </template>
@@ -49,12 +54,17 @@
 <script>
   import axios from "axios";
   import {backend} from "@/constants";
-
+  // eslint-disable-next-line no-undef
+  $(function(){
+    // eslint-disable-next-line no-undef
+    $('body').tooltip({ selector: '[data-toggle="tooltip"]' });
+  });
   export default{
     data(){
       return{
         applications: null,
-
+        pagination: [],
+        url: backend + '/api/admin/applications',
       }
     },
     mounted(){
@@ -79,15 +89,33 @@
           this.$router.push('/admin/applications/'+id)
       },
       getApplications: function(){
-        axios.get(backend+'/api/getApplications', {
+        axios.get(this.url, {
           params:{
             token: localStorage.getItem('token'),
           }
         }).then((response)=>{
-          this.applications = response.data['users']
+          this.applications = response.data.data;
+          this.makePagination(response.data);
         }).catch((e)=>{
           console.log(e)
         })
+      },
+      makePagination(data) { // realizarea link-urilor pentru paginare
+        let pagination = {
+          current_page: data.current_page,
+          last_page: data.last_page,
+          next_page: data.next_page_url,
+          prev_page: data.prev_page_url
+        };
+        this.pagination = pagination;
+      },
+      fetchPaginateUsers(url) { // generarea urmatoarelor pagini pentru "next" sau "prev" si incarcarea userilor de pe o anumita pagina
+        this.url = url;
+        // eslint-disable-next-line no-undef
+        $('#btn-next').tooltip('hide')
+        // eslint-disable-next-line no-undef
+        $('#btn-prev').tooltip('hide')
+        this.getUsers();
       }
     }
   }
@@ -96,5 +124,19 @@
 <style scoped>
   h2{
     text-align: center;
+  }
+  .pagination-button{
+    background-color: transparent;
+    color: black;
+    font-size: 20px;
+    border: none;
+  }
+  .pagination-button:active, .pagination-button:focus{
+    outline: none!important;
+    box-shadow: none;
+  }
+  .pagination-button:hover{
+    background-color: transparent;
+    color: black;
   }
 </style>
