@@ -202,7 +202,8 @@ export default {
         this.verifyToken();
         this.getID();
       }
-    }).catch(() => {
+    }).catch((error) => {
+      console.log(error);
       this.$router.push('/*');
     })
   },
@@ -215,6 +216,20 @@ export default {
     }
   },
   methods: {
+    getID: function(){
+      const sendGetRequest = async() => {
+        try{
+          const response = await axios.get(backend + '/api/fetchUserData', {
+            params: {
+              token: localStorage.getItem('token'),
+            }});
+          this.id = response.data['id'];
+        }catch(error){
+          console.log(error);
+        }
+      }
+      sendGetRequest();
+    },
     banUser: function(userID, reason, reportID){
       axios.post(backend +'/api/banUser', {
         token: localStorage.getItem('token'),
